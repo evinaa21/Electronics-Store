@@ -13,7 +13,7 @@ public class Cashier extends User {
 	private ArrayList<Bill> bills;  
 	private double totalSales; 
 	
-	public Cashier(int id, String name, double salary, Role role, String username, String password, 
+	public Cashier(String name, double salary, Role role, String username, String password, 
 			Date dateOfBirth, long phonenumber, String email, Sector sector) {
 		super(name, salary, role, username, password, dateOfBirth, phonenumber, email);
 		this.sector = sector;
