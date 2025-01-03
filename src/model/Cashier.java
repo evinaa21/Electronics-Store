@@ -15,7 +15,7 @@ public class Cashier extends User {
 	
 	public Cashier(int id, String name, double salary, Role role, String username, String password, 
 			Date dateOfBirth, long phonenumber, String email, Sector sector) {
-		super(id, name, salary, role, username, password, dateOfBirth, phonenumber, email);
+		super(name, salary, role, username, password, dateOfBirth, phonenumber, email);
 		this.sector = sector;
 		this.bills = new ArrayList<>();
 		this.totalSales = 0.0;
