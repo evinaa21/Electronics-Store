@@ -1,40 +1,43 @@
 package model;
 
+import javafx.scene.image.Image;
+
 public class Item {
     private String itemName;
-    private String itemCategory;
+    private String itemSector;
     private double price;
     private int stockQuantity;
     private int itemsSold;
     private int itemQuantity;
+    private Image image;
 
-    //Constructor called by Manager
+    // Constructor for Manager
     public Item(String itemName, String itemCategory, double price, int stockQuantity) {
         this.itemName = itemName;
-        this.itemCategory = itemCategory;
+        this.itemSector = itemCategory;
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.itemsSold = 0;
-        this.itemQuantity = 0;
+        this.itemQuantity = stockQuantity;
     }
-    
-    //Constructor called by Cashier
+
+    // Constructor for Cashier
     public Item(String itemName, String itemCategory, double price, int stockQuantity, int itemsSold, int itemQuantity) {
-    	this.itemName = itemName;
-    	this.itemCategory = itemCategory;
-    	this.price = price;
-    	this.stockQuantity = stockQuantity;
-    	this.itemsSold = itemsSold;
-    	this.itemQuantity = itemQuantity;
+        this.itemName = itemName;
+        this.itemSector = itemCategory;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
+        this.itemsSold = itemsSold;
+        this.itemQuantity = itemQuantity;
     }
-    
-    //Get and set quantity for bill only
+
+    // Getters and Setters
     public void setItemQuantity(int itemQuantity) {
-    	this.itemQuantity = itemQuantity;
+        this.itemQuantity = itemQuantity;
     }
-    
+
     public int getItemQuantity() {
-    	return itemQuantity;
+        return itemQuantity;
     }
 
     public void sellItem(int quantity) {
@@ -47,34 +50,28 @@ public class Item {
     }
 
     public void restockItem(int quantity) {
-        stockQuantity += quantity;
+this.itemQuantity += quantity;
     }
-    
-    public void updateStock(int quantity) {
-		if(stockQuantity + quantity < 0) {
-			throw new IllegalArgumentException("Insufficient stock to reduce by: " + quantity);
-		}
-		stockQuantity += quantity;
-	}
-    
+  
+
     public boolean hasSufficientStock(int requestedQuantity) {
-    	return stockQuantity >= requestedQuantity;
+        return stockQuantity >= requestedQuantity;
     }
-    
+
     public double getSellingPrice() {
-		return this.price;
-	}
+        return this.price;
+    }
 
     public String getItemName() {
         return itemName;
     }
 
-    public String getItemCategory() {
-        return itemCategory;
+    public String getItemSector() {
+        return itemSector;
     }
 
-    public void setItemCategory(String itemCategory) {
-        this.itemCategory = itemCategory;
+    public void setItemSector(String itemSector) {
+        this.itemSector = itemSector;
     }
 
     public double getPrice() {
@@ -88,15 +85,22 @@ public class Item {
     public int getItemsSold() {
         return itemsSold;
     }
+
+    public void setImage(Image image) {
+        this.image = image;
+    }
+
+    public Image getImage() {
+        return image;
+    }
+
     @Override
-public String toString() {
-    return "Item->" +
-            "Name:'" + itemName + '\'' +
-            ", Category:'" + itemCategory + '\'' +
-            ", Price:" + price +
-            ", Stock:" + stockQuantity +
-            ", Items Sold:" + itemsSold;
+    public String toString() {
+        return "Item->" +
+                "Name:'" + itemName + '\'' +
+                ", Category:'" + itemSector + '\'' +
+                ", Price:" + price +
+                ", Stock:" + stockQuantity +
+                ", Items Sold:" + itemsSold;
+    }
 }
-
-}
-

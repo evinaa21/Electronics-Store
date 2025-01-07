@@ -41,7 +41,7 @@ public class ViewSectorsController {
     // Open the ViewSectorsView to display existing sectors
     private void openViewSectorsView() {
         // Create an instance of ViewSectorsView with the manager
-        ViewSectorsView viewSectorsView = new ViewSectorsView(manager);
+        ViewSectorsView viewSectorsView = new ViewSectorsView(manager, primaryStage);
         viewSectorsView.showViewSectorsView(); // Show the sectors view
     }
 
