@@ -5,7 +5,7 @@ import java.util.Date;
 import util.Role;
 
 public class Manager extends User {
-    private ArrayList<Sector> sectors;
+    private ArrayList<Sector> sectors;  // Sectors used instead of categories
     private ArrayList<Supplier> suppliers;
     private ArrayList<Item> items;
     private SalesMetrics salesMetrics;
@@ -28,6 +28,35 @@ public class Manager extends User {
         this.salesMetrics = new SalesMetrics();
     }
 
+    // Add a new sector to the list of sectors
+    public void addSector(String sectorName) {
+        if (sectorName != null && !sectorName.trim().isEmpty()) {
+            // Ensure the sector is unique before adding
+            boolean exists = false;
+            for (Sector sector : sectors) {
+                if (sector.getName().equalsIgnoreCase(sectorName)) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                sectors.add(new Sector(sectorName)); // Assuming Sector class accepts a sector name
+                System.out.println("Sector added: " + sectorName);
+            } else {
+                System.out.println("Sector already exists: " + sectorName);
+            }
+        }
+    }
+    // View the sectors in the manager's list
+    public ArrayList<String> viewSector() {
+        ArrayList<String> sectorNames = new ArrayList<>();
+        for (Sector sector : sectors) {
+            sectorNames.add(sector.getName());  // Assuming Sector class has a getName() method
+        }
+        return sectorNames;
+    }
+
+    // Add a new item
     public void addNewItem(Item item) {
         if (item != null) {
             items.add(item);
@@ -35,6 +64,7 @@ public class Manager extends User {
         }
     }
 
+    // Restock an item
     public void restockItem(Item item, int quantity) {
         if (item != null && quantity > 0) {
             item.restockItem(quantity);
@@ -42,6 +72,7 @@ public class Manager extends User {
         }
     }
 
+    // Generate sales report
     public String generateSalesReport(String timePeriod) {
         salesMetrics.setTimePeriod(timePeriod);
         salesMetrics.calculateMetrics(items);
@@ -50,6 +81,7 @@ public class Manager extends User {
                "Total Items Sold: " + salesMetrics.getTotalItemsSold();
     }
 
+    // Notify for restocks
     public void notifyRestockNeeded() {
         for (Item item : items) {
             if (item.getStockQuantity() < 5) {
@@ -58,17 +90,7 @@ public class Manager extends User {
         }
     }
 
-    public ArrayList<String> viewItemCategories() {
-        ArrayList<String> categories = new ArrayList<>();
-        for (Item item : items) {
-            if (!categories.contains(item.getItemCategory())) {
-                categories.add(item.getItemCategory());
-            }
-        }
-        return categories;
-    }
-
-    // Getters and Setters
+    // Getter and Setter methods
     public ArrayList<Sector> getSectors() {
         return sectors;
     }
@@ -101,3 +123,4 @@ public class Manager extends User {
         this.salesMetrics = salesMetrics;
     }
 }
+

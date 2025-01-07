@@ -73,6 +73,10 @@ public class Item {
         return itemCategory;
     }
 
+    public void setItemCategory(String itemCategory) {
+        this.itemCategory = itemCategory;
+    }
+
     public double getPrice() {
         return price;
     }
@@ -86,13 +90,12 @@ public class Item {
     }
     @Override
 public String toString() {
-    return "Item{" +
-            "Name='" + itemName + '\'' +
-            ", Category='" + itemCategory + '\'' +
-            ", Price=" + price +
-            ", Stock=" + stockQuantity +
-            ", Items Sold=" + itemsSold +
-            '}';
+    return "Item->" +
+            "Name:'" + itemName + '\'' +
+            ", Category:'" + itemCategory + '\'' +
+            ", Price:" + price +
+            ", Stock:" + stockQuantity +
+            ", Items Sold:" + itemsSold;
 }
 
 }

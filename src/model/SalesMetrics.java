@@ -33,7 +33,7 @@ public class SalesMetrics {
         }
     }
 
-    // Record a bill and associate it with a cashier
+    // Record a bill 
     public void recordBill(String cashierName, Bill bill) {
         bills.add(bill);
         if (!cashiers.contains(cashierName)) {
