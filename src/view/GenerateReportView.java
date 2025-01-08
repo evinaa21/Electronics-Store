@@ -19,47 +19,50 @@ public class GenerateReportView {
     public void showGenerateReportView() {
         Stage reportStage = new Stage();
 
-        // Create a title for the report window
+        // Create a title for the report window with refined style
         Label titleLabel = new Label("Generate Sales Report");
-        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        titleLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
-        // Select time period
+        // Select time period with improved styling
         Label timePeriodLabel = new Label("Select Time Period:");
         ComboBox<String> timePeriodCombo = new ComboBox<>();
         timePeriodCombo.getItems().addAll("Last 7 Days", "Last Month", "Custom");
         timePeriodCombo.setValue("Last 7 Days");
-        timePeriodLabel.setStyle("-fx-font-size: 14px;");
+        timePeriodLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #34495e;");
 
-        // Report display area
+        // Report display area with refined style
         TextArea reportArea = new TextArea();
         reportArea.setEditable(false);
-        reportArea.setStyle("-fx-font-size: 14px; -fx-padding: 10px;");
+        reportArea.setStyle("-fx-font-size: 14px; -fx-padding: 10px; -fx-background-color: #ecf0f1; -fx-border-radius: 5px;");
         reportArea.setPrefHeight(120); // Limit height to fit nicely in the window
+        reportArea.setWrapText(true);
 
-        // Generate Button
+        // Generate Button with chic style
         Button generateButton = new Button("Generate Report");
-        generateButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;");
-        generateButton.setPrefWidth(150);
+        generateButton.setStyle("-fx-background-color: linear-gradient(to bottom, #3498db, #2980b9); "
+                + "-fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-border-radius: 30px;");
+        generateButton.setPrefWidth(180);
         generateButton.setOnAction(event -> {
             String timePeriod = timePeriodCombo.getValue();
             String report = generateSalesReport(timePeriod); // Generate the report based on the time period
             reportArea.setText(report); // Display the report in the TextArea
         });
 
-        // Back Button
+        // Back Button with classy style
         Button backButton = new Button("Back");
-        backButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold;");
-        backButton.setPrefWidth(150);
+        backButton.setStyle("-fx-background-color: linear-gradient(to bottom, #e74c3c, #c0392b); "
+                + "-fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10px 20px; -fx-border-radius: 30px;");
+        backButton.setPrefWidth(180);
         backButton.setOnAction(e -> goBackToPreviousWindow(reportStage));
 
-        // Layout container
+        // Layout container with some spacing
         VBox layout = new VBox(20, titleLabel, timePeriodLabel, timePeriodCombo, generateButton, reportArea, backButton);
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.CENTER);
-        layout.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #c0c0c0; -fx-border-width: 2px;");
+        layout.setStyle("-fx-background-color: #ffffff; -fx-border-radius: 10px; -fx-shadow: 0 0 20px rgba(0, 0, 0, 0.1);");
 
-        // Scene and stage setup
-        Scene scene = new Scene(layout, 400, 350);
+        // Scene and stage setup with refined size
+        Scene scene = new Scene(layout, 450, 400);
         reportStage.setTitle("Generate Sales Report");
         reportStage.setScene(scene);
         reportStage.show();

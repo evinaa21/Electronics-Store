@@ -3,6 +3,7 @@ package view;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -10,7 +11,6 @@ import javafx.geometry.Pos;
 import javafx.stage.Stage;
 import model.Item;
 import model.Manager;
-import javafx.scene.control.ComboBox;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,7 +32,7 @@ public class RestockItemView {
 
         // Create label and combo box for selecting an item to restock
         Label itemLabel = new Label("Select Item to Restock:");
-        itemLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+        itemLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333333;");
         ComboBox<String> itemComboBox = new ComboBox<>();
         styleComboBox(itemComboBox);
 
@@ -55,7 +55,7 @@ public class RestockItemView {
 
         // Create a quantity input field and button
         Label quantityLabel = new Label("Restock Quantity:");
-        quantityLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+        quantityLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333333;");
         TextField quantityField = new TextField();
         styleTextField(quantityField);
 
@@ -92,7 +92,7 @@ public class RestockItemView {
         // Layout with buttons and fields
         VBox layout = new VBox(20); // Increased spacing between elements for better alignment
         layout.setAlignment(Pos.CENTER); // Center all components in the window
-        layout.setStyle("-fx-background-color: #f2f2f2; -fx-padding: 20px; -fx-border-radius: 10px;");
+        layout.setStyle("-fx-background-color: #f8f8f8; -fx-padding: 30px; -fx-border-radius: 15px;");
 
         layout.getChildren().addAll(itemLabel, itemComboBox, quantityLabel, quantityField, restockButton, backButton);
         
@@ -101,7 +101,7 @@ public class RestockItemView {
         styleButton(backButton);
 
         // Scene setup with layout and dimensions
-        Scene scene = new Scene(layout, 400, 350);
+        Scene scene = new Scene(layout, 450, 400);
         restockItemStage.setTitle("Restock Item");
         restockItemStage.setScene(scene);
         restockItemStage.show();
@@ -130,25 +130,25 @@ public class RestockItemView {
 
     // Method to style buttons uniformly with hover effect
     private void styleButton(Button button) {
-        button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-padding: 10px;");
-        button.setPrefWidth(200);
-        button.setMaxHeight(40);
-        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #45a049; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-padding: 10px;"));
-        button.setOnMouseExited(e -> button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-padding: 10px;"));
+        button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-border-radius: 10px; -fx-padding: 15px;");
+        button.setPrefWidth(220);
+        button.setMaxHeight(45);
+        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #45a049; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-border-radius: 10px; -fx-padding: 15px;"));
+        button.setOnMouseExited(e -> button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-border-radius: 10px; -fx-padding: 15px;"));
     }
 
     // Method to style combo box
     private void styleComboBox(ComboBox<String> comboBox) {
-        comboBox.setStyle("-fx-font-size: 14px; -fx-background-color: #ffffff; -fx-border-radius: 5px; -fx-border-color: #cccccc;");
-        comboBox.setPrefWidth(250);
-        comboBox.setMaxHeight(30);
+        comboBox.setStyle("-fx-font-size: 16px; -fx-background-color: #ffffff; -fx-border-radius: 10px; -fx-border-color: #cccccc;");
+        comboBox.setPrefWidth(280);
+        comboBox.setMaxHeight(35);
     }
 
     // Method to style text fields with a uniform look
     private void styleTextField(TextField textField) {
-        textField.setStyle("-fx-font-size: 14px; -fx-background-color: #ffffff; -fx-border-radius: 5px; -fx-padding: 10px; -fx-border-color: #cccccc;");
-        textField.setPrefWidth(250);
-        textField.setMaxHeight(30);
+        textField.setStyle("-fx-font-size: 16px; -fx-background-color: #ffffff; -fx-border-radius: 10px; -fx-padding: 15px; -fx-border-color: #cccccc;");
+        textField.setPrefWidth(280);
+        textField.setMaxHeight(35);
     }
 
     // Show error message

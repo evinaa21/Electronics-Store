@@ -1,18 +1,21 @@
-
 package view;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.Item;
 import model.Manager;
-import model.Sector;
-import javafx.geometry.Insets;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 public class AddItemView {
 
@@ -31,43 +34,57 @@ public class AddItemView {
 
         // Create title label
         Label titleLabel = new Label("Add New Item");
-        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #4CAF50;");
+        titleLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+
+        // Create the form using GridPane to align fields and labels
+        GridPane formGrid = new GridPane();
+        formGrid.setVgap(15); // Vertical gap between rows
+        formGrid.setHgap(10); // Horizontal gap between columns
+        formGrid.setAlignment(Pos.CENTER);
 
         // Item Name
         Label nameLabel = new Label("Item Name:");
         TextField nameField = new TextField();
-        HBox nameBox = createInputRow(nameLabel, nameField);
+        styleTextField(nameField);
+        formGrid.add(nameLabel, 0, 0);
+        formGrid.add(nameField, 1, 0);
 
         // Item Sector (formerly category)
         Label sectorLabel = new Label("Item Sector:");
         TextField sectorField = new TextField();
-        HBox sectorBox = createInputRow(sectorLabel, sectorField);
+        styleTextField(sectorField);
+        formGrid.add(sectorLabel, 0, 1);
+        formGrid.add(sectorField, 1, 1);
 
         // Item Price
         Label priceLabel = new Label("Price:");
         TextField priceField = new TextField();
-        HBox priceBox = createInputRow(priceLabel, priceField);
+        styleTextField(priceField);
+        formGrid.add(priceLabel, 0, 2);
+        formGrid.add(priceField, 1, 2);
 
         // Stock Quantity
         Label stockLabel = new Label("Stock Quantity:");
         TextField stockField = new TextField();
-        HBox stockBox = createInputRow(stockLabel, stockField);
+        styleTextField(stockField);
+        formGrid.add(stockLabel, 0, 3);
+        formGrid.add(stockField, 1, 3);
 
         // Item Image
         Label imageLabel = new Label("Item Image:");
         Button chooseImageButton = new Button("Choose Image");
         ImageView imageView = new ImageView();
-        chooseImageButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;");
+        chooseImageButton.setStyle("-fx-background-color: linear-gradient(to bottom, #6a89cc, #4a69bd); -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 20px; -fx-background-radius: 20px;");
         chooseImageButton.setOnAction(event -> chooseImage(imageView));
+
+        // Image row (image label, button, and image view)
         HBox imageBox = new HBox(10, imageLabel, chooseImageButton, imageView);
         imageBox.setAlignment(Pos.CENTER_LEFT);
+        formGrid.add(imageBox, 0, 4, 2, 1); // Span both columns for the image section
 
         // Buttons
-        Button saveButton = new Button("Save Item");
-        Button backButton = new Button("Back");
-
-        saveButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;");
-        backButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-weight: bold;");
+        Button saveButton = createStyledButton("Save Item");
+        Button backButton = createStyledButton("Back");
 
         HBox buttonBox = new HBox(15, saveButton, backButton);
         buttonBox.setAlignment(Pos.CENTER);
@@ -132,39 +149,45 @@ public class AddItemView {
             previousStage.show();
         });
 
-
         // Back Button Action
         backButton.setOnAction(event -> {
             addItemStage.close();
             previousStage.show();
         });
 
-
         // Layout and scene
-        VBox root = new VBox(20, titleLabel, nameBox, sectorBox, priceBox, stockBox, imageBox, buttonBox);
+        VBox root = new VBox(20, titleLabel, formGrid, buttonBox);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
-        Scene scene = new Scene(root, 400, 400);
+        Scene scene = new Scene(root, 500, 500); // Adjusted window size for a more spacious look
         addItemStage.setTitle("Add New Item");
         addItemStage.setScene(scene);
         addItemStage.show();
     }
 
-    // Utility to create input rows (label + text field)
-    private HBox createInputRow(Label label, TextField textField) {
-        HBox box = new HBox(10, label, textField);
-        box.setAlignment(Pos.CENTER_LEFT);
-        return box;
+    // Utility to create input rows (label + text field) and style them
+    private void styleTextField(TextField textField) {
+        textField.setStyle("-fx-border-radius: 10px; -fx-padding: 5px; -fx-font-size: 14px;");
     }
 
- // Method to open file chooser and select image
+    // Method to create styled buttons
+    private Button createStyledButton(String text) {
+        Button button = new Button(text);
+        button.setStyle("-fx-background-color: linear-gradient(to bottom, #6a89cc, #4a69bd); " +
+                        "-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" +
+                        "-fx-padding: 10px 20px; -fx-border-radius: 20px; -fx-background-radius: 20px;");
+        button.setPrefWidth(180);
+        return button;
+    }
+
+    // Method to open file chooser and select image
     private void chooseImage(ImageView imageView) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
         var file = fileChooser.showOpenDialog(null);
         if (file != null) {
             Image image = new Image(file.toURI().toString());
-            
+
             // Set a specific width and height for the image
             imageView.setImage(image);
             imageView.setFitWidth(100);  // Set a fixed width for the image
@@ -172,7 +195,6 @@ public class AddItemView {
             imageView.setPreserveRatio(true); // Maintain aspect ratio
         }
     }
-
 
     // Method to show error messages
     private void showError(String message) {

@@ -4,71 +4,124 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class ManagerView extends Application {
 
-    private Stage previousStage;  // Reference to the previous stage
+    private Stage previousStage;
 
     public ManagerView(Stage previousStage) {
-        this.previousStage = previousStage;  // Pass the previous stage to this view
+        this.previousStage = previousStage;
     }
 
     @Override
     public void start(Stage primaryStage) {
-        VBox layout = new VBox(15);
-        layout.setAlignment(Pos.CENTER); // Center the buttons in the layout
+        // Center welcome message
+        Text welcomeMessage = new Text("Welcome, Manager!");
+        welcomeMessage.setStyle(
+                "-fx-font-size: 32px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-fill: #2c3e50;"
+        );
+        welcomeMessage.setEffect(new DropShadow(5, Color.LIGHTGRAY));
 
-        // Buttons with added styling
-        Button addItemButton = new Button("Add New Item");
-        styleButton(addItemButton);
-        
-        Button restockItemButton = new Button("Restock Item");
-        styleButton(restockItemButton);
-        
-        Button generateReportButton = new Button("Generate Sales Report");
-        styleButton(generateReportButton);
-        
-        Button viewCategoriesButton = new Button("View Item Sectors");
-        styleButton(viewCategoriesButton);
-        
-        Button viewItemsButton = new Button("View Items");
-        styleButton(viewItemsButton);
+        // Header below the welcome message
+        Text header = new Text("Dashboard");
+        header.setStyle(
+                "-fx-font-size: 24px; " +
+                "-fx-font-weight: bold; " +
+                "-fx-fill: #34495e;"
+        );
+        header.setEffect(new DropShadow(3, Color.GRAY));
 
-        // Back Button
-        Button backButton = new Button("Back");
-        styleButton(backButton);
-        backButton.setOnAction(e -> goBackToPreviousWindow(primaryStage)); // Action for the back button
-        
-        // Add buttons to layout
-        layout.getChildren().addAll(addItemButton, restockItemButton, generateReportButton, viewCategoriesButton, viewItemsButton, backButton);
+        // Layout with chic and classy styling
+        VBox layout = new VBox(30);
+        layout.setAlignment(Pos.CENTER);
+        layout.setStyle(
+                "-fx-background-color: linear-gradient(to bottom, #f8f9fa, #e9ecef);" +
+                "-fx-padding: 40px;" +
+                "-fx-border-color: #bdc3c7;" +
+                "-fx-border-width: 2px;" +
+                "-fx-border-radius: 10px;"
+        );
 
-        // Scene setup with layout and dimensions
-        Scene scene = new Scene(layout, 400, 350);
+        // Buttons with classy style
+        Button addItemButton = createClassyButton("Add New Item");
+        Button restockItemButton = createClassyButton("Restock Item");
+        Button generateReportButton = createClassyButton("Generate Sales Report");
+        Button viewCategoriesButton = createClassyButton("View Item Sectors");
+        Button viewItemsButton = createClassyButton("View Items");
+        Button backButton = createClassyButton("Back");
+
+        // Back button functionality
+        backButton.setOnAction(e -> goBackToPreviousWindow(primaryStage));
+
+        // Add elements to layout
+        layout.getChildren().addAll(welcomeMessage, header, addItemButton, restockItemButton, generateReportButton, viewCategoriesButton, viewItemsButton, backButton);
+
+        // Scene setup
+        Scene scene = new Scene(layout, 800, 600);
         primaryStage.setTitle("Manager Dashboard");
         primaryStage.setScene(scene);
+        primaryStage.centerOnScreen(); // Center window on the screen
         primaryStage.show();
     }
 
-    // Method to style buttons uniformly
-    private void styleButton(Button button) {
-        button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-padding: 10px;");
-        button.setPrefWidth(200);
-        button.setMaxHeight(40);
+    // Create chic and classy buttons
+    private Button createClassyButton(String text) {
+        Button button = new Button(text);
+        button.setStyle(
+                "-fx-background-color: linear-gradient(to bottom, #5d6d7e, #34495e);" +
+                "-fx-text-fill: white;" +
+                "-fx-font-size: 16px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-background-radius: 15px;" +
+                "-fx-border-radius: 15px;" +
+                "-fx-border-color: #95a5a6;" +
+                "-fx-border-width: 2px;" +
+                "-fx-padding: 10px 20px;"
+        );
+
+        // Hover effect
+        button.setOnMouseEntered(e -> button.setStyle(
+                "-fx-background-color: linear-gradient(to bottom, #34495e, #5d6d7e);" +
+                "-fx-text-fill: white;" +
+                "-fx-font-size: 16px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-background-radius: 15px;" +
+                "-fx-border-radius: 15px;" +
+                "-fx-border-color: #7f8c8d;" +
+                "-fx-border-width: 2px;" +
+                "-fx-padding: 10px 20px;" +
+                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 2);"
+        ));
+        button.setOnMouseExited(e -> button.setStyle(
+                "-fx-background-color: linear-gradient(to bottom, #5d6d7e, #34495e);" +
+                "-fx-text-fill: white;" +
+                "-fx-font-size: 16px;" +
+                "-fx-font-weight: bold;" +
+                "-fx-background-radius: 15px;" +
+                "-fx-border-radius: 15px;" +
+                "-fx-border-color: #95a5a6;" +
+                "-fx-border-width: 2px;" +
+                "-fx-padding: 10px 20px;"
+        ));
+        button.setPrefWidth(250);
+        return button;
     }
 
-    // Go back to the previous window
     private void goBackToPreviousWindow(Stage primaryStage) {
-        primaryStage.close(); // Close the current window
-
+        primaryStage.close();
         if (previousStage != null) {
-            previousStage.show(); // Show the previous window
+            previousStage.show();
         }
     }
 
     public static void main(String[] args) {
-        // Initialize with a null previous stage for simplicity in this example
         launch(args);
     }
 }

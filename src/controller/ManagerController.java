@@ -1,7 +1,11 @@
 package controller;
 
+
+
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import view.AddItemView;
@@ -24,28 +28,50 @@ public class ManagerController {
     }
 
     private void setupUI() {
-        VBox layout = new VBox(10);
+        // Main layout
+        VBox layout = new VBox(20);
+        layout.setAlignment(Pos.CENTER);
+        layout.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 30px;");
 
-        Button addItemButton = new Button("Add New Item");
-        Button restockItemButton = new Button("Restock Item");
-        Button generateReportButton = new Button("Generate Sales Report");
-        Button viewSectorsButton = new Button("View Item Sector");
-        Button viewItemsButton = new Button("View Items");
+        // Welcome Text
+        Label welcomeLabel = new Label("Welcome, Manager");
+        welcomeLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
 
-        // Pass manager instance to views so they can interact with it
+        // Buttons
+        Button addItemButton = createStyledButton("Add New Item");
+        Button restockItemButton = createStyledButton("Restock Item");
+        Button generateReportButton = createStyledButton("Generate Sales Report");
+        Button viewSectorsButton = createStyledButton("View Item Sector");
+        Button viewItemsButton = createStyledButton("View Items");
+
+        // Button Actions
         addItemButton.setOnAction(e -> openAddItemView());
         restockItemButton.setOnAction(e -> openRestockItemView());
         generateReportButton.setOnAction(e -> openGenerateReportView());
         viewSectorsButton.setOnAction(e -> openViewSectorsView());
         viewItemsButton.setOnAction(e -> openViewItemsView());
 
-        layout.getChildren().addAll(addItemButton, restockItemButton, generateReportButton, viewSectorsButton, viewItemsButton);
+        // Add components to layout
+        layout.getChildren().addAll(welcomeLabel, addItemButton, restockItemButton, generateReportButton, viewSectorsButton, viewItemsButton);
 
-        managerScene = new Scene(layout, 300, 250);
+        // Scene setup
+        managerScene = new Scene(layout, 600, 400);  // Increased window size
         primaryStage.setTitle("Manager Dashboard");
         primaryStage.setScene(managerScene);
+        primaryStage.centerOnScreen(); // Center window on screen
         primaryStage.show();
     }
+
+    // Method to create styled buttons
+    private Button createStyledButton(String text) {
+        Button button = new Button(text);
+        button.setStyle("-fx-background-color: linear-gradient(to bottom, #6a89cc, #4a69bd);" +
+                        "-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" +
+                        "-fx-padding: 10px 20px; -fx-border-radius: 15px; -fx-background-radius: 15px;");
+        button.setPrefWidth(250);
+        return button;
+    }
+
 
     // Open AddItemView with manager instance
     private void openAddItemView() {

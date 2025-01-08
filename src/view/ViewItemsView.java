@@ -3,11 +3,13 @@ package view;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import model.Item;
 import model.Manager;
+import javafx.scene.paint.Color;
 
 public class ViewItemsView {
     private Manager manager; // Instance of Manager
@@ -24,8 +26,10 @@ public class ViewItemsView {
 
         // Create ComboBox for sectors with "All Items" option
         Label sectorLabel = new Label("Select Sector:");
+        sectorLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333333;");
+
         ComboBox<String> sectorComboBox = new ComboBox<>();
-        
+
         // Populate ComboBox with sector names + "All Items"
         sectorComboBox.getItems().add("All Items"); // Option to view all items
         sectorComboBox.getItems().addAll(manager.viewSector()); // Get sectors from the manager
@@ -46,7 +50,7 @@ public class ViewItemsView {
         sectorComboBox.setPromptText("Choose a Sector");
 
         // Layout for the ComboBox
-        HBox sectorBox = new HBox(10, sectorLabel, sectorComboBox);
+        HBox sectorBox = new HBox(15, sectorLabel, sectorComboBox);
         sectorBox.setAlignment(Pos.CENTER_LEFT);
 
         // Display the items in the FlowPane
@@ -64,6 +68,7 @@ public class ViewItemsView {
         // Create main layout to hold everything
         VBox root = new VBox(20);
         root.setAlignment(Pos.TOP_LEFT);
+        root.setStyle("-fx-background-color: #f2f2f2; -fx-padding: 20px; -fx-border-radius: 10px;");
         root.getChildren().addAll(sectorBox, itemsFlowPane, buttonsLayout);
 
         // Set scene and stage
@@ -83,7 +88,7 @@ public class ViewItemsView {
             if ("All Items".equals(selectedSector) || item.getItemSector().equalsIgnoreCase(selectedSector)) {
                 VBox itemBox = new VBox(10);
                 itemBox.setAlignment(Pos.CENTER);
-                itemBox.setStyle("-fx-border-color: #ddd; -fx-border-radius: 5px; -fx-padding: 10px; -fx-background-color: white;");
+                itemBox.setStyle("-fx-border-color: #ddd; -fx-border-radius: 8px; -fx-padding: 10px; -fx-background-color: white;");
 
                 // Create ImageView for the item image
                 ImageView itemImage = new ImageView(item.getImage());
@@ -93,7 +98,7 @@ public class ViewItemsView {
 
                 // Create Label for item name (Heading 1)
                 Label itemName = new Label(item.getItemName());
-                itemName.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;");
+                itemName.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333333;");
 
                 // Create Label for item price
                 Label itemPrice = new Label("$" + item.getPrice());
@@ -108,15 +113,22 @@ public class ViewItemsView {
 
                 // Add itemBox to the FlowPane
                 flowPane.getChildren().add(itemBox);
+                
+                // Apply shadow effect on mouse hover
+                DropShadow shadow = new DropShadow(10, Color.BLACK);
+                itemBox.setOnMouseEntered(e -> itemBox.setEffect(shadow));
+                itemBox.setOnMouseExited(e -> itemBox.setEffect(null));
             }
         }
     }
 
     // Apply style to buttons
     private void styleButton(Button button) {
-        button.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-padding: 10px;");
+        button.setStyle("-fx-background-color: #214e60; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-padding: 10px;");
         button.setPrefWidth(150);
         button.setMaxHeight(40);
+        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #5ca7c6; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-padding: 10px;"));
+        button.setOnMouseExited(e -> button.setStyle("-fx-background-color: #214e60; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-padding: 10px;"));
     }
 
     // Method to go back to the previous stage (Manager Dashboard)
