@@ -1,19 +1,25 @@
 package model;
 
-import javafx.scene.image.Image;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Sector {
-    private String sectorName;
+public class Sector implements Serializable {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8568062619814491335L;
+	private String sectorName;
     private Manager manager;
     private List<Cashier> cashiers;
     private List<Item> items;
+    private List<String> categories;  // Add a list to store categories
 
     public Sector(String sectorName) {
         this.sectorName = sectorName;
         this.cashiers = new ArrayList<>();
         this.items = new ArrayList<>();
+        this.categories = new ArrayList<>();  // Initialize the categories list
     }
 
     public void addItem(Item item) {
@@ -28,12 +34,20 @@ public class Sector {
         this.manager = manager;
     }
 
+    public void addCategory(String category) {
+        categories.add(category);  // Add category to the list
+    }
+
     public List<Item> viewItems() {
         return items;
     }
 
     public List<Cashier> getCashiers() {
         return cashiers;
+    }
+
+    public List<String> getCategories() {
+        return categories;  // Get the list of categories
     }
 
     @Override
@@ -43,6 +57,7 @@ public class Sector {
                 ", Manager=" + (manager != null ? manager.getName() : "None") +
                 ", Number of Cashiers=" + cashiers.size() +
                 ", Number of Items=" + items.size() +
+                ", Categories=" + categories.size() +  // Display category count
                 '}';
     }
 

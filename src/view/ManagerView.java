@@ -5,6 +5,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -20,48 +22,34 @@ public class ManagerView extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Center welcome message
+        // Welcome message
         Text welcomeMessage = new Text("Welcome, Manager!");
-        welcomeMessage.setStyle(
-                "-fx-font-size: 32px; " +
-                "-fx-font-weight: bold; " +
-                "-fx-fill: #2c3e50;"
-        );
+        welcomeMessage.setStyle("-fx-font-size: 24px; -fx-fill: white;");
         welcomeMessage.setEffect(new DropShadow(5, Color.LIGHTGRAY));
+
+        // Manager information (sample info)
+        Text managerInfo = new Text("Name: John Doe\nEmail: john.doe@example.com");
+        managerInfo.setStyle("-fx-font-size: 18px; -fx-fill: white;");
+        managerInfo.setEffect(new DropShadow(3, Color.GRAY));
 
         // Header below the welcome message
         Text header = new Text("Dashboard");
-        header.setStyle(
-                "-fx-font-size: 24px; " +
-                "-fx-font-weight: bold; " +
-                "-fx-fill: #34495e;"
-        );
+        header.setStyle("-fx-font-size: 20px; -fx-fill: white;");
         header.setEffect(new DropShadow(3, Color.GRAY));
 
-        // Layout with chic and classy styling
-        VBox layout = new VBox(30);
-        layout.setAlignment(Pos.CENTER);
-        layout.setStyle(
-                "-fx-background-color: linear-gradient(to bottom, #f8f9fa, #e9ecef);" +
-                "-fx-padding: 40px;" +
-                "-fx-border-color: #bdc3c7;" +
-                "-fx-border-width: 2px;" +
-                "-fx-border-radius: 10px;"
-        );
+        // Top navigation bar
+        HBox navigationBar = createNavigationBar(primaryStage);
 
-        // Buttons with classy style
-        Button addItemButton = createClassyButton("Add New Item");
-        Button restockItemButton = createClassyButton("Restock Item");
-        Button generateReportButton = createClassyButton("Generate Sales Report");
-        Button viewCategoriesButton = createClassyButton("View Item Sectors");
-        Button viewItemsButton = createClassyButton("View Items");
-        Button backButton = createClassyButton("Back");
+        // Center content (Home view by default)
+        VBox centerContent = new VBox(20);
+        centerContent.setAlignment(Pos.CENTER);
+        centerContent.getChildren().addAll(welcomeMessage, managerInfo, header);
 
-        // Back button functionality
-        backButton.setOnAction(e -> goBackToPreviousWindow(primaryStage));
-
-        // Add elements to layout
-        layout.getChildren().addAll(welcomeMessage, header, addItemButton, restockItemButton, generateReportButton, viewCategoriesButton, viewItemsButton, backButton);
+        // Layout using BorderPane
+        BorderPane layout = new BorderPane();
+        layout.setTop(navigationBar);
+        layout.setCenter(centerContent);
+        layout.setStyle("-fx-background-color: #2C3E50;");
 
         // Scene setup
         Scene scene = new Scene(layout, 800, 600);
@@ -71,55 +59,88 @@ public class ManagerView extends Application {
         primaryStage.show();
     }
 
-    // Create chic and classy buttons
-    private Button createClassyButton(String text) {
-        Button button = new Button(text);
-        button.setStyle(
-                "-fx-background-color: linear-gradient(to bottom, #5d6d7e, #34495e);" +
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 16px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-background-radius: 15px;" +
-                "-fx-border-radius: 15px;" +
-                "-fx-border-color: #95a5a6;" +
-                "-fx-border-width: 2px;" +
-                "-fx-padding: 10px 20px;"
+    // Create a horizontal navigation bar with a new "Home" button
+    private HBox createNavigationBar(Stage primaryStage) {
+        HBox navigationBar = new HBox(20);
+        navigationBar.setAlignment(Pos.CENTER);
+        navigationBar.setStyle("-fx-background-color: #34495E;");
+
+        Button homeButton = createNavButton("Home", primaryStage);
+        Button addItemButton = createNavButton("Add New Item", primaryStage);
+        Button restockItemButton = createNavButton("Restock Item", primaryStage);
+        Button generateReportButton = createNavButton("Generate Sales Report", primaryStage);
+        Button viewCategoriesButton = createNavButton("View Item Sectors", primaryStage);
+        Button viewItemsButton = createNavButton("View Items", primaryStage);
+        Button viewSupplier=createNavButton("Suppliers", primaryStage);
+
+        navigationBar.getChildren().addAll(
+                homeButton,
+                addItemButton,
+                restockItemButton,
+                generateReportButton,
+                viewCategoriesButton,
+                viewItemsButton,
+                viewSupplier
         );
 
-        // Hover effect
-        button.setOnMouseEntered(e -> button.setStyle(
-                "-fx-background-color: linear-gradient(to bottom, #34495e, #5d6d7e);" +
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 16px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-background-radius: 15px;" +
-                "-fx-border-radius: 15px;" +
-                "-fx-border-color: #7f8c8d;" +
-                "-fx-border-width: 2px;" +
-                "-fx-padding: 10px 20px;" +
-                "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 2);"
-        ));
-        button.setOnMouseExited(e -> button.setStyle(
-                "-fx-background-color: linear-gradient(to bottom, #5d6d7e, #34495e);" +
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 16px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-background-radius: 15px;" +
-                "-fx-border-radius: 15px;" +
-                "-fx-border-color: #95a5a6;" +
-                "-fx-border-width: 2px;" +
-                "-fx-padding: 10px 20px;"
-        ));
-        button.setPrefWidth(250);
+        return navigationBar;
+    }
+
+    // Create navigation bar buttons with event handlers
+    private Button createNavButton(String text, Stage primaryStage) {
+        Button button = new Button(text);
+        button.setStyle("-fx-background-color: #3498DB; -fx-text-fill: white; -fx-padding: 10px 20px; -fx-border-radius: 5;");
+        
+        // Set hover effect
+        button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #2980B9; -fx-text-fill: white;"));
+        button.setOnMouseExited(e -> button.setStyle("-fx-background-color: #3498DB; -fx-text-fill: white;"));
+
+        button.setOnAction(e -> {
+            if (text.equals("Home")) {
+                showHomePage(primaryStage);
+            } else {
+                // Handle other buttons if needed
+            }
+        });
+
         return button;
     }
 
-    private void goBackToPreviousWindow(Stage primaryStage) {
-        primaryStage.close();
-        if (previousStage != null) {
-            previousStage.show();
-        }
+    // Show the Home page with manager info and welcome message
+    private void showHomePage(Stage primaryStage) {
+        // Create welcome message and manager info
+        Text welcomeMessage = new Text("Welcome, Manager!");
+        welcomeMessage.setStyle("-fx-font-size: 24px; -fx-fill: white;");
+        welcomeMessage.setEffect(new DropShadow(5, Color.LIGHTGRAY));
+
+        Text managerInfo = new Text("Name: John Doe\nEmail: john.doe@example.com");
+        managerInfo.setStyle("-fx-font-size: 18px; -fx-fill: white;");
+        managerInfo.setEffect(new DropShadow(3, Color.GRAY));
+
+        // Header below the welcome message
+        Text header = new Text("Dashboard");
+        header.setStyle("-fx-font-size: 20px; -fx-fill: white;");
+        header.setEffect(new DropShadow(3, Color.GRAY));
+
+        // Center content for home page
+        VBox homeContent = new VBox(20);
+        homeContent.setAlignment(Pos.CENTER);
+        homeContent.getChildren().addAll(welcomeMessage, managerInfo, header);
+
+        // Layout using BorderPane
+        BorderPane layout = new BorderPane();
+        layout.setTop(createNavigationBar(primaryStage));
+        layout.setCenter(homeContent);
+        layout.setStyle("-fx-background-color: #2C3E50;");
+
+        // Scene setup
+        Scene scene = new Scene(layout, 800, 600);
+        primaryStage.setTitle("Manager Dashboard - Home");
+        primaryStage.setScene(scene);
+        primaryStage.centerOnScreen(); // Center window on the screen
+        primaryStage.show();
     }
+
 
     public static void main(String[] args) {
         launch(args);

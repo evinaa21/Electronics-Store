@@ -1,15 +1,23 @@
 package model;
 
+import java.io.Serializable;
+
 import javafx.scene.image.Image;
 
-public class Item {
-    private String itemName;
+public class Item implements Serializable {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3874406897246168956L;
+	private String itemName;
     private String itemSector;
     private double price;
     private int stockQuantity;
     private int itemsSold;
     private int itemQuantity;
     private Image image;
+    private String category;
+    private String description;
 
     // Constructor for Manager
     public Item(String itemName, String itemCategory, double price, int stockQuantity) {
@@ -45,9 +53,10 @@ public class Item {
             System.out.println("Not enough stock available for: " + itemName);
             return;
         }
-        stockQuantity -= quantity;
-        itemsSold += quantity;
+        stockQuantity -= quantity;  // Decrease the stock by the sold quantity
+        itemsSold += quantity;      // Increase the sold count
     }
+
 
     public void restockItem(int quantity) {
 this.itemQuantity += quantity;
@@ -92,6 +101,21 @@ this.itemQuantity += quantity;
 
     public Image getImage() {
         return image;
+    }
+    public String getCategory() {
+        return category;
+    }
+
+    // Setter for category
+    public void setCategory(String category) {
+        this.category = category;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     @Override

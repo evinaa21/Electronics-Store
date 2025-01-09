@@ -3,7 +3,6 @@ package model;
 import java.util.ArrayList;
 import java.util.Date;
 import util.Role;
-import util.BillGenerationException;
 import util.LowStockException;
 
 public class Cashier extends User {
@@ -66,7 +65,7 @@ public class Cashier extends User {
 			checkStock(item, quantity);  
 			
 			//Deduct stock
-			item.updateStock(-quantity);
+			item.sellItem(quantity);
 			
 			totalAmount += item.getSellingPrice() * quantity;		
 		} 

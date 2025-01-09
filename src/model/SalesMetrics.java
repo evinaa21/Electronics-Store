@@ -1,10 +1,15 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class SalesMetrics {
-    private double totalRevenue; // Total revenue from items sold
+public class SalesMetrics implements Serializable{
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3790826895954351115L;
+	private double totalRevenue; // Total revenue from items sold
     private int totalItemsSold; // Total items sold
     private String timePeriod; // Time period for the report
     private double totalCosts; // Total costs (items purchased + staff salaries)
@@ -75,7 +80,8 @@ public class SalesMetrics {
     }
 
     // Helper method to compare dates for daily sales
-    private boolean isSameDay(Date date1, Date date2) {
+    @SuppressWarnings("deprecation")
+	private boolean isSameDay(Date date1, Date date2) {
         return date1.getYear() == date2.getYear() &&
                date1.getMonth() == date2.getMonth() &&
                date1.getDate() == date2.getDate();

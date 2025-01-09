@@ -1,16 +1,20 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import util.Role;
 
-public class Manager extends User {
-    private ArrayList<Sector> sectors;  // Sectors used instead of categories
+public class Manager extends User implements Serializable {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7638438919947446592L;
+	private ArrayList<Sector> sectors;  // Sectors used instead of categories
     private ArrayList<Supplier> suppliers;
     private ArrayList<Item> items;
-    private SalesMetrics salesMetrics;
-    private static final int LOW_STOCK_THRESHOLD = 5; // Set threshold
+    private SalesMetrics salesMetrics; 
 
     public Manager(int id, String name, double salary, Role role, String username, String password, Date dateOfBirth,
                    long phonenumber, String email) {
@@ -51,6 +55,7 @@ public class Manager extends User {
         return true;
     }
 
+
     // View the sectors in the manager's list
     public ArrayList<String> viewSector() {
         ArrayList<String> sectorNames = new ArrayList<>();
@@ -73,6 +78,7 @@ public class Manager extends User {
             System.out.println("Item restocked: " + item.getItemName());
         }
     }
+    
 
     // Generate sales report
     public String generateSalesReport(String timePeriod) {
@@ -86,7 +92,7 @@ public class Manager extends User {
     // Notify for restocks
     public void notifyRestockNeeded() {
         for (Item item : items) {
-            if (item.getStockQuantity() < LOW_STOCK_THRESHOLD) {
+            if (item.getStockQuantity() < 5) {
                 System.out.println("Restock needed for: " + item.getItemName());
             }
         }
@@ -109,6 +115,15 @@ public class Manager extends User {
 
     private void showSuccess(String message) {
         System.out.println("Success: " + message);
+    }
+    public void addCategoryToSector(String sectorName, String categoryName) {
+        for (Sector sector : sectors) {
+            if (sector.getName().equals(sectorName)) {
+                sector.addCategory(categoryName); // Assuming Sector has an addCategory method
+                return;
+            }
+        }
+        throw new IllegalArgumentException("Sector not found: " + sectorName);
     }
 
     // Getter and Setter methods

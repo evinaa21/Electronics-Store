@@ -2,101 +2,128 @@ package view;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import model.Category;
 import model.Item;
 import model.Manager;
+import model.Sector;
 
 public class AddItemView {
-
     private Manager manager;
-    private Stage previousStage; // To store the reference to the previous stage
+    private VBox parentLayout;
 
-    // Constructor to pass the Manager instance and previous Stage reference
-    public AddItemView(Manager manager, Stage previousStage) {
+    public AddItemView(Manager manager) {
         this.manager = manager;
-        this.previousStage = previousStage;
+        this.parentLayout = new VBox();
     }
 
-    // Method to show the Add Item view
-    public void showAddItemView() {
-        Stage addItemStage = new Stage();
-
-        // Create title label
+    public VBox getViewContent() {
+        // Main title
         Label titleLabel = new Label("Add New Item");
-        titleLabel.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;");
+        titleLabel.setFont(new Font("Arial", 28));
+        titleLabel.setTextFill(Color.WHITE);
 
-        // Create the form using GridPane to align fields and labels
+        // Parent container with dark blue background
+        parentLayout.setStyle("-fx-background-color: #2C3E50;");
+        parentLayout.setSpacing(20);
+        parentLayout.setAlignment(Pos.CENTER);
+
+        // Form container with lighter blue background
+        VBox formContainer = new VBox(20);
+        formContainer.setStyle("-fx-background-color: #34495E; -fx-padding: 30; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 5, 0, 0, 2);");
+
+        // Title inside the form container
+        Label formTitle = new Label("Enter Item Details");
+        formTitle.setFont(new Font("Arial", 22));
+        formTitle.setTextFill(Color.WHITE);
+
+        // Form Grid for input fields
         GridPane formGrid = new GridPane();
-        formGrid.setVgap(15); // Vertical gap between rows
-        formGrid.setHgap(10); // Horizontal gap between columns
+        formGrid.setVgap(15);
+        formGrid.setHgap(10);
         formGrid.setAlignment(Pos.CENTER);
 
-        // Item Name
+        // Label and Input for Item Name
         Label nameLabel = new Label("Item Name:");
+        nameLabel.setTextFill(Color.WHITE);
         TextField nameField = new TextField();
-        styleTextField(nameField);
+        nameField.setPromptText("Enter item name");
+        nameField.setStyle("-fx-border-radius: 5; -fx-border-color: #5D6D7E;");
         formGrid.add(nameLabel, 0, 0);
         formGrid.add(nameField, 1, 0);
 
-        // Item Sector (formerly category)
-        Label sectorLabel = new Label("Item Sector:");
-        TextField sectorField = new TextField();
-        styleTextField(sectorField);
-        formGrid.add(sectorLabel, 0, 1);
-        formGrid.add(sectorField, 1, 1);
+        // Label and Input for Item Category
+        Label categoryLabel = new Label("Item Category:");
+        categoryLabel.setTextFill(Color.WHITE);
+        TextField categoryField = new TextField();
+        categoryField.setPromptText("Enter item category");
+        categoryField.setStyle("-fx-border-radius: 5; -fx-border-color: #5D6D7E;");
+        formGrid.add(categoryLabel, 0, 1);
+        formGrid.add(categoryField, 1, 1);
 
-        // Item Price
+        // Label and Input for Item Price
         Label priceLabel = new Label("Price:");
+        priceLabel.setTextFill(Color.WHITE);
         TextField priceField = new TextField();
-        styleTextField(priceField);
+        priceField.setPromptText("Enter price");
+        priceField.setStyle("-fx-border-radius: 5; -fx-border-color: #5D6D7E;");
         formGrid.add(priceLabel, 0, 2);
         formGrid.add(priceField, 1, 2);
 
-        // Stock Quantity
+        // Label and Input for Stock Quantity
         Label stockLabel = new Label("Stock Quantity:");
+        stockLabel.setTextFill(Color.WHITE);
         TextField stockField = new TextField();
-        styleTextField(stockField);
+        stockField.setPromptText("Enter stock quantity");
+        stockField.setStyle("-fx-border-radius: 5; -fx-border-color: #5D6D7E;");
         formGrid.add(stockLabel, 0, 3);
         formGrid.add(stockField, 1, 3);
 
+        // Item Description
+        Label descriptionLabel = new Label("Item Description:");
+        descriptionLabel.setTextFill(Color.WHITE);
+        TextArea descriptionField = new TextArea();
+        descriptionField.setPromptText("Enter item description");
+        descriptionField.setWrapText(true);
+        descriptionField.setStyle("-fx-border-radius: 5; -fx-border-color: #5D6D7E;");
+        formGrid.add(descriptionLabel, 0, 4);
+        formGrid.add(descriptionField, 1, 4);
+
         // Item Image
         Label imageLabel = new Label("Item Image:");
+        imageLabel.setTextFill(Color.WHITE);
         Button chooseImageButton = new Button("Choose Image");
+        chooseImageButton.setStyle("-fx-background-color: #2980B9; -fx-text-fill: white; -fx-padding: 8px 16px; -fx-border-radius: 5;");
         ImageView imageView = new ImageView();
-        chooseImageButton.setStyle("-fx-background-color: linear-gradient(to bottom, #6a89cc, #4a69bd); -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 20px; -fx-background-radius: 20px;");
         chooseImageButton.setOnAction(event -> chooseImage(imageView));
 
-        // Image row (image label, button, and image view)
         HBox imageBox = new HBox(10, imageLabel, chooseImageButton, imageView);
         imageBox.setAlignment(Pos.CENTER_LEFT);
-        formGrid.add(imageBox, 0, 4, 2, 1); // Span both columns for the image section
+        formGrid.add(imageBox, 0, 5, 2, 1);
 
-        // Buttons
-        Button saveButton = createStyledButton("Save Item");
-        Button backButton = createStyledButton("Back");
+        // Save Button
+        Button saveButton = new Button("Save Item");
+        saveButton.setStyle("-fx-background-color: #3498DB; -fx-text-fill: white; -fx-padding: 12px 20px; -fx-border-radius: 5;");
+        saveButton.setFont(new Font("Arial", 14));
 
-        HBox buttonBox = new HBox(15, saveButton, backButton);
+        HBox buttonBox = new HBox(20, saveButton);
         buttonBox.setAlignment(Pos.CENTER);
 
+        // Save button action handling
         saveButton.setOnAction(event -> {
             String name = nameField.getText();
-            String sector = sectorField.getText().trim(); // Trim whitespace
+            String category = categoryField.getText().trim();
             String priceText = priceField.getText();
             String stockText = stockField.getText();
+            String description = descriptionField.getText(); 
 
-            // Validate inputs
-            if (name.isEmpty() || sector.isEmpty() || priceText.isEmpty() || stockText.isEmpty()) {
+            if (name.isEmpty() || category.isEmpty() || priceText.isEmpty() || stockText.isEmpty() || description.isEmpty()) {
                 showError("All fields must be filled in.");
                 return;
             }
@@ -118,88 +145,61 @@ public class AddItemView {
                 return;
             }
 
-            // Check if the sector exists
-            boolean sectorExists = manager.getSectors().stream()
-                    .anyMatch(s -> s != null && s.getName() != null && s.getName().equalsIgnoreCase(sector));
+            boolean categoryExists = false;
+            for (Sector sector : manager.getSectors()) {
+                if (sector.getCategories().contains(category)) {
+                    categoryExists = true;
+                    break;
+                }
+            }
 
-            if (!sectorExists) {
-                showError("The sector does not exist. Please choose from the available sectors.");
+            if (!categoryExists) {
+                showError("The category does not exist. Please choose from the available categories.");
                 return;
             }
 
-            // Create new item with entered details
-            Item newItem = new Item(name, sector, price, stock);
-
-            // If an image was selected, set it for the item
+            Item newItem = new Item(name, category, price, stock);
+            newItem.setDescription(description); 
             if (imageView.getImage() != null) {
                 newItem.setImage(imageView.getImage());
             }
 
-            // Add the item using Manager
             manager.addNewItem(newItem);
-
-            // Notify success and close the current window
-            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-            successAlert.setTitle("Success");
-            successAlert.setHeaderText(null);
-            successAlert.setContentText("Item successfully added!");
-            successAlert.showAndWait();
-
-            addItemStage.close();
-            previousStage.show();
+            showSuccess("Item added successfully!");
         });
 
-        // Back Button Action
-        backButton.setOnAction(event -> {
-            addItemStage.close();
-            previousStage.show();
-        });
+        // Add everything to the layout
+        formContainer.getChildren().addAll(formTitle, formGrid, buttonBox);
+        parentLayout.getChildren().addAll(titleLabel, formContainer);
+        parentLayout.setPadding(new Insets(30));
 
-        // Layout and scene
-        VBox root = new VBox(20, titleLabel, formGrid, buttonBox);
-        root.setPadding(new Insets(20));
-        root.setAlignment(Pos.CENTER);
-        Scene scene = new Scene(root, 500, 500); // Adjusted window size for a more spacious look
-        addItemStage.setTitle("Add New Item");
-        addItemStage.setScene(scene);
-        addItemStage.show();
+        return parentLayout;
     }
 
-    // Utility to create input rows (label + text field) and style them
-    private void styleTextField(TextField textField) {
-        textField.setStyle("-fx-border-radius: 10px; -fx-padding: 5px; -fx-font-size: 14px;");
-    }
-
-    // Method to create styled buttons
-    private Button createStyledButton(String text) {
-        Button button = new Button(text);
-        button.setStyle("-fx-background-color: linear-gradient(to bottom, #6a89cc, #4a69bd); " +
-                        "-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;" +
-                        "-fx-padding: 10px 20px; -fx-border-radius: 20px; -fx-background-radius: 20px;");
-        button.setPrefWidth(180);
-        return button;
-    }
-
-    // Method to open file chooser and select image
     private void chooseImage(ImageView imageView) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
         var file = fileChooser.showOpenDialog(null);
         if (file != null) {
             Image image = new Image(file.toURI().toString());
-
-            // Set a specific width and height for the image
             imageView.setImage(image);
-            imageView.setFitWidth(100);  // Set a fixed width for the image
-            imageView.setFitHeight(100); // Set a fixed height for the image
-            imageView.setPreserveRatio(true); // Maintain aspect ratio
+            imageView.setFitWidth(100);
+            imageView.setFitHeight(100);
+            imageView.setPreserveRatio(true);
         }
     }
 
-    // Method to show error messages
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showSuccess(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
