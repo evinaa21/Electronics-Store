@@ -1,9 +1,12 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Bill {
+public class Bill implements Serializable{
+	private static final long serialVersionUID = -4660349044455634797L;
+	
 	private String billNumber;
 	private ArrayList<Item> items;
 	private double totalAmount;
@@ -72,6 +75,8 @@ public class Bill {
 		
 		System.out.println("Total Amount: $" + totalAmount);
 	}
+	
+	
 	
 	@Override
 	public String toString() {
