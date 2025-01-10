@@ -51,4 +51,28 @@ public class ModifyEmployeeView {
 	public GridPane getLayout() {
 		return layout;
 	}
+
+	public TextField getUsername() {
+		return username;
+	}
+
+	public TextField getPassword() {
+		return password;
+	}
+
+	public TextField getSalary() {
+		return salary;
+	}
+
+	public TextField getRole() {
+		return role;
+	}
+
+	public TextField getEmail() {
+		return email;
+	}
+
+	public Button getModifyButton() {
+		return Modify;
+	}
 }
