@@ -1,11 +1,17 @@
 package model;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import util.Role;
 import util.LowStockException;
 
-public class Cashier extends User {
+public class Cashier extends User implements Serializable {
+	private static final long serialVersionUID = -6931271312379051945L;
+	
 	private Sector sector; 
 	private ArrayList<Bill> bills;  
 	private double totalSales; 
@@ -65,7 +71,7 @@ public class Cashier extends User {
 			checkStock(item, quantity);  
 			
 			//Deduct stock
-			item.sellItem(quantity);
+			item.updateStock(-quantity);
 			
 			totalAmount += item.getSellingPrice() * quantity;		
 		} 
@@ -105,6 +111,35 @@ public class Cashier extends User {
 			
 		return dailyBills;
 	}
+	
+	// Export daily bills to a file
+    public void exportDailyBillsToFile(String filePath) {
+        ArrayList<Bill> dailyBills = viewDailyBills();
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            writer.write("Daily Bills:\n");
+            writer.write("-----------------------------------------\n");
+
+            for (int i = 0; i < dailyBills.size(); i++) {
+                Bill bill = dailyBills.get(i);
+                writer.write("Bill Number: " + bill.getBillNumber() + "\n");
+                writer.write("Sale Date: " + bill.getSaleDate() + "\n");
+                writer.write("Items:\n");
+
+                for (Item item : bill.getItems()) {
+                    writer.write("- " + item.getItemName() + " | Quantity: " + item.getItemQuantity() +
+                            " | Price: $" + item.getSellingPrice() + "\n");
+                }
+
+                writer.write("Total Amount: $" + bill.getTotalAmount() + "\n");
+                writer.write("-----------------------------------------\n");
+            }
+
+            System.out.println("Daily bills exported to file: " + filePath);
+        } catch (IOException e) {
+            System.err.println("Error exporting daily bills to file: " + e.getMessage());
+        }
+    }
 		
 	//Compare dates to check if they are on the same day
 	private boolean isSameDay(Date date1, Date date2) {
