@@ -1,10 +1,7 @@
 package util;
 
-import model.Admin;
 import model.Bill;
-import model.Cashier;
 import model.Item;
-import model.Manager;
 import model.User;
 
 import java.io.*;
@@ -15,7 +12,7 @@ import java.util.Date;
 public class FileHandler {
 	
 	//Constants for file paths
-	private static final String EMPLOYEE_FILE = "BinaryFiles/employees.dat"; //Binary files for employees
+	private static final String EMPLOYEE_FILE = "src/BinaryFiles/employees.dat"; //Binary files for employees
 	private static final String INVENTORY_FILE = "BinaryFiles/items.dat"; //Binary files for inventory
 	private static final String BILL_DIRECTORY = "bill/"; //Text files for bills
 	
@@ -277,7 +274,8 @@ public class FileHandler {
                     String itemName = itemDetails[0];
                     int itemQuantity = Integer.parseInt(itemDetails[1]);
                     double itemPrice = Double.parseDouble(itemDetails[2]);
-                    items.add(new Item(itemName, itemQuantity, itemPrice));
+                    //Ky line ishte error
+                    //items.add(new Item(itemName, itemQuantity, itemPrice));
                 }
             }
 

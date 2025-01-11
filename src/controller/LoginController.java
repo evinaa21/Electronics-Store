@@ -1,8 +1,5 @@
 package controller;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javafx.animation.PauseTransition;
@@ -18,7 +15,6 @@ import view.LoginView;
 import view.AdminView;
 
 public class LoginController {
-	private static final String FILE_PATH = "employees.dat";
 	private final Stage stage;
 	private final LoginView loginView;
 	private Scene loginScene;
