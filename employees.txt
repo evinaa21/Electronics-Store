@@ -1,3 +1,0 @@
-1,Florjon Allkaj,50000,Admin,Florjon05,password,11/04/2005,0696428069,florionallkaj@gmail.com
-2,John Doe,50000,Cashier,Johndoe,passward,11/05/2009,0698745663,Johndoe@example.com
-3,Jane Smith,60000,Manager,Janesmith,pass,15/08/1985,0689451234,janesmith@example.com

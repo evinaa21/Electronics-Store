@@ -7,7 +7,9 @@ import java.util.ArrayList;
 
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
-
+import model.Admin;
+import model.User;
+import util.FileHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
@@ -16,7 +18,7 @@ import view.LoginView;
 import view.AdminView;
 
 public class LoginController {
-	private static final String FILE_PATH = "employees.txt";
+	private static final String FILE_PATH = "employees.dat";
 	private final Stage stage;
 	private final LoginView loginView;
 	private Scene loginScene;
@@ -42,29 +44,34 @@ public class LoginController {
 	}
 
 	private void authenticate(String username, String password){
-		ArrayList<String[]> database = loadEmployeeData();
+		ArrayList<User> employees = new ArrayList<>();
+		FileHandler file = new FileHandler();
+		employees = file.loadEmployeeData();
 		
-		for(String[] column: database) {
-			String role = column[3].trim();
-			String usernameInFile = column[4].trim();
-			String passwordInFile = column[5].trim();
-			
-			if(username.equals(usernameInFile) && password.equals(passwordInFile)) {
-				if(role.equals("Admin")) {
+		for(User user : employees) {
+			String usernameInFile = user.getUsername();
+			String passwordInFile = user.getPassword();
+			if(user instanceof Admin) {
+				if(username.equals(usernameInFile) && password.equals(passwordInFile)) {
 					AdminView adminView = new AdminView();
 					AdminController adminController = new AdminController(stage, adminView);
 					break;
 				}
-//				 else if(role.equals("Cashier")) {
-//					CashierView CashierView = new CashierView();
-//					CashierController cashierController = new CashierController(stage, CashierView);
-//					break;
-//				}else {
-//					ManagerView ManagerView = new ManagerView();
-//					ManagerController ManagerController = new ManagerController(stage, ManagerView);
+			}
+//			}else if(user instanceof Manager) {
+//				if(username.equals(usernameInFile) && password.equals(passwordInFile)) {
+//					ManagerView managerView = new ManagerView();
+//					ManagerController managerController = new ManagerController(stage, managerView);
 //					break;
 //				}
-			}else {
+//			}else if(user instanceof Cashier){
+//				if(username.equals(usernameInFile) && password.equals(passwordInFile)) {
+//					CashierView cashierView = new CashierView();
+//					CashierController cashierController = new CashierController(stage, cashierView);
+//					break;
+//				}
+//			}
+				else {
 				Label errorMessageLabel = new Label();
 		        GridPane loginLayout = loginView.getLoginPane();
 		        
@@ -78,21 +85,7 @@ public class LoginController {
 			}
 		}
 	}
-	
-	private ArrayList<String[]> loadEmployeeData(){
-	    ArrayList<String[]> employeeData = new ArrayList<>();
-	    
-	    try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
-	        String line;
-	        while ((line = reader.readLine()) != null){
-	            String[] data = line.split(",");
-	            employeeData.add(data);
-	        }
-	    } catch (IOException e) {
-	        System.err.println("Error reading the employee file: " + e.getMessage());
-	    }
-	    return employeeData;
-	}
+
 
 	public Scene getLoginScene() {
 		return loginScene;

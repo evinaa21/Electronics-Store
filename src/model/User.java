@@ -2,25 +2,29 @@
 package model;
 
 import util.Role;
-import java.util.Date;
 
-abstract class User {
-	private static int idCounter = 1;
+import java.io.Serializable;
+import java.time.LocalDate;
+
+public abstract class User implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
+	private static int idCounter = 0;
 	private int id;
     private String name;
     private double salary;
     private Role role;
     private String username;
     private String password;
-    private Date dateOfBirth;
-    private long phonenumber;
+    private LocalDate dateOfBirth;
+    private String phonenumber;
     private String email;
 
     public User() {
     };
 
-    public User(String name, double salary, Role role, String username, String password, Date dateOfBirth,
-            long phonenumber, String email) {
+    public User(String name, double salary, Role role, String username, String password, LocalDate dateOfBirth,
+            String phonenumber, String email) {
         this.id = idCounter++;
         this.name = name;
         this.salary = salary;
@@ -80,19 +84,19 @@ abstract class User {
         return password;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(LocalDate dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public Date getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setPhonenumber(long phonenumber) {
+    public void setPhonenumber(String phonenumber) {
         this.phonenumber = phonenumber;
     }
 
-    public long getPhonenumber() {
+    public String getPhonenumber() {
         return phonenumber;
     }
 

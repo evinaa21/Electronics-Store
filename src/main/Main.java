@@ -1,13 +1,16 @@
 package main;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.time.LocalDate;
 
 import controller.LoginController;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import model.Admin;
+import util.Role;
 import view.LoginView;
 
 public class Main extends Application {
@@ -28,15 +31,17 @@ public class Main extends Application {
 	}
 
 	private static void initializeAdminFile() {
-		String filepath = "employees.txt";
+		String filepath = "employees.dat";
 		File file = new File(filepath);
 		
 		if(!file.exists()) {
+			
+			Admin admin = new Admin("Florjon Allkaj", 50000, Role.Admin, "Flori05", "password", LocalDate.of(2005, 4, 11), "069 642 8069", "Florionallkaj@gmail.com");
 			try {
-				BufferedWriter writer = new BufferedWriter(new FileWriter(filepath));
-				writer.write("1,Florjon Allkaj,50000,Admin,Florjon05,password,11/04/2005,0696428069,florionallkaj@gmail.com");
-				writer.newLine();
-				writer.close();
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filepath));
+				
+				oos.writeObject(admin);
+				oos.close();
 				System.out.println("Admin file created with default admin.");
 			} catch (IOException e) {
 				System.err.println("Error creating admin file: " + e.getMessage());
