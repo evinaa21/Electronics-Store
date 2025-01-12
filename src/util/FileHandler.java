@@ -22,6 +22,28 @@ public class FileHandler {
 	public FileHandler() {
 		
 	}
+
+	//Ensure directories and files exist
+	private void ensureDirectoriesExist() {
+        try {
+            File employeeFile = new File(EMPLOYEE_FILE);
+            File inventoryFile = new File(INVENTORY_FILE);
+            File billDir = new File(BILL_DIRECTORY);
+
+            if (!employeeFile.getParentFile().exists()) {
+                employeeFile.getParentFile().mkdirs();
+            }
+            if (!inventoryFile.getParentFile().exists()) {
+                inventoryFile.getParentFile().mkdirs();
+            }
+            if (!billDir.exists()) {
+                billDir.mkdirs();
+            }
+        } catch (Exception e) {
+            System.err.println("Error ensuring directories exist: " + e.getMessage());
+        }
+    }
+	
 	 // Load inventory data for a specific sector
     public ArrayList<Item> loadInventoryBySector(String sector) {
         ArrayList<Item> inventory = loadInventory();
@@ -175,83 +197,69 @@ public class FileHandler {
 		    }
 	}
 	
-	//Save a bill to a text file
+	// Save a bill to a text file
 	public void saveBill(String billNumber, ArrayList<Item> items, double total, String cashierName, String sector) {
-        String date = dateFormat.format(new Date());
-        String fileName = BILL_DIRECTORY + billNumber + "_" + date + ".txt";
+	    String date = dateFormat.format(new Date());
+	    String fileName = BILL_DIRECTORY + billNumber + "_" + date + ".txt";
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            writer.write("=========================================\n");
-            writer.write("                ELECTRONIC STORE          \n");
-            writer.write("=========================================\n");
-            writer.write("Bill Number: " + billNumber + "\n");
-            writer.write("Cashier: " + cashierName + "\n");
-            writer.write("Sector: " + sector + "\n");
-            writer.write("Date: " + date + "\n");
-            writer.write("-----------------------------------------\n");
-            writer.write("Items:\n");
-            writer.write(String.format("%-20s %-10s %-10s\n", "Item Name", "Quantity", "Price"));
-            writer.write("-----------------------------------------\n");
-            for (Item item : items) {
-                writer.write(String.format("%-20s %-10d %-10.2f\n",
-                        item.getItemName(), item.getItemQuantity(), item.getSellingPrice()));
-            }
-            writer.write("-----------------------------------------\n");
-            writer.write(String.format("Total Amount: %.2f\n", total));
-            writer.write("=========================================\n");
-            writer.write("          THANK YOU FOR SHOPPING         \n");
-            writer.write("=========================================\n");
+	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+	        writer.write("=========================================\n");
+	        writer.write("                ELECTRONIC STORE          \n");
+	        writer.write("=========================================\n");
+	        writer.write("Bill Number: " + billNumber + "\n");
+	        writer.write("Cashier: " + cashierName + "\n");
+	        writer.write("Sector: " + sector + "\n");
+	        writer.write("Date: " + date + "\n");
+	        writer.write("-----------------------------------------\n");
+	        writer.write("Items:\n");
+	        writer.write(String.format("%-20s %-10s %-10s %-10s\n", "Item Name", "Category", "Quantity", "Price"));
+	        writer.write("-----------------------------------------\n");
 
-            System.out.println("Bill saved successfully to " + fileName);
-        } catch (IOException e) {
-            System.err.println("Error saving bill to file: " + fileName + ". Cause: " + e.getMessage());
-        }
-    }
-	
-	// Notify manager of low stock items without filtering by category
-	public ArrayList<Item> notifyLowStock(int threshold) {
-	    ArrayList<Item> inventory = loadInventory();
-	    ArrayList<Item> lowStockItems = new ArrayList<>();
-
-	    for (Item item : inventory) {
-	        if (item.getStockQuantity() < threshold) {
-	            lowStockItems.add(item);
+	        // Loop through items and print details including category
+	        for (Item item : items) {
+	            writer.write(String.format("%-20s %-10s %-10d %-10.2f\n",
+	                    item.getItemName(),
+	                    item.getCategory() != null ? item.getCategory() : "Uncategorized", // Check for null category
+	                    item.getItemQuantity(),
+	                    item.getSellingPrice()));
 	        }
+
+	        writer.write("-----------------------------------------\n");
+	        writer.write(String.format("Total Amount: %.2f\n", total));
+	        writer.write("=========================================\n");
+	        writer.write("          THANK YOU FOR SHOPPING         \n");
+	        writer.write("=========================================\n");
+
+	        System.out.println("Bill saved successfully to " + fileName);
+	    } catch (IOException e) {
+	        System.err.println("Error saving bill to file: " + fileName + ". Cause: " + e.getMessage());
 	    }
-
-	    return lowStockItems;
 	}
-	// Notify manager of low stock items filtered by category
-    public ArrayList<Item> notifyLowStockByCategory(String category, int threshold) {
-        ArrayList<Item> inventory = loadInventory();
-        ArrayList<Item> lowStockItems = new ArrayList<>();
 
-        for (Item item : inventory) {
-            if (item.getCategory().equalsIgnoreCase(category) && item.getStockQuantity() < threshold) {
-                lowStockItems.add(item);
+  	//Load all bills for a specific cashier
+	public ArrayList<Bill> loadBills(String cashierName, Date date) {
+        	ArrayList<Bill> bills = new ArrayList<>();
+        	File billDirectory = new File(BILL_DIRECTORY);
+
+        if (billDirectory.exists() && billDirectory.isDirectory()) {
+            	File[] billFiles = billDirectory.listFiles((dir, name) -> name.contains(cashierName));
+
+            if (billFiles != null) {
+                for (File billFile : billFiles) {
+                    Bill bill = loadBillFromFile(billFile, date);
+                    if (bill != null) {
+                        bills.add(bill);
+                    }
+                }
             }
-        }
-
-        return lowStockItems;
-    }
-
-    // Load all bills from text files
-    public ArrayList<Bill> loadBills() {
-        ArrayList<Bill> bills = new ArrayList<>();
-        File billDirectory = new File(BILL_DIRECTORY);
-        File[] billFiles = billDirectory.listFiles((dir, name) -> name.endsWith(".txt"));
-
-        if (billFiles != null) {
-            for (File billFile : billFiles) {
-                Bill bill = loadBillFromFile(billFile);
-                bills.add(bill);
-            }
+        } else {
+            System.err.println("Bill directory not found or is not a directory.");
         }
         return bills;
     }
-
-    // Load a bill from a text file and convert it into a Bill object
-    private Bill loadBillFromFile(File billFile) {
+	
+	//Load a bill from a text file and convert it into a Bill object
+	private Bill loadBillFromFile(File billFile, Date date) {
         Bill bill = null;
         try (BufferedReader reader = new BufferedReader(new FileReader(billFile))) {
             String line;
@@ -266,28 +274,33 @@ public class FileHandler {
                 } else if (line.startsWith("Date:")) {
                     String dateStr = line.split(":")[1].trim();
                     saleDate = dateFormat.parse(dateStr);
-                } else if (line.startsWith("Item Name")) {
-                    // Skip the header line
-                    continue;
-                } else if (line.trim().length() > 0) {
+                } else if (line.startsWith("Total Amount:")) {
+                    totalAmount = Double.parseDouble(line.split(":")[1].trim());
+                } else if (!line.startsWith("=") && !line.startsWith("-") && !line.isBlank()) {
                     String[] itemDetails = line.split("\\s+");
                     String itemName = itemDetails[0];
-                    int itemQuantity = Integer.parseInt(itemDetails[1]);
-                    double itemPrice = Double.parseDouble(itemDetails[2]);
-                    //Ky line ishte error
-                    //items.add(new Item(itemName, itemQuantity, itemPrice));
+                    String category = itemDetails[1];
+                    int quantity = Integer.parseInt(itemDetails[1]);
+                    double price = Double.parseDouble(itemDetails[2]);
+                    items.add(new Item(itemName, category , price, quantity));
                 }
             }
 
             if (billNumber != null && saleDate != null) {
-                bill = new Bill(billNumber, items, totalAmount, saleDate);
-                bill.calculateTotal(); // Calculate the total amount
+                if (date == null || isSameDay(saleDate, date)) {
+                    bill = new Bill(billNumber, items, totalAmount, saleDate);
+                }
             }
-        } catch (IOException | java.text.ParseException e) {
+        } catch (Exception e) {
             System.err.println("Error reading bill file: " + billFile.getName());
-            e.printStackTrace();
         }
         return bill;
+    }
+	
+	private boolean isSameDay(Date date1, Date date2) {
+        return date1.getYear() == date2.getYear() &&
+                date1.getMonth() == date2.getMonth() &&
+                date1.getDate() == date2.getDate();
     }
 	
 } 
