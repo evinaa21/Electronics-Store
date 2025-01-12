@@ -71,7 +71,7 @@ public class Cashier extends User implements Serializable {
 			checkStock(item, quantity);  
 			
 			//Deduct stock
-			item.updateStock(-quantity);
+			item.sellItem(quantity);
 			
 			totalAmount += item.getSellingPrice() * quantity;		
 		} 
