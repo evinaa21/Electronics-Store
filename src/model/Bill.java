@@ -62,21 +62,45 @@ public class Bill implements Serializable{
 		return total;
 	}
 	
-	public void printBill() {
-		System.out.println("Bill Number: " + billNumber);
-		System.out.println("Sale Date: " + saleDate);
-		System.out.println("Items:");
-		
-		for(int i = 0; i < items.size(); i++) {
-			Item item = items.get(i);
-			System.out.println("- " + item.getItemName() + " | Quantity: " + item.getItemQuantity() 
-			+ " | Price: $ " + item.getSellingPrice() + "each");
-		}
-		
-		System.out.println("Total Amount: $" + totalAmount);
+	public String printBill(String cashierName, String sector) {
+	    // Use StringBuilder to construct the bill
+	    StringBuilder billDisplay = new StringBuilder();
+
+	    billDisplay.append("=========================================\n");
+	    billDisplay.append("                ELECTRONIC STORE          \n");
+	    billDisplay.append("=========================================\n");
+	    billDisplay.append("Bill Number: ").append(billNumber).append("\n");
+	    billDisplay.append("Cashier: ").append(cashierName).append("\n");
+	    billDisplay.append("Sector: ").append(sector).append("\n");
+	    billDisplay.append("Sale Date: ").append(saleDate).append("\n");
+	    billDisplay.append("-----------------------------------------\n");
+	    billDisplay.append("Items:\n");
+	    billDisplay.append(String.format("%-20s %-15s %-10s %-10s\n", "Item Name", "Category", "Quantity", "Price"));
+	    billDisplay.append("-----------------------------------------\n");
+
+	    // Loop through items to include their details
+	    for (Item item : items) {
+	        billDisplay.append(String.format(
+	            "%-20s %-15s %-10d %-10.2f\n",
+	            item.getItemName(),
+	            item.getCategory() != null ? item.getCategory() : "Uncategorized", // Handle null category
+	            item.getItemQuantity(),
+	            item.getSellingPrice()
+	        ));
+	    }
+
+	    billDisplay.append("-----------------------------------------\n");
+	    billDisplay.append(String.format("Total Amount: %.2f\n", totalAmount));
+	    billDisplay.append("=========================================\n");
+	    billDisplay.append("          THANK YOU FOR SHOPPING         \n");
+	    billDisplay.append("=========================================\n");
+
+	    // Display the bill in the console
+	    System.out.println(billDisplay.toString());
+
+	    //Return the bill as a string if needed for UI display
+	     return billDisplay.toString();
 	}
-	
-	
 	
 	@Override
 	public String toString() {
