@@ -9,35 +9,41 @@ public class Supplier implements Serializable {
 
     private String supplierName;
     private String contactInfo;
-    private List<Item> suppliedItems;
+    private ArrayList<Item> suppliedItems;
+    private List<String> itemIds; // Store IDs of items supplied by this supplier
 
-    // Constructor
-    public Supplier(String supplierName, String contactInfo) {
+	private String supplierId;
+
+    public Supplier( String supplierName) {
         this.supplierName = supplierName;
-        this.contactInfo = contactInfo;
+        this.itemIds = new ArrayList<>();
         this.suppliedItems = new ArrayList<>();
     }
 
-    // Add an item to the supplier's list of supplied items
     public void addItem(Item item) {
-        if (item != null) {
-            suppliedItems.add(item);
+        if (suppliedItems == null) {
+            suppliedItems = new ArrayList<>();  // Initialize if not already initialized
         }
+        suppliedItems.add(item);  // Add the item
     }
+
 
     // Remove an item from the supplier's list of supplied items
     public void removeItem(Item item) {
         suppliedItems.remove(item);
     }
 
-    // Getter for supplied items
-    public List<Item> getSuppliedItems() {
-        return new ArrayList<>(suppliedItems); // Return a copy to ensure encapsulation
-    }
 
     // Getter and Setter for supplier name
     public String getSupplierName() {
         return supplierName;
+    }
+
+    public ArrayList<Item> getSuppliedItems() {
+    	if(suppliedItems == null) {
+    		suppliedItems = new ArrayList<Item>();
+    	}
+        return suppliedItems;
     }
 
     public void setSupplierName(String supplierName) {
@@ -52,10 +58,22 @@ public class Supplier implements Serializable {
     public void setContactInfo(String contactInfo) {
         this.contactInfo = contactInfo;
     }
+    public void setSuppliedItems(ArrayList<Item> suppliedItems) {
+        this.suppliedItems = suppliedItems;
+    }
+    public List<String> getItemIds() {
+        return itemIds;
+    }
+    public void removeItem(String itemId) {
+        itemIds.remove(itemId);
+    }
+
 
     @Override
     public String toString() {
         return "Supplier: " + supplierName + ", Contact Info: " + contactInfo;
     }
+
+
 }
 

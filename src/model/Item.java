@@ -2,7 +2,9 @@ package model;
 
 import java.io.Serializable;
 
-import javafx.scene.image.Image;
+import java.util.Objects;
+
+
 
 public class Item implements Serializable {
     /**
@@ -15,18 +17,23 @@ public class Item implements Serializable {
     private int stockQuantity;
     private int itemsSold;
     private int itemQuantity;
-    private Image image;
+    private String imagePath;
     private String category;
     private String description;
+    private String supplierName;
 
     // Constructor for Manager
-    public Item(String itemName, String itemCategory, double price, int stockQuantity) {
+    public Item(String itemName, String itemSector, double price, int stockQuantity, String category, String description, String supplierName, String imagePath) {
         this.itemName = itemName;
-        this.itemSector = itemCategory;
+        this.itemSector = itemSector;
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.itemsSold = 0;
         this.itemQuantity = stockQuantity;
+        this.category = category;
+        this.description = description;
+        this.supplierName = supplierName;
+        this.imagePath = imagePath;
     }
 
     // Constructor for Cashier
@@ -59,7 +66,12 @@ public class Item implements Serializable {
 
 
     public void restockItem(int quantity) {
+
 this.itemQuantity += quantity;
+
+        this.stockQuantity += quantity;  // Update the stock quantity
+        this.itemQuantity += quantity;  // Update the total item quantity
+
     }
   
 
@@ -95,12 +107,12 @@ this.itemQuantity += quantity;
         return itemsSold;
     }
 
-    public void setImage(Image image) {
-        this.image = image;
+    public String getImagePath() {
+        return imagePath;
     }
 
-    public Image getImage() {
-        return image;
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
     public String getCategory() {
         return category;
@@ -118,6 +130,10 @@ this.itemQuantity += quantity;
         return description;
     }
 
+    public String getSupplierName() {
+        return supplierName;
+    }
+
     @Override
     public String toString() {
         return "Item->" +
@@ -126,5 +142,27 @@ this.itemQuantity += quantity;
                 ", Price:" + price +
                 ", Stock:" + stockQuantity +
                 ", Items Sold:" + itemsSold;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Item item = (Item) o;
+        return Double.compare(item.price, price) == 0 &&
+                stockQuantity == item.stockQuantity &&
+                itemsSold == item.itemsSold &&
+                itemQuantity == item.itemQuantity &&
+                Objects.equals(itemName, item.itemName) &&
+                Objects.equals(itemSector, item.itemSector) &&
+                Objects.equals(category, item.category) &&
+                Objects.equals(description, item.description) &&
+                Objects.equals(supplierName, item.supplierName) &&
+                Objects.equals(imagePath, item.imagePath);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(itemName, itemSector, price, stockQuantity, itemsSold, itemQuantity, imagePath, category, description, supplierName);
     }
 }

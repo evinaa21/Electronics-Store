@@ -1,9 +1,12 @@
 package model;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
+
 import util.Role;
 
 public class Manager extends User implements Serializable {
@@ -15,55 +18,59 @@ public class Manager extends User implements Serializable {
     private ArrayList<Supplier> suppliers;
     private ArrayList<Item> items;
     private SalesMetrics salesMetrics; 
+    private ArrayList<Cashier> cashiers;
 
-    public Manager(int id, String name, double salary, Role role, String username, String password, Date dateOfBirth,
-                   long phonenumber, String email) {
+
+
+
+    public Manager(int id, String name, double salary, Role role, String username, String password, LocalDate dateOfBirth,
+                   String phonenumber, String email) {
         super(name, salary, role, username, password, dateOfBirth, phonenumber, email);
         this.sectors = new ArrayList<>();
         this.suppliers = new ArrayList<>();
         this.items = new ArrayList<>();
         this.salesMetrics = new SalesMetrics();
+        this.cashiers = new ArrayList<>();
     }
 
-    // Default constructor
-    public Manager() {
-        super("Default", 0.0, Role.Manager, "default", "default", new Date(), 0L, "default@domain.com");
-        this.sectors = new ArrayList<>();
-        this.suppliers = new ArrayList<>();
-        this.items = new ArrayList<>();
-        this.salesMetrics = new SalesMetrics();
-    }
 
-    // Add a new sector to the list of sectors
-    public boolean addSector(String sectorName) {
-        if (sectorName == null || sectorName.trim().isEmpty()) {
-            showError("Sector name cannot be empty.");
-            return false;
-        }
-
-        // Ensure the sector is unique before adding
+ // Method to add a new sector
+    public boolean addSector(Sector newSector) {
+        // Check if the sector already exists by name (or other criteria)
         for (Sector sector : sectors) {
-            if (sector.getName().equalsIgnoreCase(sectorName)) {
-                showError("Sector already exists: " + sectorName);
-                return false;
+            if (sector.getName().equalsIgnoreCase(newSector.getName())) {
+                showError("Sector already exists: " + newSector.getName());
+                return false; // Return false if the sector already exists
             }
         }
 
-        // Add the new sector
-        sectors.add(new Sector(sectorName)); // Assuming Sector class accepts a sector name
-        showSuccess("Sector added successfully: " + sectorName);
-        return true;
+        // Add the new sector to the list of sectors
+        sectors.add(newSector);
+        showSuccess("Sector added successfully: " + newSector.getName());
+        return true; // Return true if the sector was added successfully
     }
-
-
-    // View the sectors in the manager's list
-    public ArrayList<String> viewSector() {
-        ArrayList<String> sectorNames = new ArrayList<>();
-        for (Sector sector : sectors) {
-            sectorNames.add(sector.getName());  // Assuming Sector class has a getName() method
+    public Supplier getSupplierByName(String supplierName) {
+        for (Supplier supplier : suppliers) {
+            if (supplier.getSupplierName().equals(supplierName)) {
+                return supplier;
+            }
         }
-        return sectorNames;
+        return null;  // Return null if no matching supplier found
     }
+
+
+    public ArrayList<Sector> viewSector() {
+        // Assuming 'sectors' is already an ArrayList<Sector>
+        if (sectors != null && !sectors.isEmpty()) {
+            return sectors;  // Return the list of Sector objects directly
+        } else {
+            System.out.println("No sectors available.");
+            return new ArrayList<>();  // Return an empty list if no sectors exist
+        }
+    }
+
+
+
 
     // Add a new item
     public void addNewItem(Item item) {
@@ -125,7 +132,13 @@ public class Manager extends User implements Serializable {
         }
         throw new IllegalArgumentException("Sector not found: " + sectorName);
     }
-
+    public List<String> getSupplierNames() {
+        List<String> supplierNames = new ArrayList<>();
+        for (Supplier supplier : suppliers) {  // Assuming you have a list of Supplier objects
+            supplierNames.add(supplier.getSupplierName());
+        }
+        return supplierNames;
+    }
     // Getter and Setter methods
     public ArrayList<Sector> getSectors() {
         return sectors;
@@ -138,7 +151,7 @@ public class Manager extends User implements Serializable {
     public ArrayList<Supplier> getSuppliers() {
         return suppliers;
     }
-
+    
     public void setSuppliers(ArrayList<Supplier> suppliers) {
         this.suppliers = suppliers;
     }
@@ -157,4 +170,13 @@ public class Manager extends User implements Serializable {
     public void setSalesMetrics(SalesMetrics salesMetrics) {
         this.salesMetrics = salesMetrics;
     }
+
+    public ArrayList<Cashier> getCashiers() {
+        return cashiers;
+    }
+
+    public void setCashiers(ArrayList<Cashier> cashiers) {
+        this.cashiers = cashiers;
+    }
+
 }

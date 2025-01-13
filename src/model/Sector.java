@@ -5,15 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Sector implements Serializable {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 8568062619814491335L;
+   
+	private static final long serialVersionUID = 1L;
 	private String sectorName;
     private Manager manager;
-    private List<Cashier> cashiers;
-    private List<Item> items;
-    private List<String> categories;  // Add a list to store categories
+    private ArrayList<Cashier> cashiers;
+    private ArrayList<Item> items;
+    private ArrayList<String> categories;  // Add a list to store categories
 
     public Sector(String sectorName) {
         this.sectorName = sectorName;
@@ -38,7 +36,7 @@ public class Sector implements Serializable {
         categories.add(category);  // Add category to the list
     }
 
-    public List<Item> viewItems() {
+    public ArrayList<Item> viewItems() {
         return items;
     }
 
@@ -46,7 +44,7 @@ public class Sector implements Serializable {
         return cashiers;
     }
 
-    public List<String> getCategories() {
+    public ArrayList<String> getCategories() {
         return categories;  // Get the list of categories
     }
 
