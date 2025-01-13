@@ -7,32 +7,34 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import model.Manager;
+import util.FileHandler;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class GenerateReportView {
 
     private Manager manager;
+	private FileHandler fileHandler;
+	
 
-    // Constructor to pass Manager instance
-    public GenerateReportView(Manager manager) {
+
+    public GenerateReportView(Manager manager, FileHandler fileHandler) {
+
         this.manager = manager;
+        this.fileHandler=fileHandler;
     }
 
-    // Method to return the VBox view content instead of displaying it directly
     public VBox getViewContent() {
-        // Create a title for the report window
         Label titleLabel = new Label("Generate Sales Report");
         titleLabel.setFont(new javafx.scene.text.Font("Arial", 28));
         titleLabel.setTextFill(Color.WHITE);
 
-        // Parent container with dark blue background
         VBox parentLayout = new VBox(20);
         parentLayout.setStyle("-fx-background-color: #2C3E50;");
         parentLayout.setAlignment(Pos.CENTER);
         parentLayout.setPadding(new Insets(20));
 
-        // Select time period
         Label timePeriodLabel = new Label("Select Time Period:");
         timePeriodLabel.setTextFill(Color.WHITE);
 
@@ -40,29 +42,25 @@ public class GenerateReportView {
         timePeriodCombo.getItems().addAll("Last 7 Days", "Last Month", "Custom");
         timePeriodCombo.setValue("Last 7 Days");
 
-        // Create DatePicker for Start and End Date (hidden initially)
         Label startDateLabel = new Label("Start Date:");
         startDateLabel.setTextFill(Color.WHITE);
         DatePicker startDatePicker = new DatePicker();
-        startDatePicker.setVisible(false);  // Hidden initially
+        startDatePicker.setVisible(false);
 
         Label endDateLabel = new Label("End Date:");
         endDateLabel.setTextFill(Color.WHITE);
         DatePicker endDatePicker = new DatePicker();
-        endDatePicker.setVisible(false);  // Hidden initially
+        endDatePicker.setVisible(false);
 
-        // Create HBox to arrange start and end date horizontally
         HBox dateBox = new HBox(10, startDateLabel, startDatePicker, endDateLabel, endDatePicker);
         dateBox.setAlignment(Pos.CENTER);
-        dateBox.setVisible(false);  // Hidden initially
+        dateBox.setVisible(false);
 
-        // Report display area
         TextArea reportArea = new TextArea();
         reportArea.setEditable(false);
         reportArea.setPrefHeight(150);
         reportArea.setWrapText(true);
 
-        // Generate Button
         Button generateButton = new Button("Generate Report");
         generateButton.setStyle("-fx-background-color: #3498DB; -fx-text-fill: white; -fx-padding: 12px 20px; -fx-border-radius: 5;");
         generateButton.setFont(new javafx.scene.text.Font("Arial", 14));
@@ -72,61 +70,91 @@ public class GenerateReportView {
                 reportArea.setText("Please select a valid time period.");
             } else {
                 if (timePeriod.equals("Custom")) {
-                    // Check if both start and end dates are selected
                     if (startDatePicker.getValue() == null || endDatePicker.getValue() == null) {
                         reportArea.setText("Please select both start and end dates.");
                     } else {
                         LocalDate startDate = startDatePicker.getValue();
                         LocalDate endDate = endDatePicker.getValue();
-                        reportArea.setText(generateSalesReport(timePeriod, startDate, endDate)); // Pass dates for custom range
+                        reportArea.setText(generateSalesReport(timePeriod, startDate, endDate));
                     }
                 } else {
-                    reportArea.setText(generateSalesReport(timePeriod, null, null)); // No dates for other time periods
+                    reportArea.setText(generateSalesReport(timePeriod, null, null));
                 }
             }
         });
 
-        // Show date pickers if "Custom" is selected
         timePeriodCombo.setOnAction(event -> {
             if (timePeriodCombo.getValue().equals("Custom")) {
                 startDatePicker.setVisible(true);
                 endDatePicker.setVisible(true);
-                dateBox.setVisible(true);  // Show the HBox with date pickers
+                dateBox.setVisible(true);
             } else {
                 startDatePicker.setVisible(false);
                 endDatePicker.setVisible(false);
-                dateBox.setVisible(false);  // Hide the HBox with date pickers
+                dateBox.setVisible(false);
             }
         });
 
-        // Add DropShadow effect to the layout
         parentLayout.setEffect(createDropShadowEffect());
-
-        // Add components to the layout
         parentLayout.getChildren().addAll(titleLabel, timePeriodLabel, timePeriodCombo, dateBox, generateButton, reportArea);
 
-        return parentLayout; // Return the VBox layout containing the view content
+        return parentLayout;
     }
 
-    // Method to generate a sales report based on the selected time period and optional date range
-    private String generateSalesReport(String timePeriod, LocalDate startDate, LocalDate endDate) {
-        switch (timePeriod) {
-            case "Last 7 Days":
-                return "Sales Report for Last 7 Days:\nTotal Sales: $1000\nTotal Items Sold: 50";
-            case "Last Month":
-                return "Sales Report for Last Month:\nTotal Sales: $4000\nTotal Items Sold: 200";
-            case "Custom":
-                if (startDate != null && endDate != null) {
-                    return "Sales Report for Custom Period (" + startDate + " to " + endDate + "):\nTotal Sales: $2000\nTotal Items Sold: 100";
-                } else {
-                    return "Invalid custom date range selected.";
-                }
-            default:
-                return "Invalid time period selected.";
-        }
-    }
+
+
 
     // Method to create a DropShadow effect
+
+    public String generateSalesReport(String timePeriod, LocalDate startDate, LocalDate endDate) {
+        // Use the fileHandler to read bills from the file
+        ArrayList<String> billsData = fileHandler.readBills();
+
+        // Filter the bills data based on the time period or custom date range
+        ArrayList<String> filteredBills = filterBills(billsData, timePeriod, startDate, endDate);
+
+        // Calculate the total sales from the filtered bills
+        double totalSales = calculateTotalSales(filteredBills);
+
+        return "Total Sales: $" + totalSales;
+    }
+
+    private ArrayList<String> filterBills(ArrayList<String> billsData, String timePeriod, LocalDate startDate, LocalDate endDate) {
+        ArrayList<String> filteredBills = new ArrayList<>();
+        LocalDate now = LocalDate.now();
+
+        for (String bill : billsData) {
+            // Parse each bill date and amount
+            String[] billData = bill.split(",");
+            LocalDate billDate = LocalDate.parse(billData[0]);
+            double billAmount = Double.parseDouble(billData[1]);
+
+            // Filter based on time period or custom date range
+            if (timePeriod.equals("Last 7 Days") && billDate.isAfter(now.minusDays(7))) {
+                filteredBills.add(bill);
+            } else if (timePeriod.equals("Last Month") && billDate.isAfter(now.minusMonths(1))) {
+                filteredBills.add(bill);
+            } else if (timePeriod.equals("Custom") && billDate.isAfter(startDate.minusDays(1)) && billDate.isBefore(endDate.plusDays(1))) {
+                filteredBills.add(bill);
+            }
+        }
+        return filteredBills;
+    }
+
+    private double calculateTotalSales(ArrayList<String> billsData) {
+        double totalSales = 0.0;
+
+        for (String bill : billsData) {
+            // Parse the bill data (assuming the format is "date,amount")
+            String[] billData = bill.split(",");
+            double amount = Double.parseDouble(billData[1]);
+            totalSales += amount;
+        }
+
+        return totalSales;
+    }
+
+
     private DropShadow createDropShadowEffect() {
         DropShadow dropShadow = new DropShadow();
         dropShadow.setRadius(10);
@@ -135,5 +163,13 @@ public class GenerateReportView {
         dropShadow.setColor(Color.rgb(0, 0, 0, 0.1));
         return dropShadow;
     }
+
+
+
+    public void setFileHandler(FileHandler fileHandler) {
+        this.fileHandler = fileHandler;
+    }
+
 }
+
 
