@@ -9,25 +9,53 @@ import javafx.geometry.*;
 import model.Manager;
 import model.Supplier;
 import model.Item;
+import util.FileHandler;
+
+import java.util.ArrayList;
 
 public class SupplierView {
 
-    private SupplierController supplierController;  // Declare the controller
+    private SupplierController supplierController;
     private Manager manager;
 
-    public SupplierView(Manager manager) {
+    private FileHandler fileHandler;
+
+
+    public SupplierView(Manager manager, FileHandler fileHandler) {
         this.manager = manager;
-        this.supplierController = new SupplierController(manager, this);  // Pass the view to the controller
+        this.fileHandler = fileHandler;
+
+        // Initialize the SupplierController
+        this.supplierController = new SupplierController(manager, this, fileHandler);
+
+        // Load suppliers and items from file with null checks
+        this.manager.setSuppliers(getNonNullList(fileHandler.loadSuppliers()));
+        this.manager.setItems(getNonNullList(fileHandler.loadInventory()));
+
+        // Initialize suppliedItems for each supplier if not already initialized
+        for (Supplier supplier : manager.getSuppliers()) {
+            if (supplier.getSuppliedItems() == null) {
+                supplier.setSuppliedItems(new ArrayList<>()); // Initialize with an empty list if null
+            }
+        }
+
+        // Debugging logs
+        System.out.println("Suppliers loaded from file: " + manager.getSuppliers());
+        System.out.println("Items loaded from file: " + manager.getItems());
     }
 
-    // Method to show the Supplier list view with suppliers and their items
+
     public VBox getViewContent() {
-        VBox supplierLayout = new VBox(10);
+        VBox supplierLayout = new VBox(30);
         ListView<HBox> supplierListView = new ListView<>();
         
-        // Add each supplier and their items to the ListView
+        // Set VBox to fill the available space
+        supplierLayout.setPrefWidth(Double.MAX_VALUE);
+        supplierLayout.setPrefHeight(Double.MAX_VALUE);
+
+        // Add each supplier to the ListView
         for (Supplier supplier : manager.getSuppliers()) {
-            HBox supplierItem = createSupplierItem(supplier, supplierListView); // Pass the ListView to handle adding items
+            HBox supplierItem = createSupplierItem(supplier, supplierListView);
             supplierListView.getItems().add(supplierItem);
         }
 
@@ -35,98 +63,78 @@ public class SupplierView {
         Button addSupplierButton = new Button("Add Supplier");
         addSupplierButton.setOnAction(e -> showAddSupplierDialog(supplierListView));
 
+        // Set the button to expand to fill the available width
+        addSupplierButton.setMaxWidth(100);
+
         supplierLayout.getChildren().addAll(supplierListView, addSupplierButton);
         supplierLayout.setPadding(new Insets(20));
+
+        // Allow the VBox to expand
+        VBox.setVgrow(supplierListView, Priority.ALWAYS); // Let the ListView take all the available vertical space
 
         return supplierLayout;
     }
 
-    // Method to create a detailed view of a supplier and their items
+
     private HBox createSupplierItem(Supplier supplier, ListView<HBox> supplierListView) {
         VBox itemListLayout = new VBox(5);
         itemListLayout.setPadding(new Insets(5));
+        itemListLayout.setVisible(false);
 
-        // Display each item for the supplier
+        // Populate the item list for the supplier
+        itemListLayout.getChildren().clear();
         for (Item item : supplier.getSuppliedItems()) {
-            itemListLayout.getChildren().add(new Label(item.toString()));  // Show item name and price
+            HBox itemRow = new HBox(10);
+            itemRow.setAlignment(Pos.CENTER_LEFT);
+
+            Label itemLabel = new Label(item.toString());
+            itemRow.getChildren().add(itemLabel);
+            itemListLayout.getChildren().add(itemRow);
         }
 
-        // Create the layout for the supplier
         HBox supplierItem = new HBox(10);
         supplierItem.setAlignment(Pos.CENTER_LEFT);
         supplierItem.setPadding(new Insets(5));
 
-        // Add supplier name and the item list to the HBox
         Label supplierNameLabel = new Label(supplier.getSupplierName());
-        Button addItemButton = new Button("Add Item");
+        Button toggleItemsButton = new Button("Show Items");
 
-        // Set the action for the "Add Item" button
-        addItemButton.setOnAction(e -> showAddItemDialog(supplier, supplierListView));
+        toggleItemsButton.setOnAction(e -> {
+            itemListLayout.setVisible(!itemListLayout.isVisible());
+            toggleItemsButton.setText(itemListLayout.isVisible() ? "Hide Items" : "Show Items");
+        });
 
-        // Add supplier name, item list, and button to the HBox
-        supplierItem.getChildren().addAll(supplierNameLabel, itemListLayout, addItemButton);
-        
+        supplierItem.getChildren().addAll(supplierNameLabel, toggleItemsButton, itemListLayout);
         return supplierItem;
     }
 
-    // Method to show the Add Supplier dialog
+   
     private void showAddSupplierDialog(ListView<HBox> supplierListView) {
+        // Create a dialog to enter the supplier's name
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Add Supplier");
-        dialog.setHeaderText("Enter Supplier Details");
+        dialog.setHeaderText("Enter Supplier Name");
         dialog.setContentText("Supplier Name:");
 
         dialog.showAndWait().ifPresent(supplierName -> {
             if (!supplierName.trim().isEmpty()) {
-                supplierController.addSupplier(supplierName, "Default Contact Info", supplierListView); // Pass appropriate values
-                refreshSupplierList(supplierListView);  // Pass the ListView to refresh it
+                // Add the supplier with only the name and default contact info
+                supplierController.addSupplier(supplierName, supplierListView);
+                refreshSupplierList(supplierListView);  // Refresh the list to show the new supplier
+            } else {
+                showErrorDialog("Supplier name cannot be empty.");
             }
         });
     }
 
-    // Method to show the Add Item dialog where the user selects an existing item
-    private void showAddItemDialog(Supplier supplier, ListView<HBox> supplierListView) {
-        // Create a list of predefined items to choose from
-        ListView<Item> predefinedItemsListView = new ListView<>();
-        
-        // Populate the list with available items from the system (or predefined list)
-        predefinedItemsListView.getItems().addAll(manager.getItems());  // Assuming manager has a list of items
-
-        // Create a dialog to allow the user to select an item from the predefined list
-        VBox dialogLayout = new VBox(10);
-        dialogLayout.setPadding(new Insets(10));
-        
-        Label instructionLabel = new Label("Select an item to add to the supplier:");
-        dialogLayout.getChildren().addAll(instructionLabel, predefinedItemsListView);
-        
-        Button addButton = new Button("Add Item");
-        addButton.setOnAction(e -> {
-            Item selectedItem = predefinedItemsListView.getSelectionModel().getSelectedItem();
-            if (selectedItem != null) {
-                supplierController.addItemToSupplier(supplier, selectedItem, supplierListView);
-                refreshSupplierList(supplierListView);  // Refresh the list to show the newly added item
-            }
-        });
-        
-        dialogLayout.getChildren().add(addButton);
-
-        // Create a dialog window with the layout
-        Stage dialogStage = new Stage();
-        dialogStage.setTitle("Add Item to Supplier");
-        dialogStage.setScene(new Scene(dialogLayout, 300, 200));
-        dialogStage.show();
-    }
-
-    // Method to refresh the Supplier list view after adding a supplier or an item
     public void refreshSupplierList(ListView<HBox> supplierListView) {
-        supplierListView.getItems().clear();  // Clear the current list
+        supplierListView.getItems().clear(); // Clear the existing items first
         for (Supplier supplier : manager.getSuppliers()) {
-            HBox supplierItem = createSupplierItem(supplier, supplierListView);  // Create the supplier and their items
-            supplierListView.getItems().add(supplierItem);  // Add the updated list
+            HBox supplierItem = createSupplierItem(supplier, supplierListView);
+            supplierListView.getItems().add(supplierItem); // Add the new items
         }
     }
 
-    // Utility method for showing error dialog
     public void showErrorDialog(String errorMessage) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
@@ -135,7 +143,6 @@ public class SupplierView {
         alert.showAndWait();
     }
 
-    // Utility method for showing success dialog
     public void showSuccessDialog(String successMessage) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Success");
@@ -143,4 +150,15 @@ public class SupplierView {
         alert.setContentText(successMessage);
         alert.showAndWait();
     }
+
+
+    public void setFileHandler(FileHandler fileHandler) {
+        this.fileHandler = fileHandler;
+    }
+
+    // Utility method to handle null lists
+    private <T> ArrayList<T> getNonNullList(ArrayList<T> list) {
+        return list != null ? list : new ArrayList<>();
+    }
+
 }
