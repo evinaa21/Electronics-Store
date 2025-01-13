@@ -9,33 +9,41 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import model.Manager;
 import model.Sector;
+import util.FileHandler;
 
 import java.util.ArrayList;
 
 public class ViewSectorsView {
     private Manager manager;
+
     private ArrayList<String> sectors;
 
-    public ViewSectorsView(Manager manager) {
+    private FileHandler fileHandler;
+
+
+    public ViewSectorsView(Manager manager, FileHandler fileHandler) {
         this.manager = manager;
-        this.sectors = new ArrayList<>();
+        this.fileHandler = fileHandler;
+        this.manager.setSectors(fileHandler.loadSectors());
+        System.out.println("Sectors loaded from file: " + manager.getSectors());
     }
 
     public VBox getViewContent() {
-        sectors = manager.viewSector(); // Get the sectors as strings
+        ArrayList<Sector> sectors = manager.viewSector();
         ScrollPane scrollPane = new ScrollPane();
-        VBox sectorsLayout = new VBox(15); // Spacing for a clean layout
+        VBox sectorsLayout = new VBox(15);
         scrollPane.setContent(sectorsLayout);
         scrollPane.setFitToWidth(true);
         scrollPane.setStyle("-fx-background-color: #f8f9fa; -fx-padding: 10px;");
 
-        for (String sectorName : sectors) {
-            VBox sectorBox = createSectorBox(sectorName);
+        // Add existing sectors to the view
+        for (Sector sector : sectors) {
+            VBox sectorBox = createSectorBox(sector);
             sectorsLayout.getChildren().add(sectorBox);
         }
 
         Button addSectorButton = new Button("+ Add Sector");
-        styleButton(addSectorButton, true); // Full-size button styling
+        styleButton(addSectorButton, true);
         addSectorButton.setOnAction(e -> showAddSectorDialog(sectorsLayout));
 
         HBox buttonsLayout = new HBox(10, addSectorButton);
@@ -48,15 +56,15 @@ public class ViewSectorsView {
         return layout;
     }
 
-    private VBox createSectorBox(String sectorName) {
-        VBox sectorBox = new VBox(5); // Vertical layout for sector and categories
+    private VBox createSectorBox(Sector sector) {
+        VBox sectorBox = new VBox(5);
         sectorBox.setPadding(new Insets(10));
         sectorBox.setStyle("-fx-background-color: #ffffff; -fx-border-color: #003366; -fx-border-width: 1px; -fx-border-radius: 10px; -fx-background-radius: 10px;");
 
         HBox sectorRow = new HBox(10);
         sectorRow.setAlignment(Pos.CENTER_LEFT);
 
-        Label sectorLabel = new Label(sectorName);
+        Label sectorLabel = new Label(sector.getName());
         sectorLabel.setFont(Font.font("Arial", FontWeight.BOLD, 16));
         sectorLabel.setTextFill(Color.web("#003366"));
 
@@ -65,29 +73,20 @@ public class ViewSectorsView {
         categoryLayout.setVisible(false);
 
         // Add existing categories to the category layout
-        for (Sector sector : manager.getSectors()) {
-            if (sector.getName().equals(sectorName)) {
-                for (String categoryName : sector.getCategories()) {
-                    Label categoryLabel = new Label(categoryName);
-                    styleCategoryLabel(categoryLabel);
-                    categoryLayout.getChildren().add(categoryLabel);
-                }
-                break;
-            }
+        for (String categoryName : sector.getCategories()) {
+            Label categoryLabel = new Label(categoryName);
+            styleCategoryLabel(categoryLabel);
+            categoryLayout.getChildren().add(categoryLabel);
         }
 
         Button addCategoryButton = new Button("+ Add Category");
-        styleButton(addCategoryButton, false); // Small button styling
-        addCategoryButton.setOnAction(e -> showAddCategoryDialog(sectorName, categoryLayout));
+        styleButton(addCategoryButton, false);
+        addCategoryButton.setOnAction(e -> showAddCategoryDialog(sector.getName(), categoryLayout));
 
         // Add click functionality for dropdown effect
         sectorLabel.setOnMouseClicked(e -> toggleCategoryVisibility(categoryLayout));
 
-        // Align sector name and add category button
-        HBox.setHgrow(sectorLabel, Priority.ALWAYS);
         sectorRow.getChildren().addAll(sectorLabel, addCategoryButton);
-
-        // Add the sector row and categories layout to the box
         sectorBox.getChildren().addAll(sectorRow, categoryLayout);
 
         return sectorBox;
@@ -105,12 +104,20 @@ public class ViewSectorsView {
 
         dialog.showAndWait().ifPresent(sectorName -> {
             if (!sectorName.isEmpty()) {
-                sectors.add(sectorName);
+                // Create a new sector object and add it to the manager
+                Sector newSector = new Sector(sectorName);
+                manager.addSector(newSector);
 
-                VBox newSectorBox = createSectorBox(sectorName);
+                // Refresh sector view after adding new sector
+                VBox newSectorBox = createSectorBox(newSector);
                 sectorsLayout.getChildren().add(newSectorBox);
 
-                manager.addSector(sectorName); // Add the sector to the manager
+                // Save the sectors to file
+                fileHandler.saveSectors(manager.getSectors());
+
+                System.out.println("Sector added: " + sectorName);
+            } else {
+                System.out.println("Sector name cannot be empty.");
             }
         });
     }
@@ -123,13 +130,12 @@ public class ViewSectorsView {
 
         dialog.showAndWait().ifPresent(categoryName -> {
             if (!categoryName.isEmpty()) {
-                // Add the category to the model
                 manager.addCategoryToSector(sectorName, categoryName);
 
-                // Refresh category layout
                 Label categoryLabel = new Label(categoryName);
                 styleCategoryLabel(categoryLabel);
                 categoryLayout.getChildren().add(categoryLabel);
+                fileHandler.saveSectors(manager.getSectors());
             }
         });
     }
@@ -149,4 +155,10 @@ public class ViewSectorsView {
         label.setTextFill(Color.web("#333333"));
         label.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 5px 10px; -fx-border-color: #cccccc; -fx-border-radius: 5px; -fx-background-radius: 5px;");
     }
+
+
+    public void setFileHandler(FileHandler fileHandler) {
+        this.fileHandler = fileHandler;
+    }
+
 }
