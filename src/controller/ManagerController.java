@@ -1,206 +1,264 @@
 package controller;
 
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import model.Manager;
+import model.Sector;
+import model.Supplier;
+import model.Item;
+import util.FileHandler;
 import view.AddItemView;
 import view.RestockItemView;
-import view.SupplierView;
 import view.GenerateReportView;
-import view.ViewSectorsView;
+import view.MonitorCashierPerformanceView;
+import view.SupplierView;
 import view.ViewItemsView;
-import model.Manager;
+import view.ViewSectorsView;
+
+import java.util.ArrayList;
 
 public class ManagerController {
 
     private Stage primaryStage;
     private Manager manager;
-    private BorderPane mainLayout; // Main BorderPane layout
-    private StackPane centerContent; // Container for dynamic center content
-    private Scene managerScene; // Variable to store the manager dashboard scene
+    private FileHandler fileHandler;
+    private BorderPane mainLayout;
+    private StackPane centerContent;
+    private Scene managerScene;
+    private Text lowStockMessage;
 
     public ManagerController(Stage primaryStage, Manager manager) {
         this.primaryStage = primaryStage;
-        this.manager = manager;  // Pass the manager instance
+        this.manager = manager;
+        this.fileHandler = new FileHandler();
         this.mainLayout = new BorderPane();
-        this.centerContent = new StackPane(); // Initialize StackPane for the center content
+        this.centerContent = new StackPane();
+        this.lowStockMessage = new Text();
+        loadDataFromFiles();
         setupUI();
     }
 
+    // Load data from binary and other files
+    private void loadDataFromFiles() {
+        // Load inventory items, suppliers, sectors from binary or text files
+        ArrayList<Item> items = fileHandler.loadInventory();
+        manager.setItems(items);
+
+        ArrayList<Supplier> suppliers = fileHandler.loadSuppliers();
+        manager.setSuppliers(suppliers);
+
+        ArrayList<Sector> sectors = fileHandler.loadSectors();
+        manager.setSectors(sectors);
+    }
+
     private void setupUI() {
-        // Header content (Welcome message and dashboard title)
-        Text welcomeMessage = new Text("Welcome, Manager!");
-        welcomeMessage.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-fill: white;");
-        
-        // Manager information (sample info)
-        Text managerInfo = new Text("Name: John Doe\nEmail: john.doe@example.com");
-        managerInfo.setStyle("-fx-font-size: 18px; -fx-fill: white;");
-        
-        // Header below the welcome message
-        Text header = new Text("Dashboard");
-        header.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: white;");
+        // Header content
+        VBox headerContent = createHeaderContent();
 
-        // Top navigation bar (HBox)
-        HBox navigationBar = createNavigationBar(primaryStage);
-        navigationBar.setStyle(
-                "-fx-background-color: #34495E;" + // Dark blue background
-                "-fx-padding: 10px; -fx-alignment: center;"
-        );
+        // Navigation bar
+        HBox navigationBar = createNavigationBar();
 
-        // Set the header and center content in the main layout
+        // Main content area
         VBox homeContent = new VBox(20);
         homeContent.setAlignment(Pos.CENTER);
-        homeContent.getChildren().addAll(welcomeMessage, managerInfo, header);
-        centerContent.getChildren().add(homeContent); // Add content to center
+        homeContent.getChildren().add(headerContent);
+        homeContent.getChildren().add(createLowStockNotification());
 
-        // Set layout using BorderPane
+        centerContent.getChildren().add(homeContent);
+
+        // Setting up the main layout
         mainLayout.setTop(navigationBar);
-        mainLayout.setCenter(centerContent); // Set the center part
-        mainLayout.setStyle("-fx-background-color: #2C3E50;"); // Dark background color
+        mainLayout.setCenter(centerContent);
+        mainLayout.setStyle("-fx-background-color: #2C3E50;");
 
         // Scene setup
         managerScene = new Scene(mainLayout, 800, 600);
         primaryStage.setTitle("Manager Dashboard");
         primaryStage.setScene(managerScene);
-        primaryStage.centerOnScreen(); // Center window on screen
+        primaryStage.centerOnScreen();
         primaryStage.show();
     }
 
-    // Create top navigation bar (HBox)
-    private HBox createNavigationBar(Stage primaryStage) {
-        HBox navigationBar = new HBox(20);
-        navigationBar.setAlignment(Pos.CENTER);
-
-        Button homeButton = createNavButton("Home", primaryStage);
-        Button addItemButton = createNavButton("Add New Item", primaryStage);
-        Button restockItemButton = createNavButton("Restock Item", primaryStage);
-        Button generateReportButton = createNavButton("Generate Sales Report", primaryStage);
-        Button viewSectorsButton = createNavButton("View Item Sector", primaryStage);
-        Button viewItemsButton = createNavButton("View Items", primaryStage);
-        Button manageSuppliersButton = createNavButton("Manage Suppliers", primaryStage); // New Button for Suppliers
-
-        // Button actions
-        homeButton.setOnAction(e -> openHomePage());
-        addItemButton.setOnAction(e -> openView(new AddItemView(manager)));
-        restockItemButton.setOnAction(e -> openView(new RestockItemView(manager)));
-        generateReportButton.setOnAction(e -> openView(new GenerateReportView(manager)));
-        viewSectorsButton.setOnAction(e -> openView(new ViewSectorsView(manager)));
-        viewItemsButton.setOnAction(e -> openView(new ViewItemsView(manager)));
-        manageSuppliersButton.setOnAction(e -> openView(new SupplierView(manager))); // Action for Suppliers Button
-
-        // Add buttons to the navigation bar
-        navigationBar.getChildren().addAll(
-                homeButton,
-                addItemButton,
-                restockItemButton,
-                generateReportButton,
-                viewSectorsButton,
-                viewItemsButton,
-                manageSuppliersButton // Add the new Suppliers button to the layout
-        );
-
-        return navigationBar;
-    }
-
-
-    // Create navigation bar buttons with style
-    private Button createNavButton(String text, Stage primaryStage) {
-        Button button = new Button(text);
-        button.setStyle(
-                "-fx-background-color: transparent;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 14px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-padding: 10px 15px;" +
-                "-fx-border-color: #bdc3c7;" +
-                "-fx-border-width: 1px;" +
-                "-fx-border-radius: 5px;" +
-                "-fx-background-radius: 5px;"
-        );
-
-        // Hover effect
-        button.setOnMouseEntered(e -> button.setStyle(
-                "-fx-background-color: #2980B9;" + // Hover background
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 14px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-padding: 10px 15px;" +
-                "-fx-border-color: #95a5a6;" +
-                "-fx-border-width: 1px;" +
-                "-fx-border-radius: 5px;" +
-                "-fx-background-radius: 5px;"
-        ));
-        button.setOnMouseExited(e -> button.setStyle(
-                "-fx-background-color: transparent;" +
-                "-fx-text-fill: white;" +
-                "-fx-font-size: 14px;" +
-                "-fx-font-weight: bold;" +
-                "-fx-padding: 10px 15px;" +
-                "-fx-border-color: #bdc3c7;" +
-                "-fx-border-width: 1px;" +
-                "-fx-border-radius: 5px;" +
-                "-fx-background-radius: 5px;"
-        ));
-
-        return button;
-    }
-
-    // Update center content dynamically
-    private void updateCenterContent(VBox viewContent) {
-        centerContent.getChildren().clear(); // Clear the previous content
-        centerContent.getChildren().add(viewContent); // Add the new content
-    }
-
-    // General method to open any view and update the center content
-    private void openView(Object view) {
-        VBox viewContent = null;
-        if (view instanceof AddItemView) {
-            viewContent = new AddItemView(manager).getViewContent();
-        } else if (view instanceof RestockItemView) {
-            viewContent = new RestockItemView(manager).getViewContent();
-        } else if (view instanceof GenerateReportView) {
-            viewContent = new GenerateReportView(manager).getViewContent();
-        } else if (view instanceof ViewSectorsView) {
-            viewContent = new ViewSectorsView(manager).getViewContent();
-        } else if (view instanceof ViewItemsView) {
-            viewContent = new ViewItemsView(manager).getViewContent();
-        } else if (view instanceof SupplierView) {  // Handle SupplierView
-            viewContent = new SupplierView(manager).getViewContent();
-        } else {
-            throw new IllegalArgumentException("Unsupported view type: " + view.getClass());
-        }
-        updateCenterContent(viewContent);
-    }
-
-    // Open the Home page and display manager info
-    private void openHomePage() {
-        // Create welcome message and manager info
+    private VBox createHeaderContent() {
         Text welcomeMessage = new Text("Welcome, Manager!");
         welcomeMessage.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-fill: white;");
-        
+
         Text managerInfo = new Text("Name: John Doe\nEmail: john.doe@example.com");
         managerInfo.setStyle("-fx-font-size: 18px; -fx-fill: white;");
-        
+
         Text header = new Text("Dashboard");
         header.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-fill: white;");
 
-        // Set the content in the center
+        VBox headerContent = new VBox(20);
+        headerContent.setAlignment(Pos.CENTER);
+        headerContent.getChildren().addAll(welcomeMessage, managerInfo, header);
+        return headerContent;
+    }
+
+    // Method to check and display low stock items
+    private Text createLowStockNotification() {
+        ArrayList<Item> lowStockItems = fileHandler.notifyLowStock(5);
+        if (lowStockItems.isEmpty()) {
+            lowStockMessage.setText("All items have sufficient stock.");
+            lowStockMessage.setFill(Color.GREEN);
+        } else {
+            StringBuilder lowStockInfo = new StringBuilder("Low Stock Items:\n");
+            for (Item item : lowStockItems) {
+                lowStockInfo.append(item.getItemName()).append(" - Stock: ").append(item.getStockQuantity()).append("\n");
+            }
+            lowStockMessage.setText(lowStockInfo.toString());
+            lowStockMessage.setFill(Color.RED);
+        }
+        lowStockMessage.setStyle("-fx-font-size: 18px; -fx-fill: white;");
+        return lowStockMessage;
+    }
+
+    private HBox createNavigationBar() {
+        HBox navigationBar = new HBox(20);
+        navigationBar.setAlignment(Pos.CENTER);
+
+        Button homeButton = createNavButton("Home");
+        Button addItemButton = createNavButton("Add New Item");
+        Button restockItemButton = createNavButton("Restock Item");
+        Button generateReportButton = createNavButton("Generate Sales Report");
+        Button manageSuppliersButton = createNavButton("Manage Suppliers");
+        Button monitorCashierButton = createNavButton("Monitor Cashier Performance");
+        Button viewSectorsButton = createNavButton("View Sectors");
+        Button viewItemsButton = createNavButton("View Items");
+
+        homeButton.setOnAction(e -> openHomePage());
+        addItemButton.setOnAction(e -> openAddItemView());
+        restockItemButton.setOnAction(e -> openRestockItemView());
+        generateReportButton.setOnAction(e -> openGenerateReportView());
+        manageSuppliersButton.setOnAction(e -> openSupplierView());
+        monitorCashierButton.setOnAction(e -> openMonitorCashierPerformanceView());
+        viewSectorsButton.setOnAction(e -> openViewSectorsView());
+        viewItemsButton.setOnAction(e -> openViewItemsView());
+
+        navigationBar.getChildren().addAll(
+                homeButton, addItemButton, restockItemButton,
+                generateReportButton, manageSuppliersButton, monitorCashierButton, viewSectorsButton, viewItemsButton
+        );
+        return navigationBar;
+    }
+
+    private Button createNavButton(String text) {
+        Button button = new Button(text);
+        button.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 10px 15px;" +
+                        "-fx-border-color: #bdc3c7;" +
+                        "-fx-border-width: 1px;" +
+                        "-fx-border-radius: 5px;" +
+                        "-fx-background-radius: 5px;"
+        );
+        button.setOnMouseEntered(e -> button.setStyle(
+                "-fx-background-color: #2980B9;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 10px 15px;" +
+                        "-fx-border-color: #95a5a6;" +
+                        "-fx-border-width: 1px;" +
+                        "-fx-border-radius: 5px;" +
+                        "-fx-background-radius: 5px;"));
+        button.setOnMouseExited(e -> button.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-font-size: 14px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 10px 15px;" +
+                        "-fx-border-color: #bdc3c7;" +
+                        "-fx-border-width: 1px;" +
+                        "-fx-border-radius: 5px;" +
+                        "-fx-background-radius: 5px;"));
+        return button;
+    }
+
+    // Open the home page and refresh the low stock notification
+    public void openHomePage() {
         VBox homeContent = new VBox(20);
         homeContent.setAlignment(Pos.CENTER);
-        homeContent.getChildren().addAll(welcomeMessage, managerInfo, header);
-        updateCenterContent(homeContent); // Display home content
+        homeContent.getChildren().add(createHeaderContent());
+        homeContent.getChildren().add(createLowStockNotification());
+        updateCenterContent(homeContent);
     }
 
-    // Get the Manager Scene
+    public void openAddItemView() {
+        AddItemView addItemView = new AddItemView(manager, null);
+        addItemView.setFileHandler(fileHandler);
+        updateCenterContent(addItemView.getViewContent());
+    }
+
+    public void openRestockItemView() {
+        RestockItemView restockItemView = new RestockItemView(manager, fileHandler);
+        restockItemView.setFileHandler(fileHandler);
+        updateCenterContent(restockItemView.getViewContent());
+    }
+
+    public void openGenerateReportView() {
+        GenerateReportView generateReportView = new GenerateReportView(manager, fileHandler);
+        generateReportView.setFileHandler(fileHandler);
+        updateCenterContent(generateReportView.getViewContent());
+    }
+
+    public void openSupplierView() {
+        SupplierView supplierView = new SupplierView(manager, fileHandler);
+        supplierView.setFileHandler(fileHandler);
+        updateCenterContent(supplierView.getViewContent());
+    }
+
+    public void openMonitorCashierPerformanceView() {
+        MonitorCashierPerformanceView monitorCashierPerformanceView = new MonitorCashierPerformanceView(manager, fileHandler);
+        updateCenterContent(monitorCashierPerformanceView.getViewContent());
+    }
+
+    public void openViewSectorsView() {
+        ViewSectorsView sectorsView = new ViewSectorsView(manager, fileHandler);
+        sectorsView.setFileHandler(fileHandler);
+        updateCenterContent(sectorsView.getViewContent());
+    }
+
+    public void openViewItemsView() {
+        // Create the ViewItemsController and pass the manager and fileHandler
+        ViewItemsController viewItemsController = new ViewItemsController(manager, fileHandler);
+
+        // Get the current center content container
+        VBox containerLayout = new VBox();  // or use the existing layout reference (centerContent)
+
+        // Call the controller to display the view content inside the containerLayout
+        viewItemsController.showViewItemsView(containerLayout);
+
+        // Update the center content of the main layout with the ViewItems view content
+        updateCenterContent(containerLayout);
+    }
+
+
+
+ // Update the center content dynamically
+    private void updateCenterContent(Node content) {
+        centerContent.getChildren().clear();
+        centerContent.getChildren().add(content);
+    }
+
+
+    // Get the count of low stock items
+    public int getLowStockItemsCount() {
+        ArrayList<Item> lowStockItems = fileHandler.notifyLowStock(5);
+        return lowStockItems.size(); // Return the count of low stock items
+    }
+
     public Scene getManagerScene() {
-        return managerScene;  // Return the scene created for the manager dashboard
+        return managerScene;
     }
 }
-

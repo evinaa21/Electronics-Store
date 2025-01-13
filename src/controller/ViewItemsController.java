@@ -1,31 +1,38 @@
 package controller;
 
-import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.FlowPane;
 import model.Manager;
+import util.FileHandler;
 import view.ViewItemsView;
 
 public class ViewItemsController {
 
     private Manager manager;
+    private FileHandler fileHandler;
+    private ViewItemsView viewItemsView;
 
-    public ViewItemsController(Manager manager) {
+    public ViewItemsController(Manager manager, FileHandler fileHandler) {
         this.manager = manager;
+        this.fileHandler = fileHandler;
+        this.viewItemsView = new ViewItemsView(manager, fileHandler);
     }
 
-    public void showViewItemsView() {
-        // Create the ViewItemsView and pass the Manager instance to it
-        ViewItemsView viewItemsView = new ViewItemsView(manager);
+    public void showViewItemsView(VBox containerLayout) {
+        // Initialize the necessary UI components
+        TextField searchField = new TextField();
+        ComboBox<String> filterComboBox = new ComboBox<>();
+        ComboBox<String> sortComboBox = new ComboBox<>();
+        FlowPane itemsFlowPane = new FlowPane();
 
-        // Get the VBox content from the ViewItemsView
-        VBox layout = viewItemsView.getViewContent();
+        // Get the content from the ViewItemsView
+        ScrollPane viewContent = viewItemsView.getViewContent();
 
-        // Set up the scene and stage
-        Scene scene = new Scene(layout, 600, 400);  // You can adjust the size as necessary
-        Stage itemsStage = new Stage();
-        itemsStage.setTitle("View Items");
-        itemsStage.setScene(scene);
-        itemsStage.show();
+        // Update the existing container layout with the new view content
+        containerLayout.getChildren().clear();  // Clear any existing content
+        containerLayout.getChildren().add(viewContent);  // Add the new view content
     }
 }

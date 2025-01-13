@@ -5,14 +5,17 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Manager;
+import util.FileHandler;
 import view.GenerateReportView;
 
 public class GenerateReportController {
 
     private Manager manager;
+    private FileHandler fileHandler;
 
     public GenerateReportController(Manager manager) {
         this.manager = manager;
+        this.fileHandler=fileHandler;
         showGenerateReportView();
     }
 
@@ -20,7 +23,7 @@ public class GenerateReportController {
         Stage reportStage = new Stage();
 
         // Instantiate the view (GenerateReportView)
-        GenerateReportView generateReportView = new GenerateReportView(manager);
+        GenerateReportView generateReportView = new GenerateReportView(manager, fileHandler);
 
         // Get the VBox from the GenerateReportView
         VBox layout = generateReportView.getViewContent();

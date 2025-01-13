@@ -1,69 +1,91 @@
 package controller;
 
+import java.util.ArrayList;
+
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import model.Manager;
 import model.Supplier;
+import util.FileHandler;
 import model.Item;
-import view.SupplierView; // Import SupplierView
+import view.SupplierView;
 
 public class SupplierController {
     private Manager manager;
-    private SupplierView supplierView;  // Declare the SupplierView
+    private SupplierView supplierView;
+    private FileHandler fileHandler;
 
-    public SupplierController(Manager manager, SupplierView supplierView) {
+    public SupplierController(Manager manager, SupplierView supplierView, FileHandler fileHandler) {
         this.manager = manager;
-        this.supplierView = supplierView;  // Initialize the SupplierView
+        this.supplierView = supplierView;
+        this.fileHandler = fileHandler;
+
+        // Load suppliers and items from file and set them to the manager
+        ArrayList<Supplier> suppliers = fileHandler.loadSuppliers();
+        ArrayList<Item> items = fileHandler.loadInventory();
+        manager.setSuppliers(suppliers);
+        manager.setItems(items);
+
+        // Debugging logs
+        System.out.println("Suppliers loaded: " + suppliers);
+        System.out.println("Items loaded: " + items);
     }
 
-    // Add a new supplier
-    public void addSupplier(String name, String contactInfo, ListView<HBox> supplierListView) {
-        Supplier supplier = new Supplier(name, contactInfo);
+
+    public void addSupplier(String name, ListView<HBox> supplierListView) {
+        Supplier supplier = new Supplier(name);  // Only pass the name
+
         manager.getSuppliers().add(supplier);
-        supplierView.refreshSupplierList(supplierListView);  // Pass the ListView to refresh it
+        saveSuppliersToFile();  // Ensure this is called after adding the supplier
+        supplierView.refreshSupplierList(supplierListView);
         supplierView.showSuccessDialog("Supplier added successfully.");
     }
+    
 
-    // Handle editing an existing supplier
+    // Edit an existing supplier
     public void editSupplier(Supplier supplier, String newName, String newContactInfo, ListView<HBox> supplierListView) {
         supplier.setSupplierName(newName);
         supplier.setContactInfo(newContactInfo);
-        supplierView.refreshSupplierList(supplierListView);  // Update the view with the ListView
+        saveSuppliersToFile();
+        supplierView.refreshSupplierList(supplierListView);
         supplierView.showSuccessDialog("Supplier updated successfully.");
     }
 
-    // Handle deleting a supplier
+    // Delete a supplier
     public void deleteSupplier(Supplier supplier, ListView<HBox> supplierListView) {
         manager.getSuppliers().remove(supplier);
-        supplierView.refreshSupplierList(supplierListView);  // Update the view with the ListView
+        saveSuppliersToFile();
+        supplierView.refreshSupplierList(supplierListView);
         supplierView.showSuccessDialog("Supplier deleted successfully.");
     }
 
+    // Add an item to a supplier
     public void addItemToSupplier(Supplier supplier, Item item, ListView<HBox> supplierListView) {
         if (item != null) {
-            supplier.addItem(item);  // Add the item to the supplier's list
-            supplierView.refreshSupplierList(supplierListView);  // Refresh the supplier list view
+            supplier.addItem(item);
+            saveSuppliersToFile();
+            fileHandler.saveInventory(manager.getItems());
+            supplierView.refreshSupplierList(supplierListView);
             supplierView.showSuccessDialog("Item added successfully to supplier.");
         } else {
             supplierView.showErrorDialog("Invalid item selected.");
         }
     }
 
+ // Delete an item globally and update suppliers
+    public void deleteItemGlobally(Item item, ListView<HBox> itemListView) {
+        // Ensure item removal is consistent
+        fileHandler.deleteItemAndUpdateSuppliers(item, manager.getItems(), manager.getSuppliers());
 
-    // Remove an item from a supplier
-    public void removeItemFromSupplier(Supplier supplier, Item item, ListView<HBox> supplierListView) {
-        supplier.removeItem(item);
-        supplierView.refreshSupplierList(supplierListView);  // Refresh the view to remove the item
-        supplierView.showSuccessDialog("Item removed from supplier successfully.");
+        // Refresh the items and suppliers views
+        itemListView.getItems().removeIf(hbox -> ((Label) hbox.getChildren().get(0)).getText().equals(item.getItemName())); // Example logic for updating UI
+        supplierView.refreshSupplierList(itemListView); // Refresh the supplier view to reflect changes
     }
 
-    // Handle displaying error dialogs from the SupplierView
-    public void showError(String errorMessage) {
-        supplierView.showErrorDialog(errorMessage);
-    }
 
-    // Handle displaying success dialogs from the SupplierView
-    public void showSuccess(String successMessage) {
-        supplierView.showSuccessDialog(successMessage);
+    // Save suppliers to the binary file
+    private void saveSuppliersToFile() {
+        fileHandler.saveSuppliers(manager.getSuppliers());
     }
 }

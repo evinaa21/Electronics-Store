@@ -1,22 +1,34 @@
 package controller;
 
+import java.util.ArrayList;
+
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Manager;
 import model.Sector;
+import util.FileHandler;
 import view.ViewSectorsView;
 
 public class ViewSectorsController {
 
     private Stage primaryStage;
-    private Manager manager; // Manager instance
+    private Manager manager;
+    private FileHandler fileHandler;
 
-    public ViewSectorsController(Stage primaryStage, Manager manager) {
+    public ViewSectorsController(Stage primaryStage, Manager manager, FileHandler fileHandler) {
         this.primaryStage = primaryStage;
         this.manager = manager;
+        this.fileHandler = fileHandler;
+        loadSectors();
+
         setupUI();
+    }
+
+    private void loadSectors() {
+        ArrayList<Sector> loadedSectors = fileHandler.loadSectors();
+        manager.setSectors(loadedSectors);
     }
 
     private void setupUI() {
@@ -25,10 +37,7 @@ public class ViewSectorsController {
         Button viewSectorsButton = new Button("View Sectors");
         Button addSectorButton = new Button("Add Sector");
 
-        // Open the view to see sectors
         viewSectorsButton.setOnAction(e -> openViewSectorsView());
-
-        // Show dialog to add a new sector
         addSectorButton.setOnAction(e -> showAddSectorDialog());
 
         layout.getChildren().addAll(viewSectorsButton, addSectorButton);
@@ -40,21 +49,12 @@ public class ViewSectorsController {
     }
 
     private void openViewSectorsView() {
-        // Create an instance of ViewSectorsView with the manager
-        ViewSectorsView viewSectorsView = new ViewSectorsView(manager); // No need to pass Stage anymore
-
-        // Get the layout (VBox) from ViewSectorsView
-        VBox viewContent = viewSectorsView.getViewContent(); // This method returns the layout (VBox)
-
-        // Create a new Scene using the layout from ViewSectorsView
+        ViewSectorsView viewSectorsView = new ViewSectorsView(manager, fileHandler);
+        VBox viewContent = viewSectorsView.getViewContent();
         Scene newScene = new Scene(viewContent, 400, 400);
-
-        // Set the new scene in the primary stage
         primaryStage.setScene(newScene);
     }
 
-
-    // Show a dialog to add a new sector
     private void showAddSectorDialog() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Add Sector");
@@ -63,16 +63,30 @@ public class ViewSectorsController {
 
         dialog.showAndWait().ifPresent(sectorName -> {
             if (!sectorName.isEmpty()) {
-                // Add the sector to the manager and the UI list
-                manager.addSector(sectorName);  // Assuming manager has addSector method
-                System.out.println("Sector added: " + sectorName); // Log for confirmation
+                boolean sectorExists = false;
+                for (Sector sector : manager.getSectors()) {
+                    if (sector.getName().equalsIgnoreCase(sectorName)) {
+                        sectorExists = true;
+                        break;
+                    }
+                }
+
+                if (!sectorExists) {
+                    Sector newSector = new Sector(sectorName);
+                    manager.addSector(newSector);
+
+                    System.out.println("Sector added: " + sectorName);
+
+                    fileHandler.saveSectors(manager.getSectors());
+                } else {
+                    System.out.println("Sector already exists: " + sectorName);
+                }
             } else {
-                // Optionally, handle case where the user input is empty
                 System.out.println("Sector name cannot be empty.");
             }
         });
     }
- // Show a dialog to add a new category
+
     private void showAddCategoryDialog(Sector sector) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Add Category");
@@ -81,16 +95,14 @@ public class ViewSectorsController {
 
         dialog.showAndWait().ifPresent(categoryName -> {
             if (!categoryName.isEmpty()) {
-                // Add the category to the given sector
-                sector.addCategory(categoryName);  // Assuming addCategory is a method in Sector class
-                System.out.println("Category added: " + categoryName);  // Log for confirmation
+                sector.addCategory(categoryName);
+
+                System.out.println("Category added: " + categoryName);
+
+                fileHandler.saveSectors(manager.getSectors());
             } else {
-                // Optionally, handle case where the user input is empty
                 System.out.println("Category name cannot be empty.");
             }
         });
     }
-
 }
-
-

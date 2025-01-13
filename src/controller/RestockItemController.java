@@ -1,67 +1,32 @@
 package controller;
 
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Manager;
-import model.Item;
+import view.RestockItemView;
+import util.FileHandler;
 
 public class RestockItemController {
 
     private Manager manager;
+    private FileHandler fileHandler;
 
-    public RestockItemController(Manager manager) {
+    public RestockItemController(Manager manager, FileHandler fileHandler) {
+        if (manager == null || fileHandler == null) {
+            throw new IllegalArgumentException("Manager and FileHandler cannot be null.");
+        }
         this.manager = manager;
+        this.fileHandler = fileHandler;
         showRestockItemView();
     }
 
     public void showRestockItemView() {
+        // Create the view for restocking items
+        RestockItemView restockItemView = new RestockItemView(manager, fileHandler);
+        
+        // Create and display the stage for the view
         Stage restockItemStage = new Stage();
-
-        Label nameLabel = new Label("Item Name:");
-        TextField nameField = new TextField();
-
-        Label quantityLabel = new Label("Restock Quantity:");
-        TextField quantityField = new TextField();
-
-        Button restockButton = new Button("Restock Item");
-        restockButton.setOnAction(event -> {
-            String itemName = nameField.getText();
-            int quantity = Integer.parseInt(quantityField.getText());
-
-            // Logic to restock item
-            Item item = findItemByName(itemName);
-            if (item != null) {
-                item.restockItem(quantity);
-                restockItemStage.close(); // Close the restock window
-            } else {
-                showError("Item not found");
-            }
-        });
-
-        VBox layout = new VBox(10, nameLabel, nameField, quantityLabel, quantityField, restockButton);
-
-        Scene scene = new Scene(layout, 300, 200);
         restockItemStage.setTitle("Restock Item");
-        restockItemStage.setScene(scene);
+        restockItemStage.setScene(new javafx.scene.Scene(restockItemView.getViewContent(), 400, 300));
         restockItemStage.show();
-    }
-
-    private Item findItemByName(String name) {
-        for (Item item : manager.getItems()) {
-            if (item.getItemName().equals(name)) {
-                return item;
-            }
-        }
-        return null;
-    }
-
-    private void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }
