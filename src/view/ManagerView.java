@@ -4,20 +4,36 @@ import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
+import controller.ManagerController;
+import model.Item;
+import model.Manager;
+import util.FileHandler;
+
 public class ManagerView extends Application {
 
-    private Stage previousStage;
+    private ManagerController managerController;
+    private Stage primaryStage;
+    private BorderPane mainLayout;
+    private StackPane centerContent;
+    private FileHandler fileHandler;
+    private Label lowStockLabel;
 
-    public ManagerView(Stage previousStage) {
-        this.previousStage = previousStage;
+    public ManagerView(Stage primaryStage, Manager manager, FileHandler fileHandler) {
+        this.primaryStage = primaryStage;
+        this.managerController = new ManagerController(primaryStage, manager);  // Pass the controller
+        this.mainLayout = new BorderPane();
+        this.centerContent = new StackPane();
+        this.fileHandler = fileHandler;  // Properly initialize fileHandler
+        this.lowStockLabel = new Label();
     }
 
     @Override
@@ -40,10 +56,18 @@ public class ManagerView extends Application {
         // Top navigation bar
         HBox navigationBar = createNavigationBar(primaryStage);
 
-        // Center content (Home view by default)
-        VBox centerContent = new VBox(20);
-        centerContent.setAlignment(Pos.CENTER);
-        centerContent.getChildren().addAll(welcomeMessage, managerInfo, header);
+        VBox homeContent = new VBox(20);
+        homeContent.setAlignment(Pos.CENTER);
+        homeContent.getChildren().addAll(welcomeMessage, managerInfo, header);
+
+        // Adding the low stock information
+        String lowStockInfo = getLowStockInfo();
+        Text lowStockMessage = new Text(lowStockInfo);
+        lowStockMessage.setStyle("-fx-font-size: 18px; -fx-fill: white;");
+        homeContent.getChildren().add(lowStockMessage);
+
+        centerContent.getChildren().add(homeContent);
+
 
         // Layout using BorderPane
         BorderPane layout = new BorderPane();
@@ -69,18 +93,26 @@ public class ManagerView extends Application {
         Button addItemButton = createNavButton("Add New Item", primaryStage);
         Button restockItemButton = createNavButton("Restock Item", primaryStage);
         Button generateReportButton = createNavButton("Generate Sales Report", primaryStage);
-        Button viewCategoriesButton = createNavButton("View Item Sectors", primaryStage);
+        Button manageSuppliersButton = createNavButton("Manage Suppliers", primaryStage);
+        Button monitorCashierButton = createNavButton("Monitor Cashier Performance", primaryStage);
+        Button viewSectorsButton = createNavButton("View Sectors", primaryStage);
         Button viewItemsButton = createNavButton("View Items", primaryStage);
-        Button viewSupplier=createNavButton("Suppliers", primaryStage);
 
+        // Button actions tied to the controller
+        homeButton.setOnAction(e -> managerController.openHomePage());
+        addItemButton.setOnAction(e -> managerController.openAddItemView());
+        restockItemButton.setOnAction(e -> managerController.openRestockItemView());
+        generateReportButton.setOnAction(e -> managerController.openGenerateReportView());
+        manageSuppliersButton.setOnAction(e -> managerController.openSupplierView());
+        monitorCashierButton.setOnAction(e -> managerController.openMonitorCashierPerformanceView());
+        viewSectorsButton.setOnAction(e -> managerController.openViewSectorsView());
+        viewItemsButton.setOnAction(e -> managerController.openViewItemsView());
+
+        // Add the buttons to the navigation bar
         navigationBar.getChildren().addAll(
-                homeButton,
-                addItemButton,
-                restockItemButton,
-                generateReportButton,
-                viewCategoriesButton,
-                viewItemsButton,
-                viewSupplier
+                homeButton, addItemButton, restockItemButton,
+                generateReportButton, manageSuppliersButton, monitorCashierButton, viewSectorsButton, viewItemsButton
+
         );
 
         return navigationBar;
@@ -110,35 +142,44 @@ public class ManagerView extends Application {
     private void showHomePage(Stage primaryStage) {
         // Create welcome message and manager info
         Text welcomeMessage = new Text("Welcome, Manager!");
-        welcomeMessage.setStyle("-fx-font-size: 24px; -fx-fill: white;");
-        welcomeMessage.setEffect(new DropShadow(5, Color.LIGHTGRAY));
+        welcomeMessage.setStyle("-fx-font-size: 32px; -fx-font-weight: bold; -fx-fill: white;");
 
-        Text managerInfo = new Text("Name: John Doe\nEmail: john.doe@example.com");
-        managerInfo.setStyle("-fx-font-size: 18px; -fx-fill: white;");
-        managerInfo.setEffect(new DropShadow(3, Color.GRAY));
 
-        // Header below the welcome message
-        Text header = new Text("Dashboard");
-        header.setStyle("-fx-font-size: 20px; -fx-fill: white;");
-        header.setEffect(new DropShadow(3, Color.GRAY));
-
-        // Center content for home page
         VBox homeContent = new VBox(20);
         homeContent.setAlignment(Pos.CENTER);
-        homeContent.getChildren().addAll(welcomeMessage, managerInfo, header);
+        homeContent.getChildren().addAll(welcomeMessage);
 
-        // Layout using BorderPane
-        BorderPane layout = new BorderPane();
-        layout.setTop(createNavigationBar(primaryStage));
-        layout.setCenter(homeContent);
-        layout.setStyle("-fx-background-color: #2C3E50;");
+        // Refresh and display the low stock notification dynamically
+        String lowStockInfo = getLowStockInfo();
+        Text lowStockMessage = new Text(lowStockInfo);
+        lowStockMessage.setStyle("-fx-font-size: 18px; -fx-fill: white;");
+        homeContent.getChildren().add(lowStockMessage);
 
-        // Scene setup
-        Scene scene = new Scene(layout, 800, 600);
-        primaryStage.setTitle("Manager Dashboard - Home");
-        primaryStage.setScene(scene);
-        primaryStage.centerOnScreen(); // Center window on the screen
-        primaryStage.show();
+        updateCenterContent(homeContent);
+    }
+
+    private String getLowStockInfo() {
+        // Specify the threshold for low stock (e.g., 5)
+        ArrayList<Item> lowStockItems = fileHandler.notifyLowStock(5);  // Use fileHandler to get low stock items
+        
+        if (lowStockItems != null && !lowStockItems.isEmpty()) {
+            StringBuilder lowStockInfo = new StringBuilder("Low Stock Items:\n");
+            for (Item item : lowStockItems) {
+                lowStockInfo.append(item.getItemName())
+                            .append(" - Stock: ")
+                            .append(item.getStockQuantity())
+                            .append("\n");
+            }
+            return lowStockInfo.toString();
+        } else {
+            return "No low stock items.";
+        }
+    }
+
+
+    private void updateCenterContent(VBox viewContent) {
+        centerContent.getChildren().clear();
+        centerContent.getChildren().add(viewContent);
     }
 
 
@@ -146,3 +187,4 @@ public class ManagerView extends Application {
         launch(args);
     }
 }
+
