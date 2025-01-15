@@ -2,6 +2,9 @@
 package controller;
 
 import java.util.ArrayList;
+
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.Manager;
 import model.Sector;
@@ -32,7 +35,7 @@ public class ViewSectorsController {
         ViewSectorsView view = new ViewSectorsView(manager);
         view.setFileHandler(fileHandler);
         view.setController(this);
-        primaryStage.setScene(view.getScene());
+        primaryStage.setScene(new Scene((Parent) view.getSceneContent(), 400, 400));
         primaryStage.setTitle("Manager Dashboard");
         primaryStage.show();
     }
