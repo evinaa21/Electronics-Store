@@ -3,6 +3,7 @@ package view;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -25,7 +26,7 @@ public class ViewSectorsView {
         this.manager = manager;
     }
 
-    public Scene getScene() {
+    public Node getSceneContent() {
         VBox layout = new VBox(20);
         layout.setPadding(new Insets(20));
         layout.setStyle("-fx-background-color: #eaf3fc;");
@@ -48,8 +49,9 @@ public class ViewSectorsView {
         buttonsLayout.setAlignment(Pos.TOP_LEFT);
 
         layout.getChildren().addAll(buttonsLayout, scrollPane);
-        return new Scene(layout, 400, 400);
+        return layout;
     }
+
 
     private VBox createSectorBox(Sector sector) {
         VBox sectorBox = new VBox(5);
