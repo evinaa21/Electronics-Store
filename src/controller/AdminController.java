@@ -1,9 +1,13 @@
 package controller;
 
+import java.util.ArrayList;
+
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
+import model.User;
+import util.FileHandler;
 import view.AdminView;
 import view.RegisterEmployeeView;
 import view.ModifyEmployeeView;
@@ -26,23 +30,23 @@ public class AdminController {
 
 	private void setButtonActions() {
 		adminView.getRegisterButton().setOnAction(event -> {
-			RegisterEmployeeView registerAdmin = new RegisterEmployeeView();
-			RegisterEmployeeController registerEmployeeController = new RegisterEmployeeController(stage, registerAdmin);
+			RegisterEmployeeView registerEmpView = new RegisterEmployeeView();
+			RegisterEmployeeController registerEmployeeController = new RegisterEmployeeController(stage, registerEmpView);
 		});
 		
 		adminView.getModifyButton().setOnAction(event -> {
-			if(adminView.getModifyEmpName().getText().equals("")) {
-				//Here should be added also the case where the name is entered wrong
+			FileHandler file = new FileHandler();
+			if(adminView.getModifyEmpName().getText().equals("") || file.getEmployee(adminView.getModifyEmpName().getText()) == null){
 				alertMessage();
 			}else {
 				ModifyEmployeeView modEmpView = new ModifyEmployeeView();
-				ModifyEmployeeController modEmpCtrl = new ModifyEmployeeController(stage, modEmpView);
+				ModifyEmployeeController modEmpCtrl = new ModifyEmployeeController(stage, modEmpView, file.getEmployee(adminView.getModifyEmpName().getText()));
 			}
 		});
 		
 		adminView.getDeleteButton().setOnAction(event -> {
-			if(adminView.getDeleteEmpName().getText().equals("")) {
-				//Here should be added also the case where the name is entered wrong
+			FileHandler file = new FileHandler();
+			if(adminView.getDeleteEmpName().getText().equals("") || file.getEmployee(adminView.getDeleteEmpName().getText()) == null) {
 				alertMessage();
 			}else {
 				deleteEmployee(adminView.getDeleteEmpName().getText());
@@ -51,7 +55,16 @@ public class AdminController {
 	}
 
 	private void deleteEmployee(String name) {
-		
+		FileHandler file = new FileHandler();
+		ArrayList<User> empData = file.loadEmployeeData();
+		for(User user : empData) {
+			if(user.getName().equals(name)) {
+				empData.removeIf(obj -> obj.equals(user));
+				User.idCounter--;
+				break;
+			}
+		}
+		file.saveEmployeeData(empData);
 	}
 
 	private void alertMessage() {

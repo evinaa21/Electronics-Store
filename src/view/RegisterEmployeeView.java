@@ -1,15 +1,23 @@
 package view;
 
+import java.util.ArrayList;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import model.Sector;
+import util.FileHandler;
 
 public class RegisterEmployeeView {
 	private GridPane grid;
-	private TextField name, salary, role, username, password, dob, phone, email;
+	private TextField name, salary, role, username, password, phone, email;
+	private ComboBox<String> comboBox;
+	private DatePicker dob;
 	private Button registerButton;
 	
 	public RegisterEmployeeView() {
@@ -24,6 +32,14 @@ public class RegisterEmployeeView {
 		name.setPrefWidth(300);
 		Label salaryL = new Label("Salary");
 		salary = new TextField();
+		
+        salary.setTextFormatter(new javafx.scene.control.TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+            if (newText.matches("\\d*")) {
+                return change;
+            }
+            return null;
+        }));
 		Label roleL = new Label("Role");
 		role = new TextField();
 		Label usernameL = new Label("Username");
@@ -31,11 +47,22 @@ public class RegisterEmployeeView {
 		Label passwordL = new Label("Password");
 		password = new TextField();
 		Label dobL = new Label("Date of Birth");
-		dob = new TextField();
+		dob = new DatePicker();
 		Label phoneL = new Label("Phone number");
 		phone = new TextField();
 		Label emailL = new Label("Email");
 		email = new TextField();
+		Label sectorL = new Label("Sector");
+		
+		comboBox = new ComboBox<>();
+		
+		comboBox.getItems().addAll(readSectors());
+		comboBox.setPromptText("Select a Sector");
+		
+		comboBox.setOnAction(e -> {
+			getSector();
+		});
+		
 		registerButton = new Button("Register");
 		
 		grid.add(nameL, 0, 1);
@@ -54,9 +81,23 @@ public class RegisterEmployeeView {
 		grid.add(phone, 0, 14);
 		grid.add(emailL, 0, 15);
 		grid.add(email, 0, 16);
-		grid.add(registerButton, 0, 18);
+		grid.add(sectorL, 0, 17);
+		grid.add(comboBox, 0, 18);
+		grid.add(registerButton, 0, 20);
 	}
 	
+	private ArrayList<String> readSectors() {
+		FileHandler file = new FileHandler();
+		ArrayList<Sector> sector = file.loadSectors();
+		ArrayList<String> sectorName = new ArrayList<>();
+		for(Sector s : sector) {
+			sectorName.add(s.getName());
+		}
+		
+		return sectorName;
+		
+	}
+
 	public GridPane getLayout() {
 		return grid;
 	}
@@ -81,7 +122,7 @@ public class RegisterEmployeeView {
 		return password;
 	}
 
-	public TextField getDob() {
+	public DatePicker getDob() {
 		return dob;
 	}
 
@@ -92,6 +133,10 @@ public class RegisterEmployeeView {
 
 	public TextField getEmail() {
 		return email;
+	}
+	
+	public String getSector() {
+		return comboBox.getValue();
 	}
 	
 	public Button getRegisterButton() {

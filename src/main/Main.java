@@ -46,21 +46,6 @@ public class Main extends Application {
 			} catch (IOException e) {
 				System.err.println("Error creating admin file: " + e.getMessage());
 			}
-		}else {
-			//These will be test lines and after testing they will be deleted, among with the 
-			//Here, create the manager and cashier object by yourself and output them in the employees.dat
-			//Uncomment the try and catch below and add the users
-//			try {
-//				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filepath));
-//					
-//					oos.writeObject(manager);
-//					oos.writeObject(cashier);
-//					oos.close();
-//					System.out.println("Admin file created with default admin.");
-//				} catch (IOException e) {
-//					System.err.println("Error creating admin file: " + e.getMessage());
-//			}
 		}
 	}
-	
 }

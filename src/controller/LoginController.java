@@ -52,36 +52,36 @@ public class LoginController {
 					AdminView adminView = new AdminView();
 					AdminController adminController = new AdminController(stage, adminView);
 					break;
-				}
+				}else {errorLabel();}
 			}
 //			}else if(user instanceof Manager) {
 //				if(username.equals(usernameInFile) && password.equals(passwordInFile)) {
 //					ManagerView managerView = new ManagerView();
 //					ManagerController managerController = new ManagerController(stage, managerView);
 //					break;
-//				}
+//				}else {errorLabel();}
 //			}else if(user instanceof Cashier){
 //				if(username.equals(usernameInFile) && password.equals(passwordInFile)) {
 //					CashierView cashierView = new CashierView();
 //					CashierController cashierController = new CashierController(stage, cashierView);
 //					break;
-//				}
+//				}else {errorLabel();}
 //			}
-				else {
-				Label errorMessageLabel = new Label();
-		        GridPane loginLayout = loginView.getLoginPane();
-		        
-				errorMessageLabel.setText("Wrong Credentials");
-	            errorMessageLabel.setStyle("-fx-text-fill: red;");
-	            loginLayout.add(errorMessageLabel, 0, 5);
-	            
-	            PauseTransition pause = new PauseTransition(Duration.seconds(10));
-	            pause.setOnFinished(e1 -> loginLayout.getChildren().remove(errorMessageLabel));
-	            pause.play();
-			}
-		}
+		}	
 	}
 
+	private void errorLabel() {
+		Label errorMessageLabel = new Label();
+        GridPane loginLayout = loginView.getLoginPane();
+        
+		errorMessageLabel.setText("Wrong Credentials");
+        errorMessageLabel.setStyle("-fx-text-fill: red;");
+        loginLayout.add(errorMessageLabel, 0, 5);
+        
+        PauseTransition pause = new PauseTransition(Duration.seconds(10));
+        pause.setOnFinished(e1 -> loginLayout.getChildren().remove(errorMessageLabel));
+        pause.play();
+	}
 
 	public Scene getLoginScene() {
 		return loginScene;

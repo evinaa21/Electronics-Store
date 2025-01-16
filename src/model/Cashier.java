@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import util.Role;
@@ -17,7 +18,7 @@ public class Cashier extends User implements Serializable {
 	private double totalSales; 
 	
 	public Cashier(String name, double salary, Role role, String username, String password, 
-			Date dateOfBirth, long phonenumber, String email, Sector sector) {
+			LocalDate dateOfBirth, String phonenumber, String email, Sector sector) {
 		super(name, salary, role, username, password, dateOfBirth, phonenumber, email);
 		this.sector = sector;
 		this.bills = new ArrayList<>();

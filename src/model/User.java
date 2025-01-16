@@ -9,7 +9,7 @@ import java.time.LocalDate;
 public abstract class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	private static int idCounter = 0;
+	public static int idCounter = 1;
 	private int id;
     private String name;
     private double salary;

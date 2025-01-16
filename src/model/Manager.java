@@ -23,7 +23,7 @@ public class Manager extends User implements Serializable {
 
 
 
-    public Manager(int id, String name, double salary, Role role, String username, String password, LocalDate dateOfBirth,
+    public Manager(String name, double salary, Role role, String username, String password, LocalDate dateOfBirth,
                    String phonenumber, String email) {
         super(name, salary, role, username, password, dateOfBirth, phonenumber, email);
         this.sectors = new ArrayList<>();

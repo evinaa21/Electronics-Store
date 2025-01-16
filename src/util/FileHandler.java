@@ -22,10 +22,10 @@ public class FileHandler {
 	private ArrayList<Item> items = new ArrayList<>();
 	
 	//Constants for file paths CHANGE IF THESE DONT WORK FOR YOU
-	private static final String EMPLOYEE_FILE = "C:\\Users\\Evina\\git\\Electronics-Store\\src\\BinaryFiles\\employees.dat"; //Binary files for employees
+	private static final String EMPLOYEE_FILE = "src/BinaryFiles/employees.dat"; //Binary files for employees
 	private static final String INVENTORY_FILE = "C:\\Users\\Evina\\git\\Electronics-Store\\src\\BinaryFiles\\items.dat"; //Binary files for inventory
 	private static final String BILL_DIRECTORY = "C:\\Users\\Evina\\git\\Electronics-Store\\src\\BinaryFiles\\bill.txt"; //Text files for bills
-	private static final String SECTOR_FILE = "C:\\Users\\Evina\\git\\Electronics-Store\\src\\BinaryFiles\\sectors.dat"; // Path to sector file
+	private static final String SECTOR_FILE = "src/BinaryFiles/sectors.dat"; // Path to sector file
 	private static final String SUPPLIER_FILE = "C:\\Users\\Evina\\git\\Electronics-Store\\src\\BinaryFiles\\suppliers.dat"; // Binary files for suppliers
 
 	
@@ -545,6 +545,16 @@ public class FileHandler {
   		}
   	}
   	
+  	public void saveEmployeeData(User employee){
+  			
+  		try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(EMPLOYEE_FILE))) {
+  				oos.writeObject(employee);
+  				System.out.println("Employee data saved successfully to binary file: " + EMPLOYEE_FILE);
+  		} catch (IOException e) {
+  			System.out.println("Error saving employee data to binary file: " + e.getMessage());
+  		}
+  	}
+  	
   	//Load employee data from a binary file
   	public ArrayList<User> loadEmployeeData() {
   		ArrayList<User> employees = new ArrayList<>();
@@ -564,6 +574,39 @@ public class FileHandler {
   			System.err.println("Error loading employee data from binary file: " + e.getMessage());
   		}
   		return employees;	
+  	}
+  	
+  	public User getEmployee(String Name) {
+  		try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(EMPLOYEE_FILE))){
+  			while(true) {
+  				try {
+  					User user = (User) ois.readObject();
+  					if(user.getName().equals(Name)) {
+  						return user;
+  					}	
+  				}catch(EOFException e) {
+  					break;
+  				}
+  			}
+  		}catch(FileNotFoundException e) {
+  			System.err.println("Employee binary file not found: " + EMPLOYEE_FILE);
+  		}catch(IOException | ClassNotFoundException e) {
+  			System.err.println("Error loading employee data from binary file: " + e.getMessage());
+  		}
+  		System.out.println("No user with the name of " +Name+ " was found!");
+  		return null;
+  	}
+  	
+  	public void updateEmployeeData(User updatedUser) {
+  		ArrayList<User> employees = loadEmployeeData();
+  		
+  		employees.removeIf(user -> user.getUsername().equals(updatedUser.getUsername()));
+  		
+  		try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(EMPLOYEE_FILE))){
+  			oos.writeObject(updatedUser);
+  		}catch(IOException e) {
+  			System.err.println("Error updating employee data: " + e.getMessage());
+  		}
   	}
   	
   	//Add employee salary or update if employee exists
