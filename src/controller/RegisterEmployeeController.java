@@ -1,6 +1,7 @@
 package controller;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -24,7 +25,7 @@ public class RegisterEmployeeController {
 	private final RegisterEmployeeView registerEmpView;
 	private String name, username, password, phone, email, role;
 	private double salary;
-	private Date dob;
+	private LocalDate dob;
 	private String sectorName;
 	private FileHandler file = new FileHandler();
 	private ArrayList<User> data = file.loadEmployeeData();
@@ -48,21 +49,22 @@ public class RegisterEmployeeController {
 				salary = parseSalary(registerEmpView.getSalary().getText());
 				username = registerEmpView.getUsername().getText();			
 				password = registerEmpView.getPassword().getText();			
-				dob = registerEmpView.getDob().getText;			
+				dob = registerEmpView.getDob().getValue();
+				Date date = Date.from(dob.atStartOfDay(ZoneId.systemDefault()).toInstant());
 				phone = registerEmpView.getPhone().getText();			
 				email = registerEmpView.getEmail().getText();			
 				role = registerEmpView.getRole().getText();
 				sectorName = registerEmpView.getSector();
 				
-				if(validateCredentials(name, username, password, dob, phone, email, role, sectorName)) {
+				if(validateCredentials(name, username, password, date, phone, email, role, sectorName)) {
 					switch (role) {
 						case "Admin":
-							Admin user = new Admin(name, salary, Role.Admin, username, password, dob, phone, email);
+							Admin user = new Admin(name, salary, Role.Admin, username, password, date, phone, email);
 							data.add(user);
 							file.saveEmployeeData(data);
 							break;
 						case "Manager":
-							Manager manager = new Manager(name, salary, Role.Manager, username, password, dob, phone, email);
+							Manager manager = new Manager(name, salary, Role.Manager, username, password, date, phone, email);
 							data.add(manager);
 							file.saveEmployeeData(data);
 							break;
@@ -74,7 +76,7 @@ public class RegisterEmployeeController {
 									sector = sec;
 								}
 							}
-							Cashier cashier = new Cashier(name, salary, Role.Cashier, username, password, dob, phone, email, sector);
+							Cashier cashier = new Cashier(name, salary, Role.Cashier, username, password, date, phone, email, sector);
 							data.add(cashier);
 							file.saveEmployeeData(data);
 							break;

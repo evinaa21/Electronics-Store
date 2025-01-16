@@ -1,7 +1,6 @@
 package model;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -23,7 +22,7 @@ public class Manager extends User implements Serializable {
 
 
 
-    public Manager(String name, double salary, Role role, String username, String password, LocalDate dateOfBirth,
+    public Manager(String name, double salary, Role role, String username, String password, Date dateOfBirth,
                    String phonenumber, String email) {
         super(name, salary, role, username, password, dateOfBirth, phonenumber, email);
         this.sectors = new ArrayList<>();

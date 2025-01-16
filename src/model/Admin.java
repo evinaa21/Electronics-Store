@@ -1,6 +1,8 @@
 package model;
 
 import java.time.LocalDate;
+import java.util.Date;
+
 import util.Role;
 //import java.util.ArrayList;
 
@@ -8,7 +10,7 @@ public class Admin extends User {
 //	private ArrayList<User> employees;
 	
     public Admin(String name, double salary, Role role, String username, String password,
-            LocalDate dateOfBirth, String phonenumber, String email) {
+            Date dateOfBirth, String phonenumber, String email) {
         super(name, salary, role, username, password, dateOfBirth, phonenumber, email);
         //setEmployees(new ArrayList<>());
     }

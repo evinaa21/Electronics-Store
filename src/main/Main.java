@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.Date;
 
 import controller.LoginController;
 import javafx.application.Application;
@@ -35,8 +37,10 @@ public class Main extends Application {
 		File file = new File(filepath);
 		
 		if(!file.exists()) {
-			
-			Admin admin = new Admin("Florjon Allkaj", 50000, Role.Admin, "Flori05", "password", LocalDate.of(2005, 4, 11), "069 642 8069", "Florionallkaj@gmail.com");
+			Calendar calendar = Calendar.getInstance();
+			calendar.set(2005, Calendar.APRIL, 11); // Year, Month (0-based), Day
+			Date date = calendar.getTime();
+			Admin admin = new Admin("Florjon Allkaj", 50000, Role.Admin, "Flori05", "password", date, "069 642 8069", "Florionallkaj@gmail.com");
 			try {
 			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filepath));
 				
