@@ -18,7 +18,7 @@ public class Cashier extends User implements Serializable {
 	private double totalSales; 
 	
 	public Cashier(String name, double salary, Role role, String username, String password, 
-			LocalDate dateOfBirth, String phonenumber, String email, Sector sector) {
+			Date dateOfBirth, String phonenumber, String email, Sector sector) {
 		super(name, salary, role, username, password, dateOfBirth, phonenumber, email);
 		this.sector = sector;
 		this.bills = new ArrayList<>();

@@ -5,6 +5,7 @@ import util.Role;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Date;
 
 public abstract class User implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -16,14 +17,14 @@ public abstract class User implements Serializable {
     private Role role;
     private String username;
     private String password;
-    private LocalDate dateOfBirth;
+    private Date dateOfBirth;
     private String phonenumber;
     private String email;
 
     public User() {
     };
 
-    public User(String name, double salary, Role role, String username, String password, LocalDate dateOfBirth,
+    public User(String name, double salary, Role role, String username, String password, Date dateOfBirth,
             String phonenumber, String email) {
         this.id = idCounter++;
         this.name = name;
@@ -84,11 +85,11 @@ public abstract class User implements Serializable {
         return password;
     }
 
-    public void setDateOfBirth(LocalDate dateOfBirth) {
+    public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public LocalDate getDateOfBirth() {
+    public Date getDateOfBirth() {
         return dateOfBirth;
     }
 

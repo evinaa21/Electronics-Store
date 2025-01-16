@@ -2,6 +2,7 @@ package controller;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -23,7 +24,7 @@ public class RegisterEmployeeController {
 	private final RegisterEmployeeView registerEmpView;
 	private String name, username, password, phone, email, role;
 	private double salary;
-	private LocalDate dob;
+	private Date dob;
 	private String sectorName;
 	private FileHandler file = new FileHandler();
 	private ArrayList<User> data = file.loadEmployeeData();
@@ -47,7 +48,7 @@ public class RegisterEmployeeController {
 				salary = parseSalary(registerEmpView.getSalary().getText());
 				username = registerEmpView.getUsername().getText();			
 				password = registerEmpView.getPassword().getText();			
-				dob = registerEmpView.getDob().getValue();			
+				dob = registerEmpView.getDob().getText;			
 				phone = registerEmpView.getPhone().getText();			
 				email = registerEmpView.getEmail().getText();			
 				role = registerEmpView.getRole().getText();
@@ -93,7 +94,7 @@ public class RegisterEmployeeController {
 		});
 	}
 	
-	private boolean validateCredentials(String name2, String username2, String password2, LocalDate dob2, String phone2,  String email2, String role2, String sector2) throws CredentialsException {
+	private boolean validateCredentials(String name2, String username2, String password2, Date dob2, String phone2,  String email2, String role2, String sector2) throws CredentialsException {
 		
 		if(!email2.contains(String.valueOf("@"))) {
 			showAlert("Please enter a valid email!");
