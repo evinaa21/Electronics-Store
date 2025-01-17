@@ -3,6 +3,7 @@ package view;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -22,15 +23,14 @@ public class ManagerView {
     private Stage primaryStage;
     private Manager manager;
     private FileHandler fileHandler;
-	private Text lowStockMessage;
-    
+    private Label lowStockLabel;
 
     public ManagerView(ManagerController managerController, Stage primaryStage, Manager manager, FileHandler fileHandler) {
         this.managerController = managerController;
         this.primaryStage = primaryStage;
         this.manager = manager;
         this.fileHandler = fileHandler;
-        this.lowStockMessage = new Text();
+        this.lowStockLabel = new Label();
     }
 
     public void setupUI(BorderPane mainLayout, StackPane centerContent) {
@@ -48,7 +48,7 @@ public class ManagerView {
         welcomeMessage.setStyle("-fx-font-size: 24px; -fx-fill: white;");
         welcomeMessage.setEffect(new DropShadow(5, Color.LIGHTGRAY));
 
-        Text managerInfo = new Text("Name: John Doe\nEmail: john.doe@example.com");
+        Text managerInfo = new Text("Name: " + manager.getName() + "\nEmail: " + manager.getEmail());
         managerInfo.setStyle("-fx-font-size: 18px; -fx-fill: white;");
         managerInfo.setEffect(new DropShadow(3, Color.GRAY));
 
@@ -60,8 +60,8 @@ public class ManagerView {
         homeContent.setAlignment(Pos.CENTER);
         homeContent.getChildren().addAll(welcomeMessage, managerInfo, header);
 
-        Text lowStockInfo = getLowStockInfo();
-        Text lowStockMessage = new Text();
+        String lowStockInfo = getLowStockInfo();
+        Text lowStockMessage = new Text(lowStockInfo);
         lowStockMessage.setStyle("-fx-font-size: 18px; -fx-fill: white;");
         homeContent.getChildren().add(lowStockMessage);
 
@@ -142,34 +142,21 @@ public class ManagerView {
         centerContent.getChildren().add(homeContent);
     }
 
-    private Text getLowStockInfo() {
-        ArrayList<Sector> managerSectors = manager.getSectors();
-        ArrayList<String> sectorNames = new ArrayList<>();
-        for (Sector sector : managerSectors) {
-            sectorNames.add(sector.getName());
-        }
-
-        ArrayList<Item> lowStockItems = fileHandler.notifyLowStock(5);
-        ArrayList<Item> managerLowStockItems = new ArrayList<>();
-        for (Item item : lowStockItems) {
-            if (sectorNames.contains(item.getItemSector())) {
-                managerLowStockItems.add(item);
-            }
-        }
-
-        if (managerLowStockItems.isEmpty()) {
-            lowStockMessage.setText("All items have sufficient stock.");
-            lowStockMessage.setFill(Color.GREEN);
-        } else {
+    private String getLowStockInfo() {
+        // Specify the threshold for low stock (e.g., 5)
+        ArrayList<Item> lowStockItems = fileHandler.notifyLowStock(5);  // Use fileHandler to get low stock items
+        
+        if (lowStockItems != null && !lowStockItems.isEmpty()) {
             StringBuilder lowStockInfo = new StringBuilder("Low Stock Items:\n");
-            for (Item item : managerLowStockItems) {
-                lowStockInfo.append(item.getItemName()).append(" - Stock: ").append(item.getStockQuantity()).append("\n");
+            for (Item item : lowStockItems) {
+                lowStockInfo.append(item.getItemName())
+                            .append(" - Stock: ")
+                            .append(item.getStockQuantity())
+                            .append("\n");
             }
-            lowStockMessage.setText(lowStockInfo.toString());
-            lowStockMessage.setFill(Color.RED);
+            return lowStockInfo.toString();
+        } else {
+            return "No low stock items.";
         }
-        lowStockMessage.setStyle("-fx-font-size: 18px; -fx-fill: white;");
-        return lowStockMessage;
-    
     }
 }
