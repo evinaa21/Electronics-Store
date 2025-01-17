@@ -15,7 +15,7 @@ import javafx.scene.text.Text;
 public class AdminView {
 	private ScrollPane adminLayout;
 	private TextField modifyEmpName, deleteEmpName;
-	private Button register, modifyButton, deleteButton;
+	private Button registerAdmin, registerManager, registerCashier, modifyAdmin, modifyManager, modifyCashier, deleteUser;
 	
 	public AdminView() {
 		GridPane grid = new GridPane();
@@ -24,19 +24,18 @@ public class AdminView {
 		grid.setVgap(8);
 		grid.setHgap(10);
 		
-		Text registerText = new Text("Register a new employee:");
-		registerText.setFont(new Font(20));
-		register = new Button("Go");
+		registerAdmin = new Button("Register a new Admin");
+		registerManager = new Button("Register a new Manager");
+		registerCashier = new Button("Register a new Cashier");
 		
-		Text modifyText = new Text("Modify an employee:");
-		modifyText.setFont(new Font(15));
-		modifyEmpName = new TextField();
-		modifyButton = new Button("Modify");
 		
-		Text deleteText = new Text("Delete an employee:");
-		deleteText.setFont(new Font(15));
-		deleteEmpName = new TextField();
-		deleteButton = new Button("Delete");
+		modifyAdmin = new Button("Modify a Admin");
+		modifyManager = new Button("Modify a Manager");
+		modifyCashier = new Button("Modify a Cashier");
+		
+		deleteUser = new Button("Delete an User");
+		
+		
 		
 		Text EmpTableText = new Text("Data about employees:");
 		//Will add the table here, by reading all the data from
@@ -46,16 +45,15 @@ public class AdminView {
 		Text totalIncome = new Text("Total Income");
 		Text totalOutcome = new Text("Total Outcome");
 		
-		grid.add(registerText, 0, 0);
-		grid.add(register, 0, 1);
+		
 		
 		HBox modifyHBox = new HBox(10);
 		modifyHBox.setAlignment(Pos.CENTER);
-		modifyHBox.getChildren().addAll(modifyText, modifyEmpName, modifyButton);
+//		modifyHBox.getChildren().addAll(modifyText, modifyEmpName, modifyButton);
 		
 		HBox deleteHBox = new HBox(10);
 		deleteHBox.setAlignment(Pos.CENTER);
-		deleteHBox.getChildren().addAll(deleteText, deleteEmpName, deleteButton);
+	//	deleteHBox.getChildren().addAll(deleteText, deleteEmpName, deleteButton);
 		
 		HBox incomeOutcomeHBox = new HBox(10);
 		incomeOutcomeHBox.setAlignment(Pos.CENTER);
@@ -82,16 +80,16 @@ public class AdminView {
 		return deleteEmpName;
 	}
 	
-	public Button getRegisterButton() {
-		return register;
-	}
-	
-	public Button getModifyButton() {
-		return modifyButton;
-	}
-
-	public Button getDeleteButton() {
-		return deleteButton;
-	}
+//	public Button getRegisterButton() {
+//		return register;
+//	}
+//	
+//	public Button getModifyButton() {
+//		return modifyButton;
+//	}
+//
+//	public Button getDeleteButton() {
+//		return deleteButton;
+//	}
 
 }
