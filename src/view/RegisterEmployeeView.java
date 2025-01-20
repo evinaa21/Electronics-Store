@@ -17,8 +17,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import model.Sector;
 import util.FileHandler;
+import util.NavBar;
 import util.Role;
-import util.admin.NavBar;
 
 public class RegisterEmployeeView {
 	private GridPane layout;

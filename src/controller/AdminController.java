@@ -10,7 +10,7 @@ import model.Admin;
 import model.User;
 import util.DeleteException;
 import util.FileHandler;
-import util.admin.NavBar;
+import util.NavBar;
 import view.AdminView;
 import view.ModifyEmployeeView;
 

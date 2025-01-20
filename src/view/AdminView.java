@@ -19,8 +19,9 @@ import model.SalesMetrics;
 import model.User;
 
 import util.FileHandler;
+import util.NavBar;
 import util.Role;
-import util.admin.NavBar;
+
 import java.util.Date;
 
 public class AdminView {

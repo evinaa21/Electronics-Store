@@ -17,8 +17,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import model.Sector;
 import util.FileHandler;
+import util.NavBar;
 import util.Role;
-import util.admin.NavBar;
 
 public class ModifyEmployeeView {
 	private GridPane layout;

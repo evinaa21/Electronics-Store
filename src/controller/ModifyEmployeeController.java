@@ -13,8 +13,8 @@ import model.Sector;
 import model.User;
 import util.CredentialsException;
 import util.FileHandler;
+import util.NavBar;
 import util.Role;
-import util.admin.NavBar;
 import view.AdminView;
 import view.ModifyEmployeeView;
 
