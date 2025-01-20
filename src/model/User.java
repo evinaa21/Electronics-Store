@@ -4,7 +4,6 @@ package model;
 import util.Role;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.Date;
 
 public abstract class User implements Serializable {
@@ -26,7 +25,7 @@ public abstract class User implements Serializable {
 
     public User(String name, double salary, Role role, String username, String password, Date dateOfBirth,
             String phonenumber, String email) {
-        this.id = idCounter++;
+        this.id = ++idCounter;
         this.name = name;
         this.salary = salary;
         this.role = role;
@@ -107,5 +106,14 @@ public abstract class User implements Serializable {
 
     public String getEmail() {
         return email;
+    }
+    
+    @Override
+    public String toString() {
+    	return "ID " + id + " Name " + name +
+    			" Salary " + salary + " Role " + role +
+    			" Username " + username +
+    			" Password " + password + " Date Of Birth " + dateOfBirth
+    			+ " Phone number " +  phonenumber + " Email " + email;
     }
 }

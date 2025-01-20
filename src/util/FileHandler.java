@@ -545,7 +545,7 @@ public class FileHandler {
   		}
   	}
   	
-  	public void saveEmployeeData(User employee){
+  	public void saveEmployee(User employee){
   			
   		try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(EMPLOYEE_FILE))) {
   				oos.writeObject(employee);
@@ -561,8 +561,7 @@ public class FileHandler {
   		try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(EMPLOYEE_FILE))) {
   			while(true) {
   				try {
-  					User user = (User) ois.readObject();
-  					employees.add(user);
+  					 employees = (ArrayList<User>) ois.readObject();
   				}catch(EOFException e) {
   					break;
   				}
@@ -576,23 +575,14 @@ public class FileHandler {
   		return employees;	
   	}
   	
-  	public User getEmployee(String Name) {
-  		try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(EMPLOYEE_FILE))){
-  			while(true) {
-  				try {
-  					User user = (User) ois.readObject();
-  					if(user.getName().equals(Name)) {
-  						return user;
-  					}	
-  				}catch(EOFException e) {
-  					break;
-  				}
-  			}
-  		}catch(FileNotFoundException e) {
-  			System.err.println("Employee binary file not found: " + EMPLOYEE_FILE);
-  		}catch(IOException | ClassNotFoundException e) {
-  			System.err.println("Error loading employee data from binary file: " + e.getMessage());
-  		}
+  	public User loadEmployee(String Name) {
+  		ArrayList<User> user = new ArrayList<>();
+  		user = loadEmployeeData();
+		for(User employee : user) {
+			if(employee.getName().equals(Name)) {
+			return employee;
+			}
+		}
   		System.out.println("No user with the name of " +Name+ " was found!");
   		return null;
   	}

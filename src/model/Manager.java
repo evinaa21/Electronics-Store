@@ -21,11 +21,14 @@ public class Manager extends User implements Serializable {
 
 
 
+    public Manager() {
+    	
+    }
 
     public Manager(String name, double salary, Role role, String username, String password, Date dateOfBirth,
-                   String phonenumber, String email) {
+                   String phonenumber, String email, ArrayList<Sector> sectors) {
         super(name, salary, role, username, password, dateOfBirth, phonenumber, email);
-        this.sectors = new ArrayList<>();
+        this.sectors = sectors;
         this.suppliers = new ArrayList<>();
         this.items = new ArrayList<>();
         this.salesMetrics = new SalesMetrics();
