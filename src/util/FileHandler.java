@@ -726,6 +726,21 @@ public class FileHandler {
           }
           return bill;
       }
+  	
+ 	
+ 	//Notify low stock items for the specified sector where cashier is assigned
+ 	public boolean isItemOutOfStock(String itemName, String sector) {
+ 	    ArrayList<Item> sectorItems = loadInventoryBySector(sector); // Load items for the sector
+
+ 	    for (Item item : sectorItems) {
+ 	        if (item.getItemName().equalsIgnoreCase(itemName)) { // Match the item name
+ 	            return item.getStockQuantity() == 0; // Return true if stock is 0
+ 	        }
+ 	    }
+
+ 	    // If the item is not found in the sector inventory, treat it as unavailable
+ 	    return true;
+ 	}
   
 
 }

@@ -16,6 +16,7 @@ public class Cashier extends User implements Serializable {
 	private Sector sector; 
 	private ArrayList<Bill> bills;  
 	private double totalSales; 
+	private ArrayList<Item> items;
 	
 	public Cashier() {
 		
@@ -167,6 +168,14 @@ public class Cashier extends User implements Serializable {
 		}
 			
 		return dailyTotal;
+	}
+
+	public void setItems(ArrayList<Item> items) {
+		this.items = items;
+	}
+	
+	public ArrayList<Item> getItems() {
+		return this.items;
 	}
 		
 	

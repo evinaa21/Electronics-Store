@@ -1,7 +1,3 @@
-/util/
-/view/
-/main/
-/model/
 /controller/
-/BinaryFiles/
-/test.class
+/util/
+/model/

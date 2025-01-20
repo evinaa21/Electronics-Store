@@ -30,7 +30,7 @@
 	
 	    private final Stage primaryStage; // Primary application stage
 	    private final Cashier cashier; // The currently logged-in cashier
-	    private final String assignedSector; // Sector assigned to the cashier
+	    private final Sector assignedSector; // Sector assigned to the cashier
 	    private final FileHandler fileHandler; // Handles file operations
 	    private final BorderPane mainLayout; // Main layout for the dashboard
 	    private final StackPane centerContent; // Area for dynamic content
@@ -54,7 +54,7 @@
 	//Load data from binary and other files
 	private void loadDataFromFiles() {
 		// Load inventory items, bills from binary or text files
-		ArrayList<Item> items = fileHandler.loadInventoryBySector(cashier.getSector());
+		ArrayList<Item> items = fileHandler.loadInventoryBySector(cashier.getSector().getName());
 		cashier.setItems(items);
 	
 		ArrayList<Bill> bills = fileHandler.loadBills(cashier.getName(), new Date(System.currentTimeMillis()));
@@ -64,7 +64,7 @@
 	
 	private void setupUI() {
 		
-		CashierView cashierView = new CashierView(assignedSector, this, primaryStage, cashier, fileHandler);
+		CashierView cashierView = new CashierView(assignedSector.getName(), this, primaryStage, cashier, fileHandler);
 		cashierView.setupUI(mainLayout, centerContent);
 		
 		//Set up the scene
@@ -78,7 +78,7 @@
 	}
 	
 	public void openHomePage() {
-		CashierView cashierView = new CashierView(assignedSector, this, primaryStage, cashier, fileHandler);
+		CashierView cashierView = new CashierView(assignedSector.getName(), this, primaryStage, cashier, fileHandler);
 		cashierView.showHomePage();
 	}
 	
@@ -99,7 +99,7 @@
 	
 	//Check if the selected item is out of stock
 	public void handleItemSelection(String selectedItemName) {
-	    boolean isOutOfStock = fileHandler.isItemOutOfStock(selectedItemName, cashier.getSector());
+	    boolean isOutOfStock = fileHandler.isItemOutOfStock(selectedItemName, cashier.getSector().getName());
 
 	    if (isOutOfStock) {
 	        // Notify the cashier that the selected item is out of stock
