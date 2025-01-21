@@ -194,25 +194,49 @@ public class FileHandler {
 		return inventory;
 	}
 
-	public static ArrayList<Item> readLowStockItemsFromBinaryFile(String fileName, int threshold) {
-		ArrayList<Item> lowStockItems = new ArrayList<>();
-		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))) {
-			ArrayList<Item> inventory = (ArrayList<Item>) ois.readObject();
-			for (Item item : inventory) {
-				if (item.getStockQuantity() <= threshold) {
-					lowStockItems.add(item);
-				}
-			}
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		return lowStockItems;
+		// Updated method for reading low stock items based on sector categories
+	public static ArrayList<Item> readLowStockItemsFromBinaryFile(String fileName, int threshold, ArrayList<Sector> managerSectors) {
+	    ArrayList<Item> lowStockItems = new ArrayList<>();
+	    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))) {
+	        ArrayList<Item> inventory = (ArrayList<Item>) ois.readObject();
+	        
+	        // Iterate through the inventory and check stock levels and sector-category match
+	        for (Item item : inventory) {
+	            for (Sector sector : managerSectors) {
+	                // Compare category of item to sector's categories
+	                if (sector.getCategories().contains(item.getCategory()) && item.getStockQuantity() <= threshold) {
+	                    lowStockItems.add(item);
+	                    break;  // Exit once a match is found
+	                }
+	            }
+	        }
+	    } catch (IOException | ClassNotFoundException e) {
+	        e.printStackTrace();
+	    }
+	    return lowStockItems;
 	}
 
-	// Update the notifyLowStock method
-	public ArrayList<Item> notifyLowStock(int threshold) {
-		// Use INVENTORY_FILE constant instead of hardcoded filename
-		return readLowStockItemsFromBinaryFile(INVENTORY_FILE, threshold);
+	// Updated method to notify about low stock items
+	public ArrayList<Item> notifyLowStock(int threshold, ArrayList<Sector> managerSectors) {
+	    ArrayList<Item> lowStockItems = new ArrayList<>();
+
+	    // Get all low stock items from binary file
+	    ArrayList<Item> allItems = readLowStockItemsFromBinaryFile(INVENTORY_FILE, threshold, managerSectors);
+	    System.out.println("All low stock items: " + allItems);  // Debugging output
+
+	    // Iterate through all items and check sector-category match and stock level
+	    for (Item item : allItems) {
+	        System.out.println("Checking item: " + item.getItemName() + ", Stock: " + item.getStockQuantity() + ", Category: " + item.getCategory());
+	        
+	        for (Sector sector : managerSectors) {
+	            // Check if item's category matches any of the manager's sector categories and stock is low
+	            if (sector.getCategories().contains(item.getCategory()) && item.getStockQuantity() <= threshold) {
+	                lowStockItems.add(item);
+	                break;  // Exit once a match is found
+	            }
+	        }
+	    }
+	    return lowStockItems;
 	}
 
 	public ArrayList<Bill> loadBills() {
@@ -425,26 +449,55 @@ public class FileHandler {
 		return cashiers;
 	}
 
-	public ArrayList<Cashier> loadCashiersByRole() {
-		ArrayList<Cashier> cashiers = new ArrayList<>();
-		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(EMPLOYEE_FILE))) {
-			// First, read the entire ArrayList of Users
-			ArrayList<User> users = (ArrayList<User>) ois.readObject(); // Read the whole list
+	ppublic ArrayList<Cashier> loadCashiersByRole(ArrayList<Sector> managerSectors) {
+        ArrayList<Cashier> cashiers = new ArrayList<>();
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(EMPLOYEE_FILE))) {
+            // First, read the entire ArrayList of Users
+            ArrayList<User> users = (ArrayList<User>) ois.readObject(); // Read the whole list
 
-			// Now filter based on role
-			for (User user : users) {
-				if (user instanceof Cashier && user.getRole() == Role.Cashier) {
-					cashiers.add((Cashier) user);
-				}
-			}
-		} catch (EOFException e) {
-			// Handle end of file gracefully (if needed)
-		} catch (IOException | ClassNotFoundException e) {
-			System.err.println("Error reading from file: " + e.getMessage());
-			e.printStackTrace();
-		}
-		return cashiers;
-	}
+            // Debug: Print Manager Sectors
+            System.out.println("Manager Sectors: " + managerSectors);
+            for (User user : users) {
+                if (user instanceof Cashier) {
+                    Cashier cashier = (Cashier) user;
+                    System.out.println("Checking Cashier: " + cashier.getName() + " with Sector: " + cashier.getSector());
+
+                    // Check if cashier's sector matches any of the manager's sectors
+                    for (Sector managerSector : managerSectors) {
+                        System.out.println("Comparing with Manager Sector: " + managerSector);
+                        if (cashier.getSector().equals(managerSector)) {
+                            cashiers.add(cashier);
+                            break; // No need to check further once a match is found
+                        }
+                    }
+                }
+            }
+        } catch (EOFException e) {
+            // Handle end of file gracefully (if needed)
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Error reading from file: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return cashiers;
+    }
+
+
+    public ArrayList<Sector> loadManagerSectors() {
+        ArrayList<Sector> managerSectors = new ArrayList<>();
+        
+        // Load all employee data
+        ArrayList<User> allUsers = loadEmployeeData();  // Assuming this method loads all employees
+        
+        // Loop through the users to find Managers and extract their sectors
+        for (User user : allUsers) {
+            if (user instanceof Manager) {
+                Manager manager = (Manager) user;
+                managerSectors.addAll(manager.getSectors());  // Add Manager's sectors to the list
+            }
+        }
+        
+        return managerSectors;
+    }
 
 	public ArrayList<String> readBills() {
 		ArrayList<String> billsData = new ArrayList<>();
