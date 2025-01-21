@@ -449,7 +449,7 @@ public class FileHandler {
 		return cashiers;
 	}
 
-	ppublic ArrayList<Cashier> loadCashiersByRole(ArrayList<Sector> managerSectors) {
+	public ArrayList<Cashier> loadCashiersByRole(ArrayList<Sector> managerSectors) {
         ArrayList<Cashier> cashiers = new ArrayList<>();
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(EMPLOYEE_FILE))) {
             // First, read the entire ArrayList of Users
