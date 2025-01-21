@@ -39,7 +39,9 @@ public class Item implements Serializable {
     // Constructor for Cashier
     public Item(String itemName, String itemCategory, double price, int stockQuantity, int itemsSold, int itemQuantity) {
         this.itemName = itemName;
+        //TODO: itemSector should not be itemCategory
         this.itemSector = itemCategory;
+        this.category = itemCategory;
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.itemsSold = itemsSold;

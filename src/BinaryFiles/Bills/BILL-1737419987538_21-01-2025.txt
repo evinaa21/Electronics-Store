@@ -1,0 +1,17 @@
+=========================================
+                ELECTRONIC STORE          
+=========================================
+Bill Number: BILL-1737419987538
+Cashier: Ema Kuka
+Sector: Mobile & Gadgets
+Date: 21-01-2025
+-----------------------------------------
+Items:
+Item Name            Category   Quantity   Price     
+-----------------------------------------
+Apple Watch Series 8 (45mm) Uncategorized 2          399.99    
+-----------------------------------------
+Total Amount: 799.98
+=========================================
+          THANK YOU FOR SHOPPING         
+=========================================
