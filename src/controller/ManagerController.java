@@ -110,7 +110,7 @@ public class ManagerController {
         ArrayList<Sector> managerSectors = manager.getSectors();
 
         // Use fileHandler to get low stock items filtered by manager's sectors
-        ArrayList<Item> lowStockItems = fileHandler.notifyLowStock(5, managerSectors);
+        ArrayList<Item> lowStockItems = fileHandler.notifyLowStockforManager(5, managerSectors);
         
         return lowStockItems.size();
     }

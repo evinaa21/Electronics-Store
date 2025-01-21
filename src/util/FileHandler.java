@@ -195,7 +195,7 @@ public class FileHandler {
 	}
 
 		// Updated method for reading low stock items based on sector categories
-	public static ArrayList<Item> readLowStockItemsFromBinaryFile(String fileName, int threshold, ArrayList<Sector> managerSectors) {
+	public static ArrayList<Item> readLowStockItemsFromBinaryFileMANAGER(String fileName, int threshold, ArrayList<Sector> managerSectors) {
 	    ArrayList<Item> lowStockItems = new ArrayList<>();
 	    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))) {
 	        ArrayList<Item> inventory = (ArrayList<Item>) ois.readObject();
@@ -215,29 +215,49 @@ public class FileHandler {
 	    }
 	    return lowStockItems;
 	}
-
-	// Updated method to notify about low stock items
-	public ArrayList<Item> notifyLowStock(int threshold, ArrayList<Sector> managerSectors) {
-	    ArrayList<Item> lowStockItems = new ArrayList<>();
-
-	    // Get all low stock items from binary file
-	    ArrayList<Item> allItems = readLowStockItemsFromBinaryFile(INVENTORY_FILE, threshold, managerSectors);
-	    System.out.println("All low stock items: " + allItems);  // Debugging output
-
-	    // Iterate through all items and check sector-category match and stock level
-	    for (Item item : allItems) {
-	        System.out.println("Checking item: " + item.getItemName() + ", Stock: " + item.getStockQuantity() + ", Category: " + item.getCategory());
-	        
-	        for (Sector sector : managerSectors) {
-	            // Check if item's category matches any of the manager's sector categories and stock is low
-	            if (sector.getCategories().contains(item.getCategory()) && item.getStockQuantity() <= threshold) {
-	                lowStockItems.add(item);
-	                break;  // Exit once a match is found
-	            }
-	        }
-	    }
-	    return lowStockItems;
+	public static ArrayList<Item> readLowStockItemsFromBinaryFile(String fileName, int threshold) {
+		ArrayList<Item> lowStockItems = new ArrayList<>();
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))) {
+			ArrayList<Item> inventory = (ArrayList<Item>) ois.readObject();
+			for (Item item : inventory) {
+				if (item.getStockQuantity() <= threshold) {
+					lowStockItems.add(item);
+				}
+			}
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return lowStockItems;
 	}
+
+	// Update the notifyLowStock method
+		public ArrayList<Item> notifyLowStock(int threshold) {
+			// Use INVENTORY_FILE constant instead of hardcoded filename
+			return readLowStockItemsFromBinaryFile(INVENTORY_FILE, threshold);
+		}
+		
+	// Updated method to notify about low stock items
+		public ArrayList<Item> notifyLowStockforManager(int threshold, ArrayList<Sector> managerSectors) {
+		    ArrayList<Item> lowStockItems = new ArrayList<>();
+
+		    // Get all low stock items from binary file
+		    ArrayList<Item> allItems = readLowStockItemsFromBinaryFileMANAGER(INVENTORY_FILE, threshold, managerSectors);
+		    System.out.println("All low stock items: " + allItems);  // Debugging output
+
+		    // Iterate through all items and check sector-category match and stock level
+		    for (Item item : allItems) {
+		        System.out.println("Checking item: " + item.getItemName() + ", Stock: " + item.getStockQuantity() + ", Category: " + item.getCategory());
+		        
+		        for (Sector sector : managerSectors) {
+		            // Check if item's category matches any of the manager's sector categories and stock is low
+		            if (sector.getCategories().contains(item.getCategory()) && item.getStockQuantity() <= threshold) {
+		                lowStockItems.add(item);
+		                break;  // Exit once a match is found
+		            }
+		        }
+		    }
+		    return lowStockItems;
+		}
 
 	public ArrayList<Bill> loadBills() {
 		ArrayList<Bill> bills = new ArrayList<>();

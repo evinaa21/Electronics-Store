@@ -144,7 +144,7 @@ public class ManagerView {
     private String getLowStockInfo() {
         ArrayList<Sector> managerSectors = manager.getSectors();  // Get manager's assigned sectors
         // Get all low stock items based on the threshold and sectors assigned to the manager
-        ArrayList<Item> lowStockItems = fileHandler.notifyLowStock(5, managerSectors);  
+        ArrayList<Item> lowStockItems = fileHandler.notifyLowStockforManager(5, managerSectors);  
 
         // If there are no low stock items, return a message
         if (lowStockItems.isEmpty()) {
