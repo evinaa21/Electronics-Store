@@ -1,0 +1,775 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+package util;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+import model.Bill;
+import model.Item;
+import model.Sector;
+import model.User;
+
+public class FileHandler {
+   private static final String EMPLOYEE_FILE = "src/BinaryFiles/employees.dat";
+   private static final String INVENTORY_FILE = "src/BinaryFiles/items.dat";
+   private static final String BILL_DIRECTORY = "src/BinaryFiles/Bills/";
+   private static final String SECTOR_FILE = "src/BinaryFiles/sectors.dat";
+   private static final String SUPPLIER_FILE = "src/BinaryFiles/suppliers.dat";
+   private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyy");
+
+   public FileHandler() {
+   }
+
+   public ArrayList<Sector> loadSectors() {
+      ArrayList<Sector> sectors = new ArrayList();
+
+      try {
+         Throwable var2 = null;
+         Object var3 = null;
+
+         try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("src/BinaryFiles/sectors.dat"));
+
+            try {
+               Object obj = ois.readObject();
+               if (obj instanceof ArrayList<?> tempList) {
+                  if (!tempList.isEmpty() && tempList.get(0) instanceof Sector) {
+                     sectors = tempList;
+                     System.out.println("Sectors loaded successfully.");
+                  } else {
+                     System.err.println("Error: File data is not of type ArrayList<Sector>");
+                  }
+               }
+            } finally {
+               if (ois != null) {
+                  ois.close();
+               }
+
+            }
+         } catch (Throwable var18) {
+            if (var2 == null) {
+               var2 = var18;
+            } else if (var2 != var18) {
+               var2.addSuppressed(var18);
+            }
+
+            throw var2;
+         }
+      } catch (IOException var19) {
+         var19.printStackTrace();
+         System.out.println("Error loading sectors: File not found or unable to read.");
+      } catch (ClassNotFoundException var20) {
+         var20.printStackTrace();
+         System.out.println("Error loading sectors: Class not found.");
+      } catch (ClassCastException var21) {
+         var21.printStackTrace();
+         System.out.println("Error loading sectors: Incorrect data format in file.");
+      }
+
+      return sectors;
+   }
+
+   public static ArrayList<Item> readLowStockItemsFromBinaryFile(String fileName, int threshold) {
+      ArrayList<Item> lowStockItems = new ArrayList();
+
+      try {
+         Throwable var3 = null;
+         Object var4 = null;
+
+         try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName));
+
+            try {
+               ArrayList<Item> inventory = (ArrayList)ois.readObject();
+               Iterator var8 = inventory.iterator();
+
+               while(var8.hasNext()) {
+                  Item item = (Item)var8.next();
+                  if (item.getStockQuantity() <= threshold) {
+                     lowStockItems.add(item);
+                  }
+               }
+            } finally {
+               if (ois != null) {
+                  ois.close();
+               }
+
+            }
+         } catch (Throwable var16) {
+            if (var3 == null) {
+               var3 = var16;
+            } else if (var3 != var16) {
+               var3.addSuppressed(var16);
+            }
+
+            throw var3;
+         }
+      } catch (ClassNotFoundException | IOException var17) {
+         var17.printStackTrace();
+      }
+
+      return lowStockItems;
+   }
+
+   public ArrayList<Item> notifyLowStock(int threshold) {
+      return readLowStockItemsFromBinaryFile("src/BinaryFiles/items.dat", threshold);
+   }
+
+   public ArrayList<Bill> loadBills() {
+      ArrayList<Bill> bills = new ArrayList();
+      File billDirectory = new File("src/BinaryFiles/Bills/");
+      if (billDirectory.exists() && billDirectory.isDirectory()) {
+         File[] billFiles = billDirectory.listFiles((dir, name) -> {
+            return name.endsWith(".txt");
+         });
+         if (billFiles != null && billFiles.length != 0) {
+            Date today = Calendar.getInstance().getTime();
+            File[] var8 = billFiles;
+            int var7 = billFiles.length;
+
+            for(int var6 = 0; var6 < var7; ++var6) {
+               File billFile = var8[var6];
+               Bill bill = this.loadBillFromFile(billFile);
+               if (bill != null && this.isSameDay(bill.getSaleDate(), today)) {
+                  bills.add(bill);
+               }
+            }
+
+            return bills;
+         } else {
+            System.out.println("No bill files found in directory: src/BinaryFiles/Bills/");
+            return bills;
+         }
+      } else {
+         System.out.println("The specified directory does not exist or is not a valid directory: src/BinaryFiles/Bills/");
+         return bills;
+      }
+   }
+
+   public Bill loadBillFromFile(File billFile) {
+      Bill bill = null;
+
+      try {
+         Throwable var3 = null;
+         Object var4 = null;
+
+         try {
+            BufferedReader br = new BufferedReader(new FileReader(billFile));
+
+            try {
+               String billNumber = null;
+               ArrayList<Item> items = new ArrayList();
+               double totalAmount = 0.0;
+               Date saleDate = null;
+               boolean isItemSection = false;
+
+               while(true) {
+                  String line;
+                  while((line = br.readLine()) != null) {
+                     line = line.trim();
+                     if (line.startsWith("Bill Number:")) {
+                        billNumber = line.split(":")[1].trim();
+                     } else if (line.startsWith("Date:")) {
+                        String dateString = line.split(":")[1].trim();
+                        saleDate = dateFormat.parse(dateString);
+                     } else if (line.startsWith("Total Amount:")) {
+                        totalAmount = Double.parseDouble(line.split(":")[1].trim());
+                     } else if (line.startsWith("Items:")) {
+                        isItemSection = true;
+                     } else if ((!isItemSection || !line.startsWith("-----------------------------------------")) && isItemSection && !line.isEmpty() && !line.startsWith("Item Name")) {
+                        String[] itemDetails = line.split("\\s{2,}");
+                        if (itemDetails.length >= 4) {
+                           try {
+                              String itemName = itemDetails[0].trim();
+                              String category = itemDetails[1].trim();
+                              int quantity = Integer.parseInt(itemDetails[2].trim());
+                              double price = Double.parseDouble(itemDetails[3].trim());
+                              items.add(new Item(itemName, category, price, 0, 0, quantity));
+                           } catch (NumberFormatException var27) {
+                              System.err.println("Skipping invalid item line: " + line);
+                           }
+                        }
+                     }
+                  }
+
+                  if (billNumber != null && !items.isEmpty() && totalAmount > 0.0 && saleDate != null) {
+                     bill = new Bill(billNumber, items, totalAmount, saleDate);
+                  }
+                  break;
+               }
+            } finally {
+               if (br != null) {
+                  br.close();
+               }
+
+            }
+         } catch (Throwable var29) {
+            if (var3 == null) {
+               var3 = var29;
+            } else if (var3 != var29) {
+               var3.addSuppressed(var29);
+            }
+
+            throw var3;
+         }
+      } catch (NumberFormatException | ParseException | IOException var30) {
+         var30.printStackTrace();
+      }
+
+      return bill;
+   }
+
+   public ArrayList<String> readBills() {
+      ArrayList<String> billsData = new ArrayList();
+
+      try {
+         Throwable var2 = null;
+         Object var3 = null;
+
+         try {
+            BufferedReader reader = new BufferedReader(new FileReader("src/BinaryFiles/Bills/"));
+
+            String line;
+            try {
+               while((line = reader.readLine()) != null) {
+                  billsData.add(line);
+               }
+            } finally {
+               if (reader != null) {
+                  reader.close();
+               }
+
+            }
+         } catch (Throwable var13) {
+            if (var2 == null) {
+               var2 = var13;
+            } else if (var2 != var13) {
+               var2.addSuppressed(var13);
+            }
+
+            throw var2;
+         }
+      } catch (IOException var14) {
+         var14.printStackTrace();
+      }
+
+      return billsData;
+   }
+
+   private void ensureDirectoriesExist() {
+      try {
+         File employeeFile = new File("src/BinaryFiles/employees.dat");
+         File inventoryFile = new File("src/BinaryFiles/items.dat");
+         File billDir = new File("src/BinaryFiles/Bills/");
+         if (!employeeFile.getParentFile().exists()) {
+            employeeFile.getParentFile().mkdirs();
+         }
+
+         if (!inventoryFile.getParentFile().exists()) {
+            inventoryFile.getParentFile().mkdirs();
+         }
+
+         if (!billDir.exists()) {
+            billDir.mkdirs();
+         }
+      } catch (Exception var4) {
+         System.err.println("Error ensuring directories exist: " + var4.getMessage());
+      }
+
+   }
+
+   public ArrayList<Item> loadInventory() {
+      ArrayList<Item> inventory = new ArrayList();
+
+      try {
+         Throwable var2 = null;
+         Object var3 = null;
+
+         try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("src/BinaryFiles/items.dat"));
+
+            try {
+               inventory = (ArrayList)ois.readObject();
+               System.out.println("Inventory loaded successfully from binary file: src/BinaryFiles/items.dat");
+            } finally {
+               if (ois != null) {
+                  ois.close();
+               }
+
+            }
+         } catch (Throwable var14) {
+            if (var2 == null) {
+               var2 = var14;
+            } else if (var2 != var14) {
+               var2.addSuppressed(var14);
+            }
+
+            throw var2;
+         }
+      } catch (FileNotFoundException var15) {
+         System.err.println("Inventory binary file not found: src/BinaryFiles/items.dat");
+      } catch (ClassNotFoundException | IOException var16) {
+         System.err.println("Error loading inventory from binary file: " + var16.getMessage());
+      }
+
+      return inventory;
+   }
+
+   public void updateInventoryForSale(ArrayList<Item> items) throws IllegalArgumentException, IOException {
+      ArrayList<Item> inventory = this.loadInventory();
+
+      for(int i = 0; i < items.size(); ++i) {
+         Item soldItem = (Item)items.get(i);
+         boolean itemFound = false;
+
+         for(int j = 0; j < inventory.size(); ++j) {
+            Item inventoryItem = (Item)inventory.get(j);
+            if (inventoryItem.getItemName().equalsIgnoreCase(soldItem.getItemName())) {
+               itemFound = true;
+               if (!inventoryItem.hasSufficientStock(soldItem.getItemQuantity())) {
+                  throw new IllegalArgumentException("Insufficient stock for item: " + soldItem.getItemName());
+               }
+
+               inventoryItem.sellItem(soldItem.getItemQuantity());
+               break;
+            }
+         }
+
+         if (!itemFound) {
+            throw new IllegalArgumentException("Item not found in inventory: " + soldItem.getItemName());
+         }
+      }
+
+      this.saveInventory(inventory);
+   }
+
+   public void saveInventory(ArrayList<Item> inventory) {
+      try {
+         Throwable var2 = null;
+         Object var3 = null;
+
+         try {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("src/BinaryFiles/items.dat"));
+
+            try {
+               oos.writeObject(inventory);
+               System.out.println("Inventory saved successfully to binary file: src/BinaryFiles/items.dat");
+            } finally {
+               if (oos != null) {
+                  oos.close();
+               }
+
+            }
+         } catch (Throwable var12) {
+            if (var2 == null) {
+               var2 = var12;
+            } else if (var2 != var12) {
+               var2.addSuppressed(var12);
+            }
+
+            throw var2;
+         }
+      } catch (IOException var13) {
+         System.err.println("Error saving inventory to binary file: " + var13.getMessage());
+      }
+
+   }
+
+   public void saveEmployeeData(ArrayList<User> employees) {
+      if (employees.isEmpty()) {
+         System.err.println("No employee data to save.");
+      } else {
+         try {
+            Throwable var2 = null;
+            Object var3 = null;
+
+            try {
+               ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("src/BinaryFiles/employees.dat"));
+
+               try {
+                  oos.writeObject(employees);
+                  System.out.println("Employee data saved successfully to binary file: src/BinaryFiles/employees.dat");
+               } finally {
+                  if (oos != null) {
+                     oos.close();
+                  }
+
+               }
+            } catch (Throwable var12) {
+               if (var2 == null) {
+                  var2 = var12;
+               } else if (var2 != var12) {
+                  var2.addSuppressed(var12);
+               }
+
+               throw var2;
+            }
+         } catch (IOException var13) {
+            System.out.println("Error saving employee data to binary file: " + var13.getMessage());
+         }
+
+      }
+   }
+
+   public void saveEmployee(User employee) {
+      try {
+         Throwable var2 = null;
+         Object var3 = null;
+
+         try {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("src/BinaryFiles/employees.dat"));
+
+            try {
+               oos.writeObject(employee);
+               System.out.println("Employee data saved successfully to binary file: src/BinaryFiles/employees.dat");
+            } finally {
+               if (oos != null) {
+                  oos.close();
+               }
+
+            }
+         } catch (Throwable var12) {
+            if (var2 == null) {
+               var2 = var12;
+            } else if (var2 != var12) {
+               var2.addSuppressed(var12);
+            }
+
+            throw var2;
+         }
+      } catch (IOException var13) {
+         System.out.println("Error saving employee data to binary file: " + var13.getMessage());
+      }
+
+   }
+
+   public ArrayList<User> loadEmployeeData() {
+      ArrayList<User> employees = new ArrayList();
+
+      try {
+         Throwable var2 = null;
+         Object var3 = null;
+
+         try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("src/BinaryFiles/employees.dat"));
+
+            try {
+               while(true) {
+                  try {
+                     employees = (ArrayList)ois.readObject();
+                  } catch (EOFException var16) {
+                     System.out.println("Employee data loaded successfully from binary file: src/BinaryFiles/employees.dat");
+                     break;
+                  }
+               }
+            } finally {
+               if (ois != null) {
+                  ois.close();
+               }
+
+            }
+         } catch (Throwable var18) {
+            if (var2 == null) {
+               var2 = var18;
+            } else if (var2 != var18) {
+               var2.addSuppressed(var18);
+            }
+
+            throw var2;
+         }
+      } catch (FileNotFoundException var19) {
+         System.err.println("Employee binary file not found: src/BinaryFiles/employees.dat");
+      } catch (ClassNotFoundException | IOException var20) {
+         System.err.println("Error loading employee data from binary file: " + var20.getMessage());
+      }
+
+      return employees;
+   }
+
+   public User loadEmployee(String Name) {
+      new ArrayList();
+      ArrayList<User> user = this.loadEmployeeData();
+      Iterator var4 = user.iterator();
+
+      while(var4.hasNext()) {
+         User employee = (User)var4.next();
+         if (employee.getName().equals(Name)) {
+            return employee;
+         }
+      }
+
+      System.out.println("No user with the name of " + Name + " was found!");
+      return null;
+   }
+
+   public void updateEmployeeData(User updatedUser) {
+      ArrayList<User> employees = this.loadEmployeeData();
+      employees.removeIf((user) -> {
+         return user.getUsername().equals(updatedUser.getUsername());
+      });
+
+      try {
+         Throwable var3 = null;
+         Object var4 = null;
+
+         try {
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("src/BinaryFiles/employees.dat"));
+
+            try {
+               oos.writeObject(updatedUser);
+            } finally {
+               if (oos != null) {
+                  oos.close();
+               }
+
+            }
+         } catch (Throwable var13) {
+            if (var3 == null) {
+               var3 = var13;
+            } else if (var3 != var13) {
+               var3.addSuppressed(var13);
+            }
+
+            throw var3;
+         }
+      } catch (IOException var14) {
+         System.err.println("Error updating employee data: " + var14.getMessage());
+      }
+
+   }
+
+   public void addEmployeeSalary(String employeeName, double salary) {
+      ArrayList<User> employees = this.loadEmployeeData();
+      boolean found = false;
+
+      for(int i = 0; i < employees.size(); ++i) {
+         User user = (User)employees.get(i);
+         if (user.getName().equalsIgnoreCase(employeeName)) {
+            user.setSalary(salary);
+            found = true;
+            break;
+         }
+      }
+
+      if (!found) {
+         System.err.println("Employee not found: " + employeeName);
+      } else {
+         this.saveEmployeeData(employees);
+         System.out.println("Salary updated for employee: " + employeeName);
+      }
+
+   }
+
+   public void saveBill(String billNumber, ArrayList<Item> items, double total, String cashierName, String sector) {
+      String date = dateFormat.format(new Date());
+      String fileName = "src/BinaryFiles/Bills/" + billNumber + "_" + date + ".txt";
+
+      try {
+         Throwable var9 = null;
+         Object var10 = null;
+
+         try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+
+            try {
+               writer.write("=========================================\n");
+               writer.write("                ELECTRONIC STORE          \n");
+               writer.write("=========================================\n");
+               writer.write("Bill Number: " + billNumber + "\n");
+               writer.write("Cashier: " + cashierName + "\n");
+               writer.write("Sector: " + sector + "\n");
+               writer.write("Date: " + date + "\n");
+               writer.write("-----------------------------------------\n");
+               writer.write("Items:\n");
+               writer.write(String.format("%-20s %-10s %-10s %-10s\n", "Item Name", "Category", "Quantity", "Price"));
+               writer.write("-----------------------------------------\n");
+               Iterator var13 = items.iterator();
+
+               while(var13.hasNext()) {
+                  Item item = (Item)var13.next();
+                  writer.write(String.format("%-20s %-10s %-10d %-10.2f\n", item.getItemName(), item.getCategory() != null ? item.getCategory() : "Uncategorized", item.getItemQuantity(), item.getSellingPrice()));
+               }
+
+               writer.write("-----------------------------------------\n");
+               writer.write(String.format("Total Amount: %.2f\n", total));
+               writer.write("=========================================\n");
+               writer.write("          THANK YOU FOR SHOPPING         \n");
+               writer.write("=========================================\n");
+               System.out.println("Bill saved successfully to " + fileName);
+            } finally {
+               if (writer != null) {
+                  writer.close();
+               }
+
+            }
+         } catch (Throwable var21) {
+            if (var9 == null) {
+               var9 = var21;
+            } else if (var9 != var21) {
+               var9.addSuppressed(var21);
+            }
+
+            throw var9;
+         }
+      } catch (IOException var22) {
+         System.err.println("Error saving bill to file: " + fileName + ". Cause: " + var22.getMessage());
+      }
+
+   }
+
+   public boolean isSameDay(Date date1, Date date2) {
+      Calendar cal1 = Calendar.getInstance();
+      Calendar cal2 = Calendar.getInstance();
+      cal1.setTime(date1);
+      cal2.setTime(date2);
+      return cal1.get(1) == cal2.get(1) && cal1.get(6) == cal2.get(6);
+   }
+
+   public ArrayList<Bill> loadBills(String cashierName, Date date) {
+      ArrayList<Bill> bills = new ArrayList();
+      File billDirectory = new File("src/BinaryFiles/Bills/");
+      if (billDirectory.exists() && billDirectory.isDirectory()) {
+         File[] billFiles = billDirectory.listFiles((dir, name) -> {
+            return name.contains(cashierName);
+         });
+         if (billFiles != null) {
+            File[] var9 = billFiles;
+            int var8 = billFiles.length;
+
+            for(int var7 = 0; var7 < var8; ++var7) {
+               File billFile = var9[var7];
+               Bill bill = this.loadBillFromFile(billFile, date);
+               if (bill != null) {
+                  bills.add(bill);
+               }
+            }
+         }
+      } else {
+         System.err.println("Bill directory not found or is not a directory.");
+      }
+
+      return bills;
+   }
+
+   private Bill loadBillFromFile(File billFile, Date date) {
+      Bill bill = null;
+
+      try {
+         Throwable var4 = null;
+         Object var5 = null;
+
+         try {
+            BufferedReader reader = new BufferedReader(new FileReader(billFile));
+
+            try {
+               String billNumber = null;
+               Date saleDate = null;
+               ArrayList<Item> items = new ArrayList();
+               double totalAmount = 0.0;
+
+               String line;
+               while((line = reader.readLine()) != null) {
+                  if (line.startsWith("Bill Number:")) {
+                     billNumber = line.split(":")[1].trim();
+                  } else if (line.startsWith("Date:")) {
+                     String dateStr = line.split(":")[1].trim();
+                     saleDate = dateFormat.parse(dateStr);
+                  } else if (line.startsWith("Total Amount:")) {
+                     totalAmount = Double.parseDouble(line.split(":")[1].trim());
+                  } else if (!line.startsWith("=") && !line.startsWith("-") && !line.isBlank()) {
+                     String[] itemDetails = line.split("\\s+");
+                     String itemName = itemDetails[0];
+                     String category = itemDetails[1];
+                     int quantity = Integer.parseInt(itemDetails[1]);
+                     double var17 = Double.parseDouble(itemDetails[2]);
+                  }
+               }
+
+               if (billNumber != null && saleDate != null && (date == null || this.isSameDay(saleDate, date))) {
+                  bill = new Bill(billNumber, items, totalAmount, saleDate);
+               }
+            } finally {
+               if (reader != null) {
+                  reader.close();
+               }
+
+            }
+         } catch (Throwable var26) {
+            if (var4 == null) {
+               var4 = var26;
+            } else if (var4 != var26) {
+               var4.addSuppressed(var26);
+            }
+
+            throw var4;
+         }
+      } catch (Exception var27) {
+         System.err.println("Error reading bill file: " + billFile.getName());
+      }
+
+      return bill;
+   }
+
+   public ArrayList<Item> loadInventoryBySector(String sector) {
+      ArrayList<Item> inventory = this.loadInventory();
+      ArrayList<Item> sectorInventory = new ArrayList();
+      Iterator var5 = inventory.iterator();
+
+      while(var5.hasNext()) {
+         Item item = (Item)var5.next();
+         if (item.getItemSector().equalsIgnoreCase(sector)) {
+            sectorInventory.add(item);
+         }
+      }
+
+      return sectorInventory;
+   }
+
+   public ArrayList<Item> filterItemsByCategory(String category) {
+      ArrayList<Item> filteredItems = new ArrayList();
+      ArrayList<Item> inventory = this.loadInventory();
+      Iterator var5 = inventory.iterator();
+
+      while(var5.hasNext()) {
+         Item item = (Item)var5.next();
+         if (item.getCategory().equalsIgnoreCase(category)) {
+            filteredItems.add(item);
+         }
+      }
+
+      return filteredItems;
+   }
+
+   public boolean isItemOutOfStock(String itemName, String sector) {
+      ArrayList<Item> sectorItems = this.loadInventoryBySector(sector);
+      Iterator var5 = sectorItems.iterator();
+
+      while(var5.hasNext()) {
+         Item item = (Item)var5.next();
+         if (item.getItemName().equalsIgnoreCase(itemName)) {
+            if (item.getStockQuantity() == 0) {
+               return true;
+            }
+
+            return false;
+         }
+      }
+
+      return true;
+   }
+}
