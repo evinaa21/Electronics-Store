@@ -1,20 +1,16 @@
 package controller;
 
 import java.util.ArrayList;
-import java.util.Date;
 
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.*;
-import javafx.scene.text.Text;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import model.Bill;
 import model.Cashier;
 import model.Item;
 import model.Sector;
-import model.Supplier;
 import util.FileHandler;
 import view.CashierView;
 import view.CreateBillView;
@@ -64,7 +60,7 @@ public class CashierController {
 
 		// Load bills
 		try {
-			ArrayList<Bill> bills = fileHandler.loadBills(cashier.getName(), new Date(System.currentTimeMillis()));
+			ArrayList<Bill> bills = fileHandler.loadBills();
 			cashier.setBills(bills);
 		} catch (Exception e) {
 			System.out.println("Error loading bills: " + e.getMessage());
@@ -134,78 +130,3 @@ public class CashierController {
 
 }
 
-/*
- * 
- * 
- * 
- * private void showCreateBillView() {
- * 
- * // Initialize the Create Bill view and controller
- * 
- * CreateBillView createBillView = new CreateBillView(); // Pass the sector to
- * the view
- * 
- * CreateBillController createBillController = new CreateBillController(
- * 
- * createBillView.getItemsContainer(),
- * 
- * createBillView.getTotalField(),
- * 
- * createBillView.getCategoryDropdown(),
- * 
- * createBillView.getItemDropdown(),
- * 
- * assignedSector
- * 
- * );
- * 
- * 
- * 
- * // Update the center content with the Create Bill view
- * 
- * centerContent.getChildren().clear();
- * 
- * centerContent.getChildren().add(createBillView.getView());
- * 
- * }
- * 
- * 
- * 
- * private void showDailyBillsView() {
- * 
- * // Initialize the Daily Bills view and controller
- * 
- * DailyBillsView dailyBillsView = new DailyBillsView();
- * 
- * DailyBillsController dailyBillsController = new DailyBillsController(
- * 
- * dailyBillsView.getBillsContainer(),
- * 
- * dailyBillsView.getFilterCategoryDropdown(),
- * 
- * assignedSector
- * 
- * );
- * 
- * 
- * 
- * // Update the center content with the Daily Bills view
- * 
- * centerContent.getChildren().clear();
- * 
- * centerContent.getChildren().add(dailyBillsView.getMainLayout());
- * 
- * }
- * 
- * 
- * 
- * 
- * 
- * public Cashier getCashier() {
- * 
- * return this.cashier;
- * 
- * }
- * 
- * }
- */

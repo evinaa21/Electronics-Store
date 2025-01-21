@@ -5,23 +5,21 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-import model.Bill;
 import model.Item;
 import model.Sector;
 import util.FileHandler;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class CreateBillController {
-	private final FileHandler fileHandler; // Handles file operations
-	private final VBox itemsContainer; // Container for displaying items added to the bill
-	private final TextField totalField; // Field to display the current total amount
-	private final ComboBox<String> categoryDropdown; // Drop down for selecting categories
-	private final ComboBox<String> itemDropdown; // Drop down for selecting items
-	private final ArrayList<Item> inventory; // Full inventory for the cashier's assigned sector
-	private final ArrayList<Item> billItems; // Items added to the current bill
-	private final Sector assignedSector; // Sector assigned to the cashier
+	private FileHandler fileHandler; // Handles file operations
+	private VBox itemsContainer; // Container for displaying items added to the bill
+	private TextField totalField; // Field to display the current total amount
+	private ComboBox<String> categoryDropdown; // Drop down for selecting categories
+	private ComboBox<String> itemDropdown; // Drop down for selecting items
+	private ArrayList<Item> inventory; // Full inventory for the cashier's assigned sector
+	private ArrayList<Item> billItems; // Items added to the current bill
+	private Sector assignedSector; // Sector assigned to the cashier
 
 	// Constructor to initialize the controller with UI elements and assigned sector
 	public CreateBillController(VBox itemsContainer, TextField totalField, ComboBox<String> categoryDropdown,
@@ -60,7 +58,6 @@ public class CreateBillController {
 
 			// Null check for selectedCategory
 			if (selectedCategory == null) {
-//				showError("Please select a category.");
 				return;
 			}
 
@@ -69,7 +66,6 @@ public class CreateBillController {
 			ArrayList<Item> categoryItems = this.fileHandler.filterItemsByCategory(selectedCategory);
 			itemDropdown.getItems().clear();
 			for (Item i : categoryItems) {
-//				TODO: Check if in stock
 				itemDropdown.getItems().add(i.getItemName());
 			}
 		});
@@ -79,11 +75,6 @@ public class CreateBillController {
 	public void addItemToBill(String itemName, int quantity) {
 		if (itemName == null || itemName.isEmpty()) {
 			showError("Please select an item");
-			return;
-		}
-
-		if (quantity <= 0) {
-			showError("Quantity must be greater than zero.");
 			return;
 		}
 

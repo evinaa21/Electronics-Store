@@ -1,7 +1,7 @@
 =========================================
                 ELECTRONIC STORE          
 =========================================
-Bill Number: BILL-1737419987538
+Bill Number: BILL-1737458073899
 Cashier: Ema Kuka
 Sector: Mobile & Gadgets
 Date: 21-01-2025
@@ -9,9 +9,9 @@ Date: 21-01-2025
 Items:
 Item Name            Category   Quantity   Price     
 -----------------------------------------
-Apple Watch Series 8 (45mm) Uncategorized 2          399.99    
+Microsoft Surface Pro 9 Tablets    1          1299.99   
 -----------------------------------------
-Total Amount: 799.98
+Total Amount: 1299.99
 =========================================
           THANK YOU FOR SHOPPING         
 =========================================

@@ -1,0 +1,17 @@
+=========================================
+                ELECTRONIC STORE          
+=========================================
+Bill Number: BILL-1737455085987
+Cashier: Ema Kuka
+Sector: Mobile & Gadgets
+Date: 21-01-2025
+-----------------------------------------
+Items:
+Item Name            Category   Quantity   Price     
+-----------------------------------------
+Apple Watch Ultra    Smartwatches 1          799.99    
+-----------------------------------------
+Total Amount: 799.99
+=========================================
+          THANK YOU FOR SHOPPING         
+=========================================

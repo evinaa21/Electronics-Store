@@ -1,27 +1,22 @@
 package util;
-
-import model.Admin;
+ 
 import model.Bill;
 import model.Cashier;
 import model.Item;
-import model.Manager;
 import model.Sector;
 import model.Supplier;
 import model.User;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class FileHandler {
-	private ArrayList<Item> items = new ArrayList<>();
-
 	// Constants for file paths CHANGE IF THESE DONT WORK FOR YOU
 	private static final String EMPLOYEE_FILE = "src/BinaryFiles/employees.dat"; // Binary files for employees
 	private static final String INVENTORY_FILE = "src/BinaryFiles/items.dat"; // Binary files for inventory
@@ -216,78 +211,94 @@ public class FileHandler {
 	}
 
 	public ArrayList<Bill> loadBills() {
-		ArrayList<Bill> bills = new ArrayList<>();
+	    ArrayList<Bill> bills = new ArrayList<>();
+	    File billDirectory = new File(BILL_DIRECTORY);
 
-		File billDirectory = new File(BILL_DIRECTORY);
+	    if (!billDirectory.exists() || !billDirectory.isDirectory()) {
+	        System.out.println("The specified directory does not exist or is not a valid directory: " + BILL_DIRECTORY);
+	        return bills;
+	    }
 
-		// Check if the directory exists and is a valid directory
-		if (!billDirectory.exists() || !billDirectory.isDirectory()) {
-			System.out.println("The specified directory does not exist or is not a valid directory: " + BILL_DIRECTORY);
-			return bills; // Return empty list if directory is invalid
-		}
+	    File[] billFiles = billDirectory.listFiles((dir, name) -> name.endsWith(".txt"));
 
-		// List all .txt files in the directory
-		File[] billFiles = billDirectory.listFiles((dir, name) -> name.endsWith(".txt"));
+	    if (billFiles == null || billFiles.length == 0) {
+	        System.out.println("No bill files found in directory: " + BILL_DIRECTORY);
+	        return bills;
+	    }
 
-		// Check if there are any files to process
-		if (billFiles == null || billFiles.length == 0) {
-			System.out.println("No bill files found in directory: " + BILL_DIRECTORY);
-			return bills; // Return empty list if no .txt files found
-		}
+	    Date today = Calendar.getInstance().getTime();
 
-		// Process each .txt file found
-		for (File billFile : billFiles) {
-			Bill bill = loadBillFromFile(billFile);
-			if (bill != null) {
-				bills.add(bill); // Only add valid bills
-			}
-		}
+	    for (File billFile : billFiles) {
+	        Bill bill = loadBillFromFile(billFile);
+	        if (bill != null) {
+	        	// Filter for today's bills
+	            if (isSameDay(bill.getSaleDate(), today)) {
+	                bills.add(bill);
+	            } 
+	        }
+	    }
 
-		return bills;
+	    return bills;
 	}
 
 	public Bill loadBillFromFile(File billFile) {
-		Bill bill = null;
-		try (BufferedReader br = new BufferedReader(new FileReader(billFile))) {
-			String line;
-			String billNumber = null;
-			ArrayList<Item> items = new ArrayList<>();
-			double totalAmount = 0.0;
-			Date saleDate = null;
+	    Bill bill = null;
+	    try (BufferedReader br = new BufferedReader(new FileReader(billFile))) {
+	        String line;
+	        String billNumber = null;
+	        ArrayList<Item> items = new ArrayList<>();
+	        double totalAmount = 0.0;
+	        Date saleDate = null;
+	        boolean isItemSection = false;
 
-			while ((line = br.readLine()) != null) {
-				// Process each line and extract bill data
-				if (line.startsWith("Bill Number:")) {
-					billNumber = line.split(":")[1].trim(); // Extract bill number
-				} else if (line.startsWith("Date:")) {
-					String dateString = line.split(":")[1].trim();
-					saleDate = dateFormat.parse(dateString); // Parse date string into Date
-				} else if (line.startsWith("Item Name")) {
-					// Skipping header for item section
-					continue;
-				} else if (line.startsWith("-")) {
-					// Process item details from each line
-					String[] itemDetails = line.split("\\|");
-					String itemName = itemDetails[0].trim();
-					int quantity = Integer.parseInt(itemDetails[1].trim().split(":")[1].trim());
-					double price = Double.parseDouble(itemDetails[2].trim().split(":")[1].trim());
-					// error items.add(new Item(itemName, quantity, price)); // Add the item to the
-					// list
-				} else if (line.startsWith("Total Amount:")) {
-					totalAmount = Double.parseDouble(line.split(":")[1].trim()); // Extract total amount
-				}
-			}
+	        while ((line = br.readLine()) != null) {
+	            line = line.trim();
 
-			// Create the Bill object using the parsed data
-			if (billNumber != null && !items.isEmpty() && totalAmount > 0 && saleDate != null) {
-				bill = new Bill(billNumber, items, totalAmount, saleDate);
-			}
+	            if (line.startsWith("Bill Number:")) {
+	                billNumber = line.split(":")[1].trim();
+	            } else if (line.startsWith("Date:")) {
+	                String dateString = line.split(":")[1].trim();
+	                saleDate = dateFormat.parse(dateString); // Ensure dateFormat matches file's date format
+	            } else if (line.startsWith("Total Amount:")) {
+	                totalAmount = Double.parseDouble(line.split(":")[1].trim());
+	            } else if (line.startsWith("Items:")) {
+	                isItemSection = true;
+	            } else if (isItemSection && line.startsWith("-----------------------------------------")) {
+	                // Skip the header divider line
+	                continue;
+	            } else if (isItemSection && !line.isEmpty()) {
+	                // Skip the header row or invalid lines
+	                if (line.startsWith("Item Name")) {
+	                    continue; // Skip the header row
+	                }
 
-		} catch (IOException | NumberFormatException | java.text.ParseException e) {
-			e.printStackTrace();
-		}
-		return bill;
+	                // Parse item details (assumes columns are aligned and separated by spaces)
+	                String[] itemDetails = line.split("\\s{2,}"); // Splits on 2 or more spaces
+	                if (itemDetails.length >= 4) {
+	                    try {
+	                        String itemName = itemDetails[0].trim();
+	                        String category = itemDetails[1].trim();
+	                        int quantity = Integer.parseInt(itemDetails[2].trim());
+	                        double price = Double.parseDouble(itemDetails[3].trim());
+
+	                        // Create and add the item to the list
+	                        items.add(new Item(itemName, category, price, 0, 0, quantity));
+	                    } catch (NumberFormatException e) {
+	                        System.err.println("Skipping invalid item line: " + line);
+	                    }
+	                }
+	            }
+	        }
+
+	        if (billNumber != null && !items.isEmpty() && totalAmount > 0 && saleDate != null) {
+	            bill = new Bill(billNumber, items, totalAmount, saleDate);
+	        }
+	    } catch (IOException | NumberFormatException | java.text.ParseException e) {
+	        e.printStackTrace();
+	    }
+	    return bill;
 	}
+
 
 	// Filter items by category
 	public ArrayList<Item> filterItemsByCategory(String category) {
@@ -459,27 +470,6 @@ public class FileHandler {
 		return billsData;
 	}
 
-	// Ensure directories and files exist
-	private void ensureDirectoriesExist() {
-		try {
-			File employeeFile = new File(EMPLOYEE_FILE);
-			File inventoryFile = new File(INVENTORY_FILE);
-			File billDir = new File(BILL_DIRECTORY);
-
-			if (!employeeFile.getParentFile().exists()) {
-				employeeFile.getParentFile().mkdirs();
-			}
-			if (!inventoryFile.getParentFile().exists()) {
-				inventoryFile.getParentFile().mkdirs();
-			}
-			if (!billDir.exists()) {
-				billDir.mkdirs();
-			}
-		} catch (Exception e) {
-			System.err.println("Error ensuring directories exist: " + e.getMessage());
-		}
-	}
-
 	// Update inventory after a sale (used by the cashier)
 	// This method validates stock availability and saves the updated inventory
 	public void updateInventoryForSale(ArrayList<Item> items) throws IllegalArgumentException, IOException {
@@ -624,7 +614,7 @@ public class FileHandler {
 	public void saveBill(String billNumber, ArrayList<Item> items, double total, String cashierName, String sector) {
 		String date = dateFormat.format(new Date());
 		String fileName = BILL_DIRECTORY + billNumber + "_" + date + ".txt";
-
+		
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
 			writer.write("=========================================\n");
 			writer.write("                ELECTRONIC STORE          \n");
@@ -656,73 +646,18 @@ public class FileHandler {
 			System.err.println("Error saving bill to file: " + fileName + ". Cause: " + e.getMessage());
 		}
 	}
-
-	private boolean isSameDay(Date date1, Date date2) {
-		return date1.getYear() == date2.getYear() && date1.getMonth() == date2.getMonth()
-				&& date1.getDate() == date2.getDate();
+	
+	public boolean isSameDay(Date date1, Date date2) {
+	    Calendar cal1 = Calendar.getInstance();
+	    Calendar cal2 = Calendar.getInstance();
+	    cal1.setTime(date1);
+	    cal2.setTime(date2);
+	    return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+	           cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
 	}
 
-	// Load all bills for a specific cashier
-	public ArrayList<Bill> loadBills(String cashierName, Date date) {
-		ArrayList<Bill> bills = new ArrayList<>();
-		File billDirectory = new File(BILL_DIRECTORY);
 
-		if (billDirectory.exists() && billDirectory.isDirectory()) {
-			File[] billFiles = billDirectory.listFiles((dir, name) -> name.contains(cashierName));
-
-			if (billFiles != null) {
-				for (File billFile : billFiles) {
-					Bill bill = loadBillFromFile(billFile, date);
-					if (bill != null) {
-						bills.add(bill);
-					}
-				}
-			}
-		} else {
-			System.err.println("Bill directory not found or is not a directory.");
-		}
-		return bills;
-	}
-
-	// Load a bill from a text file and convert it into a Bill object
-	private Bill loadBillFromFile(File billFile, Date date) {
-		Bill bill = null;
-		try (BufferedReader reader = new BufferedReader(new FileReader(billFile))) {
-			String line;
-			String billNumber = null;
-			Date saleDate = null;
-			ArrayList<Item> items = new ArrayList<>();
-			double totalAmount = 0;
-
-			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("Bill Number:")) {
-					billNumber = line.split(":")[1].trim();
-				} else if (line.startsWith("Date:")) {
-					String dateStr = line.split(":")[1].trim();
-					saleDate = dateFormat.parse(dateStr);
-				} else if (line.startsWith("Total Amount:")) {
-					totalAmount = Double.parseDouble(line.split(":")[1].trim());
-				} else if (!line.startsWith("=") && !line.startsWith("-") && !line.isBlank()) {
-					String[] itemDetails = line.split("\\s+");
-					String itemName = itemDetails[0];
-					String category = itemDetails[1];
-					int quantity = Integer.parseInt(itemDetails[1]);
-					double price = Double.parseDouble(itemDetails[2]);
-					// KTU KA ERROR items.add(new Item(itemName, category , price, quantity));
-				}
-			}
-
-			if (billNumber != null && saleDate != null) {
-				if (date == null || isSameDay(saleDate, date)) {
-					bill = new Bill(billNumber, items, totalAmount, saleDate);
-				}
-			}
-		} catch (Exception e) {
-			System.err.println("Error reading bill file: " + billFile.getName());
-		}
-		return bill;
-	}
-
+	
 	// Notify low stock items for the specified sector where cashier is assigned
 	public boolean isItemOutOfStock(String itemName, String sector) {
 		ArrayList<Item> sectorItems = loadInventoryBySector(sector); // Load items for the sector

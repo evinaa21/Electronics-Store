@@ -1,7 +1,7 @@
 =========================================
                 ELECTRONIC STORE          
 =========================================
-Bill Number: BILL-1737419607464
+Bill Number: BILL-1737458042121
 Cashier: Ema Kuka
 Sector: Mobile & Gadgets
 Date: 21-01-2025
@@ -9,9 +9,9 @@ Date: 21-01-2025
 Items:
 Item Name            Category   Quantity   Price     
 -----------------------------------------
-Apple iPhone 14 Pro Max (256GB) Uncategorized 1          1099.99   
+Samsung Galaxy Watch 6 Classic (47mm) Smartwatches 1          429.99    
 -----------------------------------------
-Total Amount: 1099.99
+Total Amount: 429.99
 =========================================
           THANK YOU FOR SHOPPING         
 =========================================

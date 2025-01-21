@@ -18,14 +18,14 @@ import model.Sector;
 import util.FileHandler;
 
 public class CreateBillView {
-	private final BorderPane mainLayout; // Main layout container
-	private final VBox itemsContainer; // Container for displaying added items
-	private final ComboBox<String> categoryDropdown; // Dropdown to select category
-	private final ComboBox<String> itemDropdown; // Dropdown to select item
-	private final TextField quantityField; // Input field for the quantity
-	private final TextField totalField; // Field to display the current total
-	private final Button addItemButton; // Button to add items to the bill
-	private final Button finalizeBillButton; // Button to finalize and save the bill
+	private BorderPane mainLayout; // Main layout container
+	private VBox itemsContainer; // Container for displaying added items
+	private ComboBox<String> categoryDropdown; // Dropdown to select category
+	private ComboBox<String> itemDropdown; // Dropdown to select item
+	private TextField quantityField; // Input field for the quantity
+	private TextField totalField; // Field to display the current total
+	private Button addItemButton; // Button to add items to the bill
+	private Button finalizeBillButton; // Button to finalize and save the bill
 
 	private Sector sector;
 	private Cashier cashier;
@@ -46,9 +46,7 @@ public class CreateBillView {
 		Label categoryLabel = new Label("Category:");
 		categoryDropdown = new ComboBox<>();
 		categoryDropdown.setPromptText("Select Category");
-		// set kategorite me dore
 
-//		categoryDropdown.getItems().addAll(categories);
 
 		// Label and dropdown for item
 		Label itemLabel = new Label("Item:");
