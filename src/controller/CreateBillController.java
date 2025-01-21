@@ -45,13 +45,6 @@ public class CreateBillController {
 	private void loadInventory() {
 		ArrayList<Item> allItems = fileHandler.loadInventory(); // Load all items from the inventory file
 		this.inventory.addAll(allItems);
-//		// Filter items by assigned sector
-//		for (int i = 0; i < allItems.size(); i++) {
-//			Item item = allItems.get(i);
-//			if (item.getItemSector().equalsIgnoreCase(assignedSector.getName())) {
-//				this.inventory.add(item);
-//			}
-//		}
 	}
 
 	private void populateCategories() {
@@ -67,7 +60,7 @@ public class CreateBillController {
 
 			// Null check for selectedCategory
 			if (selectedCategory == null) {
-				showError("Please select a category.");
+//				showError("Please select a category.");
 				return;
 			}
 
@@ -168,10 +161,10 @@ public class CreateBillController {
 	}
 
 	private void resetFields() {
-//		itemsContainer.getChildren().clear();
+		itemsContainer.getChildren().clear();
 		totalField.setText("0.00");
-//		categoryDropdown.getSelectionModel().clearSelection();
-//		itemDropdown.getItems().clear();
+		categoryDropdown.getSelectionModel().clearSelection();
+		itemDropdown.getItems().clear();
 		this.billItems.clear();
 
 	}
