@@ -141,22 +141,42 @@ public class ManagerView {
         centerContent.getChildren().clear();
         centerContent.getChildren().add(homeContent);
     }
-
     private String getLowStockInfo() {
-        // Specify the threshold for low stock (e.g., 5)
-        ArrayList<Item> lowStockItems = fileHandler.notifyLowStock(5);  // Use fileHandler to get low stock items
-        
-        if (lowStockItems != null && !lowStockItems.isEmpty()) {
-            StringBuilder lowStockInfo = new StringBuilder("Low Stock Items:\n");
-            for (Item item : lowStockItems) {
-                lowStockInfo.append(item.getItemName())
-                            .append(" - Stock: ")
-                            .append(item.getStockQuantity())
-                            .append("\n");
-            }
-            return lowStockInfo.toString();
-        } else {
+        ArrayList<Sector> managerSectors = manager.getSectors();  // Get manager's assigned sectors
+        // Get all low stock items based on the threshold and sectors assigned to the manager
+        ArrayList<Item> lowStockItems = fileHandler.notifyLowStock(5, managerSectors);  
+
+        // If there are no low stock items, return a message
+        if (lowStockItems.isEmpty()) {
             return "No low stock items.";
         }
+
+        // Prepare the string to display low stock items
+        StringBuilder lowStockInfo = new StringBuilder("Low Stock Items:\n");
+
+        for (Item item : lowStockItems) {
+            boolean isCategoryInSector = false;
+            
+            // Iterate through the manager's sectors and check if the category is in the sector's categories
+            for (Sector sector : managerSectors) {
+                // Check if the item’s category is in the sector's categories
+                if (sector.getCategories().contains(item.getCategory())) {
+                    isCategoryInSector = true;
+                    break;
+                }
+            }
+
+            // If the category is in the sector, add the item to the list
+            if (isCategoryInSector && item.getStockQuantity() <= 5) {
+                lowStockInfo.append("Item Name: ").append(item.getItemName())
+                            .append(", Category: ").append(item.getCategory())
+                            .append(", Stock: ").append(item.getStockQuantity())
+                            .append("\n");
+            }
+        }
+
+        return lowStockInfo.toString();  // Return the formatted low stock information
     }
-}
+
+    }
+
