@@ -9,7 +9,7 @@ import model.Manager;
 import model.Item;
 
 import model.Supplier;
-import util.FileHandler;
+import util.FileHandlerMANAGER;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
 public class AddItemController {
 
     private Manager manager;
-    private FileHandler fileHandler;
+    private FileHandlerMANAGER fileHandler;
 
     public AddItemController(Manager manager) {
         this.manager = manager;
@@ -26,7 +26,7 @@ public class AddItemController {
   
 
     // Constructor accepts Manager and FileHandler to manage file operations
-    public AddItemController(Manager manager, FileHandler fileHandler) {
+    public AddItemController(Manager manager, FileHandlerMANAGER fileHandler) {
         this.manager = manager;
         this.fileHandler = fileHandler;
 

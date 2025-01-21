@@ -11,7 +11,7 @@ import model.Manager;
 import model.Sector;
 import model.Supplier;
 import model.Item;
-import util.FileHandler;
+import util.FileHandlerMANAGER;
 import view.*;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class ManagerController {
     private Stage primaryStage;
     private Manager manager;
-    private FileHandler fileHandler;
+    private FileHandlerMANAGER fileHandler;
     private BorderPane mainLayout;
     private StackPane centerContent;
     private Scene managerScene;
@@ -27,7 +27,7 @@ public class ManagerController {
     public ManagerController(Stage primaryStage, Manager manager) {
         this.primaryStage = primaryStage;
         this.manager = manager;
-        this.fileHandler = new FileHandler();
+        this.fileHandler = new FileHandlerMANAGER();
         this.mainLayout = new BorderPane();
         this.centerContent = new StackPane();
         loadDataFromFiles();

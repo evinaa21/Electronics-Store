@@ -6,16 +6,16 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import model.Manager;
-import util.FileHandler;
+import util.FileHandlerMANAGER;
 import view.ViewItemsView;
 
 public class ViewItemsController {
 
     private Manager manager;
-    private FileHandler fileHandler;
+    private FileHandlerMANAGER fileHandler;
     private ViewItemsView viewItemsView;
 
-    public ViewItemsController(Manager manager, FileHandler fileHandler) {
+    public ViewItemsController(Manager manager, FileHandlerMANAGER fileHandler) {
         this.manager = manager;
         this.fileHandler = fileHandler;
         this.viewItemsView = new ViewItemsView(manager, fileHandler);

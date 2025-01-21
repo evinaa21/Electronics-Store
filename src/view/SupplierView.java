@@ -9,7 +9,7 @@ import javafx.geometry.*;
 import model.Manager;
 import model.Supplier;
 import model.Item;
-import util.FileHandler;
+import util.FileHandlerMANAGER;
 
 import java.util.ArrayList;
 
@@ -18,10 +18,10 @@ public class SupplierView {
     private SupplierController supplierController;
     private Manager manager;
 
-    private FileHandler fileHandler;
+    private FileHandlerMANAGER fileHandler;
 
 
-    public SupplierView(Manager manager, FileHandler fileHandler) {
+    public SupplierView(Manager manager, FileHandlerMANAGER fileHandler) {
         this.manager = manager;
         this.fileHandler = fileHandler;
 
@@ -152,7 +152,7 @@ public class SupplierView {
     }
 
 
-    public void setFileHandler(FileHandler fileHandler) {
+    public void setFileHandler(FileHandlerMANAGER fileHandler) {
         this.fileHandler = fileHandler;
     }
 

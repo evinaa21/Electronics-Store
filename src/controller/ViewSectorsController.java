@@ -8,16 +8,16 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.Manager;
 import model.Sector;
-import util.FileHandler;
+import util.FileHandlerMANAGER;
 import view.ViewSectorsView;
 
 public class ViewSectorsController {
 
     private Stage primaryStage;
     private Manager manager;
-    private FileHandler fileHandler;
+    private FileHandlerMANAGER fileHandler;
 
-    public ViewSectorsController(Stage primaryStage, Manager manager, FileHandler fileHandler) {
+    public ViewSectorsController(Stage primaryStage, Manager manager, FileHandlerMANAGER fileHandler) {
         this.primaryStage = primaryStage;
         this.manager = manager;
         this.fileHandler = fileHandler;

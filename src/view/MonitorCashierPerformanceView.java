@@ -11,7 +11,7 @@ import model.Bill;
 import model.Cashier;
 import model.Manager;
 import model.Sector;
-import util.FileHandler;
+import util.FileHandlerMANAGER;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -21,10 +21,10 @@ import java.util.Date;
 public class MonitorCashierPerformanceView {
 
     private Manager manager;
-    private FileHandler fileHandler;
+    private FileHandlerMANAGER fileHandler;
 
     // Constructor to pass Manager and FileHandler instances
-    public MonitorCashierPerformanceView(Manager manager, FileHandler fileHandler) {
+    public MonitorCashierPerformanceView(Manager manager, FileHandlerMANAGER fileHandler) {
         if (manager == null || fileHandler == null) {
             throw new IllegalArgumentException("Manager and FileHandler cannot be null.");
         }

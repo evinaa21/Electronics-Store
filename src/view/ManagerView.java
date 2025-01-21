@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 import controller.ManagerController;
 import model.Manager;
 import model.Sector;
-import util.FileHandler;
+import util.FileHandlerMANAGER;
 import model.Item;
 
 import java.util.ArrayList;
@@ -22,10 +22,10 @@ public class ManagerView {
     private ManagerController managerController;
     private Stage primaryStage;
     private Manager manager;
-    private FileHandler fileHandler;
+    private FileHandlerMANAGER fileHandler;
     private Label lowStockLabel;
 
-    public ManagerView(ManagerController managerController, Stage primaryStage, Manager manager, FileHandler fileHandler) {
+    public ManagerView(ManagerController managerController, Stage primaryStage, Manager manager, FileHandlerMANAGER fileHandler) {
         this.managerController = managerController;
         this.primaryStage = primaryStage;
         this.manager = manager;

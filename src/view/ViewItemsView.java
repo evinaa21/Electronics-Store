@@ -17,14 +17,14 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.Item;
 import model.Manager;
-import util.FileHandler;
+import util.FileHandlerMANAGER;
 
 public class ViewItemsView {
     private Manager manager;
-    private FileHandler fileHandler;
-    private List<Item> items = new ArrayList<Item>();
+    private FileHandlerMANAGER fileHandler;
+    private ArrayList<Item> items = new ArrayList<Item>();
 
-    public ViewItemsView(Manager manager, FileHandler fileHandler) {
+    public ViewItemsView(Manager manager, FileHandlerMANAGER fileHandler) {
         this.manager = manager;
         this.fileHandler = fileHandler;
     }
@@ -326,7 +326,7 @@ public class ViewItemsView {
         textField.setPrefWidth(300);
     }
 
-    public void setFileHandler(FileHandler fileHandler) {
+    public void setFileHandler(FileHandlerMANAGER fileHandler) {
         this.fileHandler = fileHandler;
     }
 }

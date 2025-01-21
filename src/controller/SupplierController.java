@@ -7,16 +7,16 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import model.Manager;
 import model.Supplier;
-import util.FileHandler;
+import util.FileHandlerMANAGER;
 import model.Item;
 import view.SupplierView;
 
 public class SupplierController {
     private Manager manager;
     private SupplierView supplierView;
-    private FileHandler fileHandler;
+    private FileHandlerMANAGER fileHandler;
 
-    public SupplierController(Manager manager, SupplierView supplierView, FileHandler fileHandler) {
+    public SupplierController(Manager manager, SupplierView supplierView, FileHandlerMANAGER fileHandler) {
         this.manager = manager;
         this.supplierView = supplierView;
         this.fileHandler = fileHandler;
