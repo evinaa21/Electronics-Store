@@ -41,8 +41,10 @@ public class ManagerController {
         ArrayList<Supplier> suppliers = fileHandler.loadSuppliers();
         manager.setSuppliers(suppliers);
 
-        ArrayList<Sector> sectors = fileHandler.loadSectors();
-        manager.setSectors(sectors);
+        ArrayList<Sector> loadedSectors = fileHandler.loadManagerSectors();
+        
+        // Assuming 'manager' is a reference to the Manager object and has a setSectors() method
+        manager.setSectors(loadedSectors);
     }
 
     private void setupUI() {
@@ -104,9 +106,15 @@ public class ManagerController {
     }
 
     public int getLowStockItemsCount() {
-        ArrayList<Item> lowStockItems = fileHandler.notifyLowStock(5);
+        // Get the list of sectors the manager is responsible for
+        ArrayList<Sector> managerSectors = manager.getSectors();
+
+        // Use fileHandler to get low stock items filtered by manager's sectors
+        ArrayList<Item> lowStockItems = fileHandler.notifyLowStock(5, managerSectors);
+        
         return lowStockItems.size();
     }
+
 
     public Scene getManagerScene() {
         return managerScene;
