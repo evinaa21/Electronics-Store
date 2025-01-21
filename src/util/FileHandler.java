@@ -428,22 +428,20 @@ public class FileHandler {
 	public ArrayList<Cashier> loadCashiersByRole() {
 		ArrayList<Cashier> cashiers = new ArrayList<>();
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(EMPLOYEE_FILE))) {
-			while (true) {
-				try {
-					User user = (User) ois.readObject();
-					if (user instanceof Cashier && user.getRole() == Role.Cashier) { // Filter based on Role
-						cashiers.add((Cashier) user);
-					}
-				} catch (EOFException e) {
-					break; // End of file reached
-				} catch (IOException | ClassNotFoundException e) {
-					e.printStackTrace();
-					break; // Break the loop on error
+			// First, read the entire ArrayList of Users
+			ArrayList<User> users = (ArrayList<User>) ois.readObject(); // Read the whole list
+
+			// Now filter based on role
+			for (User user : users) {
+				if (user instanceof Cashier && user.getRole() == Role.Cashier) {
+					cashiers.add((Cashier) user);
 				}
 			}
-		} catch (IOException e) {
+		} catch (EOFException e) {
+			// Handle end of file gracefully (if needed)
+		} catch (IOException | ClassNotFoundException e) {
+			System.err.println("Error reading from file: " + e.getMessage());
 			e.printStackTrace();
-			System.out.println("Error reading from file.");
 		}
 		return cashiers;
 	}
