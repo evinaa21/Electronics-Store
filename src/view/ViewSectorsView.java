@@ -12,14 +12,14 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import model.Manager;
 import model.Sector;
-import util.FileHandler;
+import util.FileHandlerMANAGER;
 import controller.ViewSectorsController;
 
 import java.util.ArrayList;
 
 public class ViewSectorsView {
     private Manager manager;
-    private FileHandler fileHandler;
+    private FileHandlerMANAGER fileHandler;
     private ViewSectorsController controller;
 
     public ViewSectorsView(Manager manager) {
@@ -109,7 +109,7 @@ public class ViewSectorsView {
         label.setStyle("-fx-background-color: #f0f0f0; -fx-padding: 5px;");
     }
 
-    public void setFileHandler(FileHandler fileHandler) {
+    public void setFileHandler(FileHandlerMANAGER fileHandler) {
         this.fileHandler = fileHandler;
     }
 

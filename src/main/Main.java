@@ -18,7 +18,6 @@ import model.Admin;
 import model.Cashier;
 import model.Sector;
 import model.User;
-import util.FileHandler;
 import util.Role;
 import view.LoginView;
 

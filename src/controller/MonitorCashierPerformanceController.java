@@ -3,16 +3,16 @@ package controller;
 import javafx.stage.Stage;
 import model.Manager;
 import view.MonitorCashierPerformanceView;
-import util.FileHandler;
+import util.FileHandlerMANAGER;
 
 public class MonitorCashierPerformanceController {
 
     private Manager manager;
-    private FileHandler fileHandler;
+    private FileHandlerMANAGER fileHandler;
     
 
     // Constructor to initialize the manager and fileHandler
-    public MonitorCashierPerformanceController(Manager manager, FileHandler fileHandler) {
+    public MonitorCashierPerformanceController(Manager manager, FileHandlerMANAGER fileHandler) {
         if (manager == null || fileHandler == null) {
             throw new IllegalArgumentException("Manager and FileHandler cannot be null.");
         }

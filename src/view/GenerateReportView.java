@@ -7,7 +7,7 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import model.Manager;
-import util.FileHandler;
+import util.FileHandlerMANAGER;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,11 +15,11 @@ import java.util.ArrayList;
 public class GenerateReportView {
 
     private Manager manager;
-	private FileHandler fileHandler;
+	private FileHandlerMANAGER fileHandler;
 	
 
 
-    public GenerateReportView(Manager manager, FileHandler fileHandler) {
+    public GenerateReportView(Manager manager, FileHandlerMANAGER fileHandler) {
 
         this.manager = manager;
         this.fileHandler=fileHandler;
@@ -166,7 +166,7 @@ public class GenerateReportView {
 
 
 
-    public void setFileHandler(FileHandler fileHandler) {
+    public void setFileHandler(FileHandlerMANAGER fileHandler) {
         this.fileHandler = fileHandler;
     }
 

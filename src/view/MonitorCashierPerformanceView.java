@@ -10,7 +10,8 @@ import javafx.scene.layout.VBox;
 import model.Bill;
 import model.Cashier;
 import model.Manager;
-import util.FileHandler;
+import model.Sector;
+import util.FileHandlerMANAGER;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -20,10 +21,10 @@ import java.util.Date;
 public class MonitorCashierPerformanceView {
 
     private Manager manager;
-    private FileHandler fileHandler;
+    private FileHandlerMANAGER fileHandler;
 
     // Constructor to pass Manager and FileHandler instances
-    public MonitorCashierPerformanceView(Manager manager, FileHandler fileHandler) {
+    public MonitorCashierPerformanceView(Manager manager, FileHandlerMANAGER fileHandler) {
         if (manager == null || fileHandler == null) {
             throw new IllegalArgumentException("Manager and FileHandler cannot be null.");
         }
@@ -39,12 +40,14 @@ public class MonitorCashierPerformanceView {
         Label cashierLabel = new Label("Select Cashier:");
         cashierLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
 
-        // ComboBox to select cashier
+     // ComboBox to select cashier
         ComboBox<Cashier> cashierComboBox = new ComboBox<>();
         cashierComboBox.setStyle("-fx-font-size: 16px; -fx-background-color: #ffffff;");
 
         // Load only cashiers with Role.Cashier into the ComboBox
-        ArrayList<Cashier> cashiers = fileHandler.loadCashiersByRole();  // This filters based on Role
+        ArrayList<Sector> managerSectors = manager.getSectors(); // Get the list of sectors the manager is responsible for
+        ArrayList<Cashier> cashiers = fileHandler.loadCashiersByRole(managerSectors); // Pass manager sectors to filter cashiers
+
         if (cashiers != null && !cashiers.isEmpty()) {
             // Set display to cashier names
             cashierComboBox.setCellFactory(param -> new javafx.scene.control.ListCell<Cashier>() {
@@ -54,7 +57,7 @@ public class MonitorCashierPerformanceView {
                     if (empty || item == null) {
                         setText(null);
                     } else {
-                        setText(item.getName());  // Display the cashier's name
+                        setText(item.getName());  // Display only the cashier's name
                     }
                 }
             });
@@ -66,7 +69,7 @@ public class MonitorCashierPerformanceView {
                     if (empty || item == null) {
                         setText(null);
                     } else {
-                        setText(item.getName());  // Display the cashier's name
+                        setText(item.getName());  // Display the cashier's name in the button
                     }
                 }
             });
@@ -76,6 +79,7 @@ public class MonitorCashierPerformanceView {
             showError("No cashiers found in the file.");
             cashierComboBox.setDisable(true);  // Disable the ComboBox if no cashiers exist
         }
+
 
         Label dateLabel = new Label("Select Date:");
         dateLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");

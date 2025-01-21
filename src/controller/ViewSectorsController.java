@@ -8,16 +8,16 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.Manager;
 import model.Sector;
-import util.FileHandler;
+import util.FileHandlerMANAGER;
 import view.ViewSectorsView;
 
 public class ViewSectorsController {
 
     private Stage primaryStage;
     private Manager manager;
-    private FileHandler fileHandler;
+    private FileHandlerMANAGER fileHandler;
 
-    public ViewSectorsController(Stage primaryStage, Manager manager, FileHandler fileHandler) {
+    public ViewSectorsController(Stage primaryStage, Manager manager, FileHandlerMANAGER fileHandler) {
         this.primaryStage = primaryStage;
         this.manager = manager;
         this.fileHandler = fileHandler;
@@ -27,9 +27,13 @@ public class ViewSectorsController {
     }
 
     private void loadSectors() {
-        ArrayList<Sector> loadedSectors = fileHandler.loadSectors();
+        // Use the updated method to load only sectors associated with Managers
+        ArrayList<Sector> loadedSectors = fileHandler.loadManagerSectors();
+        
+        // Assuming 'manager' is a reference to the Manager object and has a setSectors() method
         manager.setSectors(loadedSectors);
     }
+
 
     private void setupUI() {
         ViewSectorsView view = new ViewSectorsView(manager);

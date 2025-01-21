@@ -3,14 +3,14 @@ package controller;
 import javafx.stage.Stage;
 import model.Manager;
 import view.RestockItemView;
-import util.FileHandler;
+import util.FileHandlerMANAGER;
 
 public class RestockItemController {
 
     private Manager manager;
-    private FileHandler fileHandler;
+    private FileHandlerMANAGER fileHandler;
 
-    public RestockItemController(Manager manager, FileHandler fileHandler) {
+    public RestockItemController(Manager manager, FileHandlerMANAGER fileHandler) {
         if (manager == null || fileHandler == null) {
             throw new IllegalArgumentException("Manager and FileHandler cannot be null.");
         }

@@ -9,7 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import model.Item;
 import model.Manager;
-import util.FileHandler;
+import util.FileHandlerMANAGER;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 public class RestockItemView {
 
     private Manager manager;
-    private FileHandler fileHandler;
+    private FileHandlerMANAGER fileHandler;
 
 
     // Constructor to pass Manager and FileHandler instances
-    public RestockItemView(Manager manager, FileHandler fileHandler) {
+    public RestockItemView(Manager manager, FileHandlerMANAGER fileHandler) {
         if (manager == null || manager.getItems() == null) {
             throw new IllegalArgumentException("Manager or item list cannot be null.");
         }
@@ -159,7 +159,7 @@ public class RestockItemView {
 
 
 
-    public void setFileHandler(FileHandler fileHandler) {
+    public void setFileHandler(FileHandlerMANAGER fileHandler) {
         this.fileHandler = fileHandler;
     }
 }

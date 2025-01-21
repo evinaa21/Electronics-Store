@@ -15,8 +15,7 @@ import model.Manager;
 import model.Sector;
 
 import model.Supplier;
-import util.FileHandler;
-
+import util.FileHandlerMANAGER;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,7 @@ public class AddItemView {
     private VBox parentLayout;
 
 
-    private FileHandler fileHandler;
+    private FileHandlerMANAGER fileHandler;
     private SupplierView supplierView;
 
 
@@ -259,7 +258,7 @@ public class AddItemView {
         alert.showAndWait();
     }
 
-	public void setFileHandler(FileHandler fileHandler) {
+	public void setFileHandler(FileHandlerMANAGER fileHandler) {
 		this.fileHandler=fileHandler;
 		
 	}
