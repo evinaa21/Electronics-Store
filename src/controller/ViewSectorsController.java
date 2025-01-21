@@ -27,9 +27,13 @@ public class ViewSectorsController {
     }
 
     private void loadSectors() {
-        ArrayList<Sector> loadedSectors = fileHandler.loadSectors();
+        // Use the updated method to load only sectors associated with Managers
+        ArrayList<Sector> loadedSectors = fileHandler.loadManagerSectors();
+        
+        // Assuming 'manager' is a reference to the Manager object and has a setSectors() method
         manager.setSectors(loadedSectors);
     }
+
 
     private void setupUI() {
         ViewSectorsView view = new ViewSectorsView(manager);
