@@ -47,7 +47,7 @@ public class ManagerController {
     private void setupUI() {
         ManagerView managerView = new ManagerView(this, primaryStage, manager, fileHandler);
         managerView.setupUI(mainLayout, centerContent);
-        managerScene = new Scene(mainLayout, 1200, 600);
+        managerScene = new Scene(mainLayout, 1200, 1200);
         primaryStage.setTitle("Manager Dashboard");
         primaryStage.setScene(managerScene);
         primaryStage.centerOnScreen();
