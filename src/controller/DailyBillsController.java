@@ -11,7 +11,7 @@ import java.util.*;
 public class DailyBillsController {
     private final VBox billsContainer; // Container to display daily bills
     private ArrayList<String> dailyBills; // Cache for all daily bills
-    private final String summaryFilePath = "C:\\Users\\Evina\\git\\Electronics-Store\\src\\BinaryFiles\\sales_summary.txt";
+    private final String summaryFilePath = "src/BinaryFiles/sales_summary.txt";
 
     // Constructor
     public DailyBillsController(VBox billsContainer) {
