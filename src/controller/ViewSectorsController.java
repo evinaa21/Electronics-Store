@@ -20,12 +20,10 @@ public class ViewSectorsController {
         this.manager = manager;
         this.fileHandler = fileHandler;
         loadSectors();
-
         setupUI();
     }
 
     private void loadSectors() {
-        //loads only assigned sectors to manager
         ArrayList<Sector> loadedSectors = fileHandler.loadManagerSectors();
         manager.setSectors(loadedSectors);
     }

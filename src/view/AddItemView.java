@@ -3,32 +3,25 @@ package view;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.stage.FileChooser;
 import model.Item;
 import model.Manager;
-import model.Supplier;
-import util.FileHandlerMANAGER;
-import java.util.ArrayList;
+import controller.AddItemController;
 
 
 public class AddItemView {
-    private Manager manager;
     private VBox parentLayout;
+    private AddItemController controller;
 
-
-    private FileHandlerMANAGER fileHandler;
-    public AddItemView(Manager manager, SupplierView supplierView) {
-        this.manager = manager;
+    public AddItemView(Manager manager, AddItemController controller) {
+        this.controller = controller;
         this.parentLayout = new VBox();
     }
 
     public ScrollPane getViewContent() {
-        
         Label titleLabel = new Label("Add New Item");
         titleLabel.setFont(new Font("Arial", 28));
         titleLabel.setTextFill(Color.WHITE);
@@ -40,9 +33,8 @@ public class AddItemView {
         VBox formContainer = new VBox(20);
         formContainer.setStyle("-fx-background-color: #34495E; -fx-padding: 30; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 5, 0, 0, 2);");
         formContainer.setPrefWidth(0.75 * parentLayout.getWidth());  
-        formContainer.setMinWidth(500); 
+        formContainer.setMinWidth(500);
 
-        
         Label formTitle = new Label("Enter Item Details");
         formTitle.setFont(new Font("Arial", 22));
         formTitle.setTextFill(Color.WHITE);
@@ -53,7 +45,6 @@ public class AddItemView {
         formGrid.setAlignment(Pos.CENTER);
         formGrid.setMaxWidth(Double.MAX_VALUE);
 
-        
         Label nameLabel = new Label("Item Name:");
         nameLabel.setTextFill(Color.WHITE);
         TextField nameField = new TextField();
@@ -85,6 +76,7 @@ public class AddItemView {
         stockField.setStyle("-fx-border-radius: 5; -fx-border-color: #5D6D7E;");
         formGrid.add(stockLabel, 0, 3);
         formGrid.add(stockField, 1, 3);
+
         Label descriptionLabel = new Label("Item Description:");
         descriptionLabel.setTextFill(Color.WHITE);
         TextArea descriptionField = new TextArea();
@@ -98,7 +90,7 @@ public class AddItemView {
         supplierLabel.setTextFill(Color.WHITE);
         ComboBox<String> supplierComboBox = new ComboBox<>();
         supplierComboBox.setStyle("-fx-border-radius: 5; -fx-border-color: #5D6D7E;");
-        loadSuppliersIntoComboBox(supplierComboBox);
+        controller.loadSuppliersIntoComboBox(supplierComboBox);  // Load suppliers into ComboBox
         formGrid.add(supplierLabel, 0, 5);
         formGrid.add(supplierComboBox, 1, 5);
 
@@ -107,7 +99,7 @@ public class AddItemView {
         Button chooseImageButton = new Button("Choose Image");
         chooseImageButton.setStyle("-fx-background-color: #2980B9; -fx-text-fill: white; -fx-padding: 8px 16px; -fx-border-radius: 5;");
         ImageView imageView = new ImageView();
-        chooseImageButton.setOnAction(event -> chooseImage(imageView));
+        chooseImageButton.setOnAction(event -> controller.chooseImage(imageView));
 
         HBox imageBox = new HBox(10, imageLabel, chooseImageButton, imageView);
         imageBox.setAlignment(Pos.CENTER_LEFT);
@@ -132,7 +124,7 @@ public class AddItemView {
 
             if (name.isEmpty() || sector.isEmpty() || priceText.isEmpty() || stockText.isEmpty() ||
                 category.isEmpty() || description.isEmpty() || supplierName == null) {
-                showError("All fields are required, including supplier selection!");
+                controller.showError("All fields are required, including supplier selection!");
                 return;
             }
 
@@ -142,43 +134,26 @@ public class AddItemView {
 
                 Item newItem = new Item(name, sector, price, stock, category, description, supplierName, imagePath);
 
-                fileHandler.addNewItem(newItem);
+                controller.addNewItem(newItem);  // Save item via controller
 
-                ArrayList<Supplier> suppliers = fileHandler.loadSuppliers(); 
-                for (Supplier supplier : suppliers) {
-                    if (supplier.getSupplierName().equals(supplierName)) {
-                        supplier.getSuppliedItems().add(newItem); 
-                    }
-                }
-
-                fileHandler.saveSuppliers(suppliers);
-
-                ArrayList<Item> savedItems = fileHandler.loadInventory();
-                if (savedItems.contains(newItem)) {
-                    showSuccess("Item added successfully!");
-                } else {
-                    showError("Failed to save the item.");
-                }
-
+                controller.showSuccess("Item added successfully!");
             } catch (NumberFormatException e) {
-                showError("Price and Stock must be numeric!");
+                controller.showError("Price and Stock must be numeric!");
             } catch (Exception e) {
-                showError("An error occurred while saving the item: " + e.getMessage());
+                controller.showError("An error occurred while saving the item: " + e.getMessage());
             }
         });
 
-     
         formContainer.getChildren().addAll(formTitle, formGrid, buttonBox);
         parentLayout.getChildren().addAll(titleLabel, formContainer);
         parentLayout.setPadding(new Insets(30));
 
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(parentLayout);
-        scrollPane.setFitToWidth(true);  
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); // Disable horizontal scrolling
-        scrollPane.setFitToHeight(true); // Ensure content fits the height of the ScrollPane
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); 
+        scrollPane.setFitToHeight(true); 
 
-        // Add a listener to handle window resizing dynamically
         scrollPane.widthProperty().addListener((obs, oldValue, newValue) -> {
             parentLayout.setPrefWidth(newValue.doubleValue());
             formContainer.setPrefWidth(newValue.doubleValue());
@@ -186,50 +161,4 @@ public class AddItemView {
 
         return scrollPane;
     }
-
-    private void loadSuppliersIntoComboBox(ComboBox<String> supplierComboBox) {
-        ArrayList<String> suppliers = manager.getSupplierNames();
-        if (suppliers != null && !suppliers.isEmpty()) {
-            supplierComboBox.getItems().addAll(suppliers);
-        } else {
-            supplierComboBox.setPromptText("No suppliers available");
-        }
-    }
-
-    private void chooseImage(ImageView imageView) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
-        var file = fileChooser.showOpenDialog(null);
-        if (file != null) {
-            imageView.setImage(new Image(file.toURI().toString()));
-            imageView.setFitWidth(100);
-            imageView.setFitHeight(100);
-            imageView.setPreserveRatio(true);
-        }
-    }
-
-    // Helper method to show error messages
-    private void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Input Error");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    // Helper method to show success messages
-    private void showSuccess(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Success");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-	public void setFileHandler(FileHandlerMANAGER fileHandler) {
-		this.fileHandler=fileHandler;
-		
-	}
-
 }
-

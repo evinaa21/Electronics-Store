@@ -15,7 +15,6 @@ public class FileHandlerMANAGER{
 	// Constants for file paths CHANGE IF THESE DONT WORK FOR YOU
 	private static final String EMPLOYEE_FILE = "src/BinaryFiles/employees.dat"; // Binary files for employees
 	private static final String INVENTORY_FILE = "src/BinaryFiles/items.dat"; // Binary files for inventory
-	private static final String BILL_DIRECTORY = "src/BinaryFiles/Bills/"; // Text files for bills
 	private static final String SECTOR_FILE = "src/BinaryFiles/sectors.dat"; // Path to sector file
 	private static final String SUPPLIER_FILE = "src/BinaryFiles/suppliers.dat"; // Binary files for suppliers
 
@@ -27,7 +26,7 @@ public class FileHandlerMANAGER{
 		boolean itemRemoved = inventory.remove(item);
 
 		if (itemRemoved) {
-			// Remove the item from all suppliers
+		
 			for (Supplier supplier : suppliers) {
 				supplier.getSuppliedItems().removeIf(i -> i.getItemName().equals(item.getItemName()));
 			}
@@ -40,36 +39,10 @@ public class FileHandlerMANAGER{
 		return false;
 	}
 
-	// Add a new item to the inventory and save it to the file
-	public void addNewItem(Item newItem) {
-		ArrayList<Item> inventory = loadInventory(); // Load existing inventory
-		inventory.add(newItem); // Add the new item
-		saveInventory(inventory); // Save the updated inventory
-		System.out.println("New item added to inventory: " + newItem.getItemName());
-	}
-
-	public boolean deleteItem(Item itemToDelete) {
-		try {
-			ArrayList<Item> items = loadInventory(); // Load existing items
-			boolean removed = items.removeIf(item -> item.getItemName().equals(itemToDelete.getItemName())); // Remove
-																												// the
-																												// matching
-																												// item
-
-			if (removed) {
-				saveInventory(items); // Save updated list back to the file
-			}
-			return removed; // Return whether the item was deleted
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false; // Return false in case of an error
-		}
-	}
-
-	// Save the entire inventory to the binary file
+	
 	public void saveInventory(ArrayList<Item> inventory) {
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(INVENTORY_FILE))) {
-			oos.writeObject(inventory); // Write the entire list of items to the file
+			oos.writeObject(inventory); 
 			System.out.println("Inventory saved successfully to binary file: " + INVENTORY_FILE);
 		} catch (IOException e) {
 			System.err.println("Error saving inventory to binary file: " + e.getMessage());
@@ -121,8 +94,6 @@ public class FileHandlerMANAGER{
 		}
 	}
 
-	
-
 
 	// Load inventory data from the item.dat file
 	// This method does not modify or update the inventory file
@@ -147,13 +118,11 @@ public class FileHandlerMANAGER{
 	        @SuppressWarnings("unchecked")
 			ArrayList<Item> inventory = (ArrayList<Item>) ois.readObject();
 	        
-	        // Iterate through the inventory and check stock levels and sector-category match
 	        for (Item item : inventory) {
 	            for (Sector sector : managerSectors) {
-	                // Compare category of item to sector's categories
 	                if (sector.getCategories().contains(item.getCategory()) && item.getStockQuantity() <= threshold) {
 	                    lowStockItems.add(item);
-	                    break;  // Exit once a match is found
+	                    break; 
 	                }
 	            }
 	        }
@@ -162,23 +131,20 @@ public class FileHandlerMANAGER{
 	    }
 	    return lowStockItems;
 	}
-	// Updated method to notify about low stock items
+	
 		public ArrayList<Item> notifyLowStockforManager(int threshold, ArrayList<Sector> managerSectors) {
 		    ArrayList<Item> lowStockItems = new ArrayList<>();
 
-		    // Get all low stock items from binary file
 		    ArrayList<Item> allItems = readLowStockItemsFromBinaryFileMANAGER(INVENTORY_FILE, threshold, managerSectors);
-		    System.out.println("All low stock items: " + allItems);  // Debugging output
 
-		    // Iterate through all items and check sector-category match and stock level
 		    for (Item item : allItems) {
 		        System.out.println("Checking item: " + item.getItemName() + ", Stock: " + item.getStockQuantity() + ", Category: " + item.getCategory());
 		        
 		        for (Sector sector : managerSectors) {
-		            // Check if item's category matches any of the manager's sector categories and stock is low
+		          
 		            if (sector.getCategories().contains(item.getCategory()) && item.getStockQuantity() <= threshold) {
 		                lowStockItems.add(item);
-		                break;  // Exit once a match is found
+		                break;  
 		            }
 		        }
 		    }
@@ -234,29 +200,20 @@ public class FileHandlerMANAGER{
 	public ArrayList<Cashier> loadCashiersByRole(ArrayList<Sector> managerSectors) {
         ArrayList<Cashier> cashiers = new ArrayList<>();
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(EMPLOYEE_FILE))) {
-            // First, read the entire ArrayList of Users
-            @SuppressWarnings("unchecked")
 			ArrayList<User> users = (ArrayList<User>) ois.readObject(); // Read the whole list
-
             // Debug: Print Manager Sectors
             System.out.println("Manager Sectors: " + managerSectors);
             for (User user : users) {
                 if (user instanceof Cashier) {
                     Cashier cashier = (Cashier) user;
-                    System.out.println("Checking Cashier: " + cashier.getName() + " with Sector: " + cashier.getSector());
-
-                    // Check if cashier's sector matches any of the manager's sectors
                     for (Sector managerSector : managerSectors) {
-                        System.out.println("Comparing with Manager Sector: " + managerSector);
                         if (cashier.getSector().equals(managerSector)) {
                             cashiers.add(cashier);
-                            break; // No need to check further once a match is found
+                            break; 
                         }
                     }
                 }
             }
-        } catch (EOFException e) {
-            // Handle end of file gracefully (if needed)
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("Error reading from file: " + e.getMessage());
             e.printStackTrace();
@@ -268,32 +225,19 @@ public class FileHandlerMANAGER{
     public ArrayList<Sector> loadManagerSectors() {
         ArrayList<Sector> managerSectors = new ArrayList<>();
         
-        // Load all employee data
-        ArrayList<User> allUsers = loadEmployeeData();  // Assuming this method loads all employees
-        
-        // Loop through the users to find Managers and extract their sectors
+        ArrayList<User> allUsers = loadEmployeeData();
+       
         for (User user : allUsers) {
             if (user instanceof Manager) {
                 Manager manager = (Manager) user;
-                managerSectors.addAll(manager.getSectors());  // Add Manager's sectors to the list
+                managerSectors.addAll(manager.getSectors()); 
             }
         }
         
         return managerSectors;
     }
 
-	public ArrayList<String> readBills() {
-		ArrayList<String> billsData = new ArrayList<>();
-		try (BufferedReader reader = new BufferedReader(new FileReader(BILL_DIRECTORY))) {
-			String line;
-			while ((line = reader.readLine()) != null) {
-				billsData.add(line); // Add each bill entry to the list
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return billsData;
-	}
+	
 
 
 	// Save inventory data to the item.dat file
@@ -306,7 +250,6 @@ public class FileHandlerMANAGER{
 		}
 	}
 
-	
 
 	// Load employee data from a binary file
 	@SuppressWarnings("unchecked")

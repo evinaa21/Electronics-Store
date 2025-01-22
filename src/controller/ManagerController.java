@@ -60,20 +60,28 @@ public class ManagerController {
     }
 
     public void openAddItemView() {
-        AddItemView addItemView = new AddItemView(manager, null);
-        addItemView.setFileHandler(fileHandler);
+ 
+        FileHandlerMANAGER fileHandler = new FileHandlerMANAGER(); 
+        AddItemController addItemController = new AddItemController(manager, fileHandler);
+        AddItemView addItemView = new AddItemView(manager, addItemController);
+        
         updateCenterContent(addItemView.getViewContent());
     }
+
 
     public void openRestockItemView() {
         RestockItemView restockItemView = new RestockItemView(manager, fileHandler);
         updateCenterContent(restockItemView.getViewContent());
     }
 
+
+
     public void openGenerateReportView() {
-        GenerateReportView generateReportView = new GenerateReportView(manager, fileHandler1);
+        GenerateReportController generateReportController = new GenerateReportController(manager);
+        GenerateReportView generateReportView = new GenerateReportView(manager, generateReportController);
         updateCenterContent(generateReportView.getViewContent());
     }
+
 
     public void openSupplierView() {
         SupplierView supplierView = new SupplierView(manager, fileHandler);
@@ -81,9 +89,12 @@ public class ManagerController {
     }
 
     public void openMonitorCashierPerformanceView() {
-        MonitorCashierPerformanceView monitorCashierPerformanceView = new MonitorCashierPerformanceView(manager, fileHandler);
+        MonitorCashierPerformanceController controller = new MonitorCashierPerformanceController(manager, fileHandler);
+       
+        MonitorCashierPerformanceView monitorCashierPerformanceView = new MonitorCashierPerformanceView(manager, controller);
         updateCenterContent(monitorCashierPerformanceView.getViewContent());
     }
+
 
     public void openViewSectorsView() {
         ViewSectorsView sectorsView = new ViewSectorsView(manager);

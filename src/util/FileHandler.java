@@ -28,7 +28,6 @@ public class FileHandler {
 
 	}
 
-
 	// Load inventory data for a specific sector
 	public ArrayList<Item> loadInventoryBySector(String sector) {
 		ArrayList<Item> inventory = loadInventory();
@@ -76,12 +75,9 @@ public class FileHandler {
 
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(SECTOR_FILE))) {
 			Object obj = ois.readObject();
-
-			// Check if the object is an instance of ArrayList
 			if (obj instanceof ArrayList<?>) {
 				ArrayList<?> tempList = (ArrayList<?>) obj;
 
-				// Check if the list contains Sector objects
 				if (!tempList.isEmpty() && tempList.get(0) instanceof Sector) {
 					sectors = (ArrayList<Sector>) tempList;
 					System.out.println("Sectors loaded successfully.");
@@ -119,27 +115,7 @@ public class FileHandler {
 		return inventory;
 	}
 
-	public static ArrayList<Item> readLowStockItemsFromBinaryFile(String fileName, int threshold) {
-		ArrayList<Item> lowStockItems = new ArrayList<>();
-		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))) {
-			@SuppressWarnings("unchecked")
-			ArrayList<Item> inventory = (ArrayList<Item>) ois.readObject();
-			for (Item item : inventory) {
-				if (item.getStockQuantity() <= threshold) {
-					lowStockItems.add(item);
-				}
-			}
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-		return lowStockItems;
-	}
-
-	// Update the notifyLowStock method
-	public ArrayList<Item> notifyLowStock(int threshold) {
-		// Use INVENTORY_FILE constant instead of hardcoded filename
-		return readLowStockItemsFromBinaryFile(INVENTORY_FILE, threshold);
-	}
+	
 
 	public ArrayList<Bill> loadBills() {
 	    ArrayList<Bill> bills = new ArrayList<>();
