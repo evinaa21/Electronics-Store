@@ -16,7 +16,7 @@ import java.util.Date;
 public class FileHandler {
 	// Constants for file paths CHANGE IF THESE DONT WORK FOR YOU
 	private static final String EMPLOYEE_FILE = "src/BinaryFiles/employees.dat"; // Binary files for employees
-	private static final String INVENTORY_FILE = "C:\\Users\\Evina\\git\\Electronics-Store\\src\\BinaryFiles\\items .dat"; // Binary files for inventory
+	private static final String INVENTORY_FILE = "src/BinaryFiles/items.dat"; // Binary files for inventory
 	private static final String BILL_DIRECTORY = "src/BinaryFiles/Bills/"; // Text files for bills
 	private static final String SECTOR_FILE = "src/BinaryFiles/sectors.dat"; // Path to sector file
 
