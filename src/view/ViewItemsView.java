@@ -1,11 +1,8 @@
 package view;
 
 import java.io.File;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.stream.Collectors;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -30,12 +27,10 @@ public class ViewItemsView {
     }
 
     public ScrollPane getViewContent() {
-        // Create a VBox for layout
         VBox layout = new VBox(20);
         layout.setAlignment(Pos.TOP_LEFT);
         layout.setStyle("-fx-background-color: #f8f8f8; -fx-padding: 20px;");
 
-        // Create a TextField for search
         Label searchLabel = new Label("Search Items:");
         searchLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333333;");
 
@@ -43,7 +38,6 @@ public class ViewItemsView {
         searchField.setPromptText("Enter item name...");
         styleTextField(searchField);
 
-        // Create a ComboBox for filtering by category
         Label filterLabel = new Label("Filter by Category:");
         filterLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333333;");
 
@@ -52,7 +46,6 @@ public class ViewItemsView {
         ArrayList<String> categories = fileHandler.loadCategoriesBySectors();
         filterComboBox.getItems().addAll(categories);
 
-        // Create a ComboBox for sorting by price
         Label sortLabel = new Label("Sort by Price:");
         sortLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333333;");
 
@@ -67,10 +60,9 @@ public class ViewItemsView {
         itemsFlowPane.setAlignment(Pos.CENTER); // Center items within the FlowPane
         itemsFlowPane.setPadding(new Insets(20)); // Add padding around the FlowPane
 
-        // Bind the FlowPane width to the parent ScrollPane's width
         itemsFlowPane.prefWidthProperty().bind(layout.widthProperty());
 
-        // Wrap the FlowPane in a ScrollPane
+        // Wrap the FlowPane in a ScrollPane for scrolling
         ScrollPane itemsScrollPane = new ScrollPane(itemsFlowPane);
         itemsScrollPane.setFitToWidth(true); // Ensure it resizes horizontally
         itemsScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
@@ -80,7 +72,7 @@ public class ViewItemsView {
         // Make itemsScrollPane grow to fill remaining space
         VBox.setVgrow(itemsScrollPane, Priority.ALWAYS);
 
-        // Add listeners for filters
+        // Add listeners for filters using lambda
         searchField.textProperty().addListener((observable, oldValue, newValue) -> updateFilters(searchField, filterComboBox, sortComboBox, itemsFlowPane));
         filterComboBox.valueProperty().addListener((observable, oldValue, newValue) -> updateFilters(searchField, filterComboBox, sortComboBox, itemsFlowPane));
         sortComboBox.valueProperty().addListener((observable, oldValue, newValue) -> updateFilters(searchField, filterComboBox, sortComboBox, itemsFlowPane));
@@ -95,7 +87,6 @@ public class ViewItemsView {
             displayItems(itemsFlowPane, "", "All", "Low to High");
         });
 
-        // Organize controls
         HBox searchBox = new HBox(15, searchLabel, searchField);
         HBox filterBox = new HBox(15, filterLabel, filterComboBox);
         HBox sortBox = new HBox(15, sortLabel, sortComboBox);
@@ -106,13 +97,10 @@ public class ViewItemsView {
         sortBox.setAlignment(Pos.CENTER_LEFT);
         buttonBox.setAlignment(Pos.CENTER_LEFT);
 
-        // Add controls to the VBox layout
         layout.getChildren().addAll(searchBox, filterBox, sortBox, buttonBox, itemsScrollPane);
 
-        // Display initial items
         displayItems(itemsFlowPane, "", "All", "Low to High");
 
-        // Wrap the entire layout in a ScrollPane for overall scrolling
         ScrollPane mainScrollPane = new ScrollPane(layout);
         mainScrollPane.setFitToWidth(true);
         mainScrollPane.setFitToHeight(true);
@@ -126,15 +114,12 @@ public class ViewItemsView {
     private void displayItems(FlowPane flowPane, String searchQuery, String categoryFilter, String sortOrder) {
         flowPane.getChildren().clear();
 
-        // Load items from file using FileHandler
         items = fileHandler.loadInventory();
 
-     // Set a default value if categoryFilter is null
         if (categoryFilter == null) {
-            categoryFilter = "All"; // Default category
+            categoryFilter = "All"; 
         }
 
-        // Filter items based on search query and category
         ArrayList<Item> filteredItems = new ArrayList<>();
 
         for (Item item : items) {
@@ -148,14 +133,12 @@ public class ViewItemsView {
             }
         }
 
-        // Sort the filtered items
         if ("Low to High".equals(sortOrder)) {
             filteredItems.sort(Comparator.comparingDouble(Item::getPrice)); // Ascending order
         } else if ("High to Low".equals(sortOrder)) {
             filteredItems.sort((item1, item2) -> Double.compare(item2.getPrice(), item1.getPrice())); // Descending order
         }
 
-        // Display the filtered and sorted items
         for (Item item : filteredItems) {
             displayItem(flowPane, item);
         }
@@ -197,7 +180,7 @@ public class ViewItemsView {
         Label itemPrice = new Label("$" + item.getPrice());
         itemPrice.setStyle("-fx-font-size: 14px; -fx-text-fill: #666666;");
 
-        Label itemStock = new Label("Stock: " + item.getItemQuantity());
+        Label itemStock = new Label("Stock: " + item.getStockQuantity());
         itemStock.setStyle("-fx-font-size: 14px; -fx-text-fill: #999999;");
 
         itemBox.getChildren().addAll(itemName, itemPrice, itemStock);
@@ -256,25 +239,23 @@ public class ViewItemsView {
         Label itemName = new Label(item.getItemName());
         itemName.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
 
-        // Description with truncation and expand functionality
         Text itemDescriptionText = new Text(item.getDescription());
         itemDescriptionText.setStyle("-fx-font-size: 16px;");
-        itemDescriptionText.setWrappingWidth(350); // Set the wrapping width for the description
+        itemDescriptionText.setWrappingWidth(350); 
 
-        // Add truncation logic for long descriptions
         String description = item.getDescription();
         if (description.length() > 100) {
             itemDescriptionText.setText(description.substring(0, 100) + "...");
             Text moreText = new Text("Show More");
             moreText.setStyle("-fx-font-size: 14px; -fx-fill: #0066cc;");
-            moreText.setOnMouseClicked(e -> itemDescriptionText.setText(description)); // Show full description on click
+            moreText.setOnMouseClicked(e -> itemDescriptionText.setText(description)); 
             itemDetailsLayout.getChildren().addAll(itemDescriptionText, moreText);
         } else {
             itemDetailsLayout.getChildren().add(itemDescriptionText);
         }
 
         Label itemPrice = new Label("Price: $" + item.getPrice());
-        Label itemStock = new Label("Stock: " + item.getItemQuantity());
+        Label itemStock = new Label("Stock: " + item.getStockQuantity());
 
         Button deleteButton = new Button("Delete");
         deleteButton.setStyle("-fx-background-color: #cc0000; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;");
@@ -306,9 +287,6 @@ public class ViewItemsView {
             }
         });
 
-
-
-
         Button closeButton = new Button("Close");
         closeButton.setOnAction(e -> itemStage.close());
 
@@ -319,7 +297,6 @@ public class ViewItemsView {
         itemStage.setScene(itemScene);
         itemStage.show();
     }
-
 
     private void styleTextField(TextField textField) {
         textField.setStyle("-fx-font-size: 14px; -fx-background-color: #ffffff; -fx-border-radius: 10px; -fx-padding: 10px; -fx-border-color: #cccccc;");

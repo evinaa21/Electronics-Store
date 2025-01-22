@@ -10,17 +10,17 @@ import javafx.scene.text.Font;
 
 public class DailyBillsView {
 
-    private final BorderPane mainLayout; // Main layout container
-    private final VBox billsContainer; // Container for displaying bill details
-    private final Button showBillsButton; // Button to show today's bills
-    private final Button calculateTotalButton; // Button to calculate total of displayed bills
-    private final Label totalSalesLabel; // Label to display total sales for the day
-    private final DailyBillsController controller; // Controller for handling logic
+    private final BorderPane mainLayout; 
+    private final VBox billsContainer;
+    private final Button showBillsButton; 
+    private final Button calculateTotalButton;
+    private final Label totalSalesLabel; 
+    private final DailyBillsController controller; 
 
     // Constructor
     public DailyBillsView() {
-        mainLayout = new BorderPane(); // Initialize main layout
-        billsContainer = new VBox(10); // Vertical layout with spacing
+        mainLayout = new BorderPane(); // Initialize 
+        billsContainer = new VBox(10); // Vertical layout
         billsContainer.setPadding(new Insets(10));
         billsContainer.setStyle("-fx-background-color: #f4f4f4;");
 
@@ -30,16 +30,16 @@ public class DailyBillsView {
         // Buttons
         showBillsButton = new Button("Show Today's Bills");
         showBillsButton.setStyle("-fx-background-color: #007BFF; -fx-text-fill: white;");
-        calculateTotalButton = new Button("Calculate Total");
+        calculateTotalButton = new Button("Calculate Sales by Cashier");
         calculateTotalButton.setStyle("-fx-background-color: #28A745; -fx-text-fill: white;");
 
         // Button Actions
         showBillsButton.setOnAction(event -> {
-            controller.showTodaysBills(); // Load and display today's bills
+            controller.showTodaysBills(); 
         });
 
         calculateTotalButton.setOnAction(event -> {
-            controller.calculateTotalSales(); // Calculate and display total sales
+            controller.calculateSalesByCashier(); // Calculate 
         });
 
         // Total sales label

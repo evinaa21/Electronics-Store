@@ -3,7 +3,6 @@ package controller;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import model.Manager;
 import model.Item;
@@ -12,20 +11,14 @@ import model.Supplier;
 import util.FileHandlerMANAGER;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class AddItemController {
-
-    private Manager manager;
+	private Manager manager;
     private FileHandlerMANAGER fileHandler;
-
     public AddItemController(Manager manager) {
         this.manager = manager;
     }
-  
-
-    // Constructor accepts Manager and FileHandler to manage file operations
     public AddItemController(Manager manager, FileHandlerMANAGER fileHandler) {
         this.manager = manager;
         this.fileHandler = fileHandler;
@@ -36,7 +29,7 @@ public class AddItemController {
     public void showAddItemView() {
         Stage addItemStage = new Stage();
 
-        // Create form fields for item details
+        // Fields for item details
         Label nameLabel = new Label("Item Name:");
         TextField nameField = new TextField();
 
@@ -49,19 +42,19 @@ public class AddItemController {
         Label stockLabel = new Label("Stock Quantity:");
         TextField stockField = new TextField();
 
-        // Supplier ComboBox
+        // Combobox i need for suppliers
         Label supplierLabel = new Label("Select Supplier:");
         ComboBox<String> supplierComboBox = new ComboBox<>();
         
-        // Load suppliers into the ComboBox
-        List<String> supplierNames = manager.getSupplierNames(); // Assuming this method exists in Manager
+        //  This Loads suppliers into the ComboBox
+        ArrayList<String> supplierNames = manager.getSupplierNames(); 
         if (supplierNames != null && !supplierNames.isEmpty()) {
             supplierComboBox.getItems().addAll(supplierNames);
         } else {
             supplierComboBox.setPromptText("No suppliers available");
         }
 
-        // Create a save button
+        //THIS IS BUTTON FOR SAVING ITEM
         Button saveButton = new Button("Save Item");
         saveButton.setOnAction(event -> {
             String name = nameField.getText();
@@ -70,43 +63,35 @@ public class AddItemController {
             String stockText = stockField.getText();
             String supplierName = supplierComboBox.getValue();
 
-            // Validate input fields
+            // Validation if fields are empty
             if (name.isEmpty() || category.isEmpty() || priceText.isEmpty() || stockText.isEmpty() || supplierName == null) {
                 showError("All fields are required, including supplier selection!");
                 return;
             }
 
-
-            addItemStage.close(); // Close the add item window
+            addItemStage.close(); 
 
             try {
                 double price = Double.parseDouble(priceText);
                 int stock = Integer.parseInt(stockText);
 
-                // Create new item
-                Item newItem = new Item(name, category, price, stock, 0, stock);
+                Item newItem = new Item(name, category, price, stock, 0);
 
-                // Add item to inventory via FileHandler and Manager
-                ArrayList<Item> currentItems = fileHandler.loadInventory(); // Load existing items
-                currentItems.add(newItem); // Add new item
-                fileHandler.saveInventory(currentItems); // Save updated item list
-
-                // Find the supplier and associate the item
-                ArrayList<Supplier> suppliers = fileHandler.loadSuppliers(); // Load existing suppliers
+                // Adds item to inventory via FileHandler and Manager
+                ArrayList<Item> currentItems = fileHandler.loadInventory(); 
+                currentItems.add(newItem);
+                fileHandler.saveInventory(currentItems); 
+                ArrayList<Supplier> suppliers = fileHandler.loadSuppliers(); 
                 for (Supplier supplier : suppliers) {
                     if (supplier.getSupplierName().equals(supplierName)) {
-                        supplier.getSuppliedItems().add(newItem); // Associate the item to the supplier
+                        supplier.getSuppliedItems().add(newItem); // it associates item to supplier
                         break;
                     }
                 }
 
-                // Save updated supplier list back to the file
                 fileHandler.saveSuppliers(suppliers);
 
-                // Update manager's item list
                 manager.setItems(currentItems);
-
-                // Show success message and close the Add Item window
                 showSuccess("Item added successfully!");
                 addItemStage.close();
 
@@ -116,7 +101,7 @@ public class AddItemController {
 
         });
 
-        VBox layout = new VBox(10, nameLabel, nameField, categoryLabel, categoryField, priceLabel, priceField, stockLabel, stockField, supplierLabel, supplierComboBox, saveButton);
+        VBox layout = new VBox(10, nameLabel, nameField, categoryLabel, categoryField, priceLabel, priceField, stockLabel, supplierLabel, supplierComboBox, saveButton);
         layout.setSpacing(10);
 
         Scene scene = new Scene(layout, 300, 400);
@@ -124,7 +109,7 @@ public class AddItemController {
         addItemStage.setTitle("Add New Item");
         addItemStage.show();
     }
-
+    //Alerts
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");

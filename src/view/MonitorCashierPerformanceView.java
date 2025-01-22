@@ -4,26 +4,25 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
-import model.Bill;
 import model.Cashier;
 import model.Manager;
 import model.Sector;
 import util.FileHandlerMANAGER;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class MonitorCashierPerformanceView {
 
     private Manager manager;
     private FileHandlerMANAGER fileHandler;
 
-    // Constructor to pass Manager and FileHandler instances
+
     public MonitorCashierPerformanceView(Manager manager, FileHandlerMANAGER fileHandler) {
         if (manager == null || fileHandler == null) {
             throw new IllegalArgumentException("Manager and FileHandler cannot be null.");
@@ -40,13 +39,13 @@ public class MonitorCashierPerformanceView {
         Label cashierLabel = new Label("Select Cashier:");
         cashierLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
 
-     // ComboBox to select cashier
+        // ComboBox to select cashier
         ComboBox<Cashier> cashierComboBox = new ComboBox<>();
         cashierComboBox.setStyle("-fx-font-size: 16px; -fx-background-color: #ffffff;");
 
-        // Load only cashiers with Role.Cashier into the ComboBox
-        ArrayList<Sector> managerSectors = manager.getSectors(); // Get the list of sectors the manager is responsible for
-        ArrayList<Cashier> cashiers = fileHandler.loadCashiersByRole(managerSectors); // Pass manager sectors to filter cashiers
+       
+        ArrayList<Sector> managerSectors = manager.getSectors(); 
+        ArrayList<Cashier> cashiers = fileHandler.loadCashiersByRole(managerSectors); 
 
         if (cashiers != null && !cashiers.isEmpty()) {
             // Set display to cashier names
@@ -57,7 +56,7 @@ public class MonitorCashierPerformanceView {
                     if (empty || item == null) {
                         setText(null);
                     } else {
-                        setText(item.getName());  // Display only the cashier's name
+                        setText(item.getName()); 
                     }
                 }
             });
@@ -69,40 +68,31 @@ public class MonitorCashierPerformanceView {
                     if (empty || item == null) {
                         setText(null);
                     } else {
-                        setText(item.getName());  // Display the cashier's name in the button
+                        setText(item.getName());  
                     }
                 }
             });
 
-            cashierComboBox.getItems().addAll(cashiers);  // Add the filtered cashiers to the ComboBox
+            cashierComboBox.getItems().addAll(cashiers);  
         } else {
             showError("No cashiers found in the file.");
-            cashierComboBox.setDisable(true);  // Disable the ComboBox if no cashiers exist
+            cashierComboBox.setDisable(true); 
         }
-
-
-        Label dateLabel = new Label("Select Date:");
-        dateLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
-
-        DatePicker datePicker = new DatePicker();
-        datePicker.setStyle("-fx-font-size: 16px; -fx-background-color: #ffffff;");
 
         Button monitorButton = new Button("Monitor Performance");
         monitorButton.setStyle("-fx-background-color: #3498DB; -fx-text-fill: white; -fx-font-size: 16px;");
 
-
         Label totalBillsLabel = new Label("Total Bills: 0");
-        Label totalItemsSoldLabel = new Label("Total Items Sold: 0");
         Label totalRevenueLabel = new Label("Total Revenue: $0.00");
 
-        monitorButton.setOnAction(event -> {
-            LocalDate selectedDate = datePicker.getValue();
-            Cashier selectedCashier = cashierComboBox.getValue();
+        // Apply style to both labels
+        String labelStyle = "-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;";
 
-            if (selectedDate == null) {
-                showError("Please select a date.");
-                return;
-            }
+        totalBillsLabel.setStyle(labelStyle);
+        totalRevenueLabel.setStyle(labelStyle);
+
+        monitorButton.setOnAction(event -> {
+            Cashier selectedCashier = cashierComboBox.getValue();
 
             if (selectedCashier == null) {
                 showError("Please select a cashier.");
@@ -110,43 +100,55 @@ public class MonitorCashierPerformanceView {
             }
 
             int totalBills = 0;
-            int totalItemsSold = 0;
             double totalRevenue = 0.0;
 
-            // Get total revenue for the selected cashier for the selected date
-            double dailyTotal = selectedCashier.calculateDailyTotal();
-            totalRevenue += dailyTotal;
+            
+            String summaryFilePath = "C:\\Users\\Evina\\git\\Electronics-Store\\src\\BinaryFiles\\sales_summary.txt";
+            File summaryFile = new File(summaryFilePath);
 
-            // Iterate through selected cashier's bills to calculate total items sold and total bills
-            ArrayList<Bill> cashierBills = selectedCashier.getBills();
-            for (Bill bill : cashierBills) {
-                if (isSameDay(bill.getSaleDate(), selectedDate)) {
-                    totalBills++;
-                    totalItemsSold += bill.getItems().size();
+            if (!summaryFile.exists()) {
+                showError("Sales summary file does not exist.");
+                return;
+            }
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(summaryFile))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(", ");
+                    if (parts.length >= 4) {
+                        String billNumber = parts[0].split(": ")[1].trim();
+                        String totalAmountStr = parts[2].split(": ")[1].trim();
+                        String cashierName = parts[3].split(": ")[1].trim();
+
+                        // Convert the total amount to double
+                        double totalAmount = 0.0;
+                        try {
+                            totalAmount = Double.parseDouble(totalAmountStr);
+                        } catch (NumberFormatException e) {
+                            System.err.println("Invalid total amount format for bill " + billNumber + ": " + totalAmountStr);
+                            continue;  
+                        }
+
+                        if (cashierName.equals(selectedCashier.getName())) {
+                            totalBills++;  
+                            totalRevenue += totalAmount;  
+                        }
+                    }
                 }
+            } catch (IOException e) {
+                showError("Error reading the sales summary file: " + e.getMessage());
+                return;
             }
 
             totalBillsLabel.setText("Total Bills: " + totalBills);
-            totalItemsSoldLabel.setText("Total Items Sold: " + totalItemsSold);
             totalRevenueLabel.setText("Total Revenue: $" + String.format("%.2f", totalRevenue));
+
+            totalBillsLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
+            totalRevenueLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
         });
-        totalBillsLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
-        totalItemsSoldLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
-        totalRevenueLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
 
-
-        layout.getChildren().addAll(cashierLabel, cashierComboBox, dateLabel, datePicker, monitorButton, totalBillsLabel, totalItemsSoldLabel, totalRevenueLabel);
+        layout.getChildren().addAll(cashierLabel, cashierComboBox, monitorButton, totalBillsLabel, totalRevenueLabel);
         return layout;
-    }
-
-    private boolean isSameDay(Date billDate, LocalDate selectedDate) {
-        // Convert Date to LocalDate
-        LocalDate billLocalDate = billDate.toInstant()
-                                         .atZone(ZoneId.systemDefault())
-                                         .toLocalDate();
-        
-        // Compare the two LocalDate objects
-        return billLocalDate.isEqual(selectedDate);
     }
 
     private void showError(String message) {

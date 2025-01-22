@@ -1,5 +1,3 @@
-
-
 package util;
  
 import model.Bill;
@@ -13,6 +11,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 939ed7eaa6c7cbbae782ec86d5b40c1d07302353
 
 public class FileHandler {
 	// Constants for file paths CHANGE IF THESE DONT WORK FOR YOU
@@ -70,6 +72,7 @@ public class FileHandler {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public ArrayList<Sector> loadSectors() {
 		ArrayList<Sector> sectors = new ArrayList<>();
 
@@ -104,6 +107,7 @@ public class FileHandler {
 
 	// Load inventory data from the item.dat file
 	// This method does not modify or update the inventory file
+	@SuppressWarnings("unchecked")
 	public ArrayList<Item> loadInventory() {
 		ArrayList<Item> inventory = new ArrayList<>();
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(INVENTORY_FILE))) {
@@ -120,6 +124,7 @@ public class FileHandler {
 	public static ArrayList<Item> readLowStockItemsFromBinaryFile(String fileName, int threshold) {
 		ArrayList<Item> lowStockItems = new ArrayList<>();
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))) {
+			@SuppressWarnings("unchecked")
 			ArrayList<Item> inventory = (ArrayList<Item>) ois.readObject();
 			for (Item item : inventory) {
 				if (item.getStockQuantity() <= threshold) {
@@ -206,11 +211,10 @@ public class FileHandler {
 	                    try {
 	                        String itemName = itemDetails[0].trim();
 	                        String category = itemDetails[1].trim();
-	                        int quantity = Integer.parseInt(itemDetails[2].trim());
 	                        double price = Double.parseDouble(itemDetails[3].trim());
 
 	                        // Create and add the item to the list
-	                        items.add(new Item(itemName, category, price, 0, 0, quantity));
+	                        items.add(new Item(itemName, category, price, 0, 0));
 	                    } catch (NumberFormatException e) {
 	                        System.err.println("Skipping invalid item line: " + line);
 	                    }
@@ -280,6 +284,7 @@ public class FileHandler {
 		ArrayList<Cashier> cashiers = new ArrayList<>();
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(EMPLOYEE_FILE))) {
 			// First, read the entire ArrayList of Users
+			@SuppressWarnings("unchecked")
 			ArrayList<User> users = (ArrayList<User>) ois.readObject(); // Read the whole list
 
 			// Now filter based on role
@@ -297,6 +302,150 @@ public class FileHandler {
 		return cashiers;
 	}
 
+	
+	// Update inventory after a sale (used by the cashier)
+	// This method validates stock availability and saves the updated inventory
+	public void updateInventoryForSale(ArrayList<Item> soldItems) throws IllegalArgumentException, IOException {
+	    // Load current inventory
+	    ArrayList<Item> inventory = loadInventory();
+
+	    // Validate and update inventory
+	    for (Item soldItem : soldItems) {
+	        boolean itemFound = false;
+
+	        for (Item inventoryItem : inventory) {
+	            if (inventoryItem.getItemName().equalsIgnoreCase(soldItem.getItemName())) {
+	                itemFound = true;
+
+	                // Check stock availability
+	                if (!inventoryItem.hasSufficientStock(soldItem.getStockQuantity())) {
+	                    throw new IllegalArgumentException("Insufficient stock for item: " + soldItem.getItemName());
+	                }
+
+	                // Deduct sold quantity from stock
+	                inventoryItem.sellItem(soldItem.getStockQuantity());
+	                System.out.println("Updated stock for item: " + soldItem.getItemName());
+	                break;
+	            }
+	        }
+
+	        if (!itemFound) {
+	            throw new IllegalArgumentException("Item not found in inventory: " + soldItem.getItemName());
+	        }
+	    }
+
+	    // Save updated inventory back to the file
+	    saveInventory(inventory);
+	    System.out.println("Inventory updated and saved successfully.");
+	}
+
+	
+
+	// Save inventory data to the item.dat file
+	public void saveIventory(ArrayList<Item> inventory) {
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(INVENTORY_FILE))) {
+			oos.writeObject(inventory);
+			System.out.println("Inventory saved successfully to binary file: " + INVENTORY_FILE);
+		} catch (IOException e) {
+			System.err.println("Error saving inventory to binary file: " + e.getMessage());
+		}
+	}
+
+<<<<<<< HEAD
+=======
+	// Save employee data to the employees.dat file
+	public void saveEmployeeData(ArrayList<User> employees) {
+
+		// Validation ???
+		if (employees.isEmpty()) {
+			System.err.println("No employee data to save.");
+			return;
+		}
+
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(EMPLOYEE_FILE))) {
+			oos.writeObject(employees);
+			System.out.println("Employee data saved successfully to binary file: " + EMPLOYEE_FILE);
+		} catch (IOException e) {
+			System.out.println("Error saving employee data to binary file: " + e.getMessage());
+		}
+	}
+
+	public void saveEmployee(User employee) {
+
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(EMPLOYEE_FILE))) {
+			oos.writeObject(employee);
+			System.out.println("Employee data saved successfully to binary file: " + EMPLOYEE_FILE);
+		} catch (IOException e) {
+			System.out.println("Error saving employee data to binary file: " + e.getMessage());
+		}
+	}
+
+	// Load employee data from a binary file
+	@SuppressWarnings("unchecked")
+	public ArrayList<User> loadEmployeeData() {
+		ArrayList<User> employees = new ArrayList<>();
+		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(EMPLOYEE_FILE))) {
+			while (true) {
+				try {
+					employees = (ArrayList<User>) ois.readObject();
+				} catch (EOFException e) {
+					break;
+				}
+			}
+			System.out.println("Employee data loaded successfully from binary file: " + EMPLOYEE_FILE);
+		} catch (FileNotFoundException e) {
+			System.err.println("Employee binary file not found: " + EMPLOYEE_FILE);
+		} catch (IOException | ClassNotFoundException e) {
+			System.err.println("Error loading employee data from binary file: " + e.getMessage());
+		}
+		return employees;
+	}
+
+	public User loadEmployee(String Name) {
+		ArrayList<User> user = new ArrayList<>();
+		user = loadEmployeeData();
+		for (User employee : user) {
+			if (employee.getName().equals(Name)) {
+				return employee;
+			}
+		}
+		System.out.println("No user with the name of " + Name + " was found!");
+		return null;
+	}
+
+	public void updateEmployeeData(User updatedUser) {
+		ArrayList<User> employees = loadEmployeeData();
+
+		employees.removeIf(user -> user.getUsername().equals(updatedUser.getUsername()));
+
+		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(EMPLOYEE_FILE))) {
+			oos.writeObject(updatedUser);
+		} catch (IOException e) {
+			System.err.println("Error updating employee data: " + e.getMessage());
+		}
+	}
+
+	// Add employee salary or update if employee exists
+	public void addEmployeeSalary(String employeeName, double salary) {
+		ArrayList<User> employees = loadEmployeeData(); // Load current employees
+		boolean found = false;
+
+		for (int i = 0; i < employees.size(); i++) {
+			User user = employees.get(i);
+			if (user.getName().equalsIgnoreCase(employeeName)) {
+				user.setSalary(salary); // Update salary if the employee exists
+				found = true;
+				break;
+			}
+		}
+
+		if (!found) {
+			System.err.println("Employee not found: " + employeeName);
+		} else {
+			saveEmployeeData(employees); // Save updated employees back to the file
+			System.out.println("Salary updated for employee: " + employeeName);
+		}
+	}
 	public ArrayList<String> readBills() {
 		ArrayList<String> billsData = new ArrayList<>();
 		try (BufferedReader reader = new BufferedReader(new FileReader(BILL_DIRECTORY))) {
@@ -310,53 +459,50 @@ public class FileHandler {
 		return billsData;
 	}
 
-	// Update inventory after a sale (used by the cashier)
-	// This method validates stock availability and saves the updated inventory
-	public void updateInventoryForSale(ArrayList<Item> items) throws IllegalArgumentException, IOException {
-		// Load current inventory
-		ArrayList<Item> inventory = loadInventory();
+	public ArrayList<String> readBills1() {
+        ArrayList<String> billsData = new ArrayList<>();
+        File folder = new File("src/BinaryFiles/Bills"); // Folder containing bill files
 
-		// Validate and update inventory
-		for (int i = 0; i < items.size(); i++) {
-			Item soldItem = items.get(i);
-			boolean itemFound = false;
+        if (folder.exists() && folder.isDirectory()) {
+            File[] files = folder.listFiles(); // List all files in the folder
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                billsData.add(line); // Add each line (bill data) to the list
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace(); // Handle file read exceptions
+                        }
+                    }
+                }
+            }
+        } else {
+            System.out.println("Folder does not exist or is not a directory.");
+        }
 
-			for (int j = 0; j < inventory.size(); j++) {
-				Item inventoryItem = inventory.get(j);
+        return billsData;
+    }
+	public void appendSalesSummary(String billNumber, double totalAmount, String date, String cashierName) {
+	    String summaryFilePath = "C:\\Users\\Evina\\git\\Electronics-Store\\src\\BinaryFiles\\sales_summary.txt";
+	    File summaryFile = new File(summaryFilePath);
 
-				if (inventoryItem.getItemName().equalsIgnoreCase(soldItem.getItemName())) {
-					itemFound = true;
-
-					// Check stock availability
-					if (!inventoryItem.hasSufficientStock(soldItem.getItemQuantity())) {
-						throw new IllegalArgumentException("Insufficient stock for item: " + soldItem.getItemName());
-					}
-
-					// Deduct sold quantity from stock
-					inventoryItem.sellItem(soldItem.getItemQuantity());
-					break;
-				}
-			}
-
-			if (!itemFound) {
-				throw new IllegalArgumentException("Item not found in inventory: " + soldItem.getItemName());
-			}
-		}
-
-		// Save updated inventory back to items.dat
-		saveIventory(inventory);
+	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(summaryFile, true))) {
+	        // Creating the line that includes the cashier's name, bill number, date, and total amount
+	        String line = "Bill Number: " + billNumber + ", Date: " + date + ", Total Amount: " + totalAmount + ", Cashier: " + cashierName;
+	        writer.write(line + "\n");
+	        System.out.println("Written to file: " + line);  // Debugging log
+	    } catch (IOException e) {
+	        System.err.println("Error updating sales summary: " + e.getMessage());
+	    }
 	}
 
-	// Save inventory data to the item.dat file
-	public void saveIventory(ArrayList<Item> inventory) {
-		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(INVENTORY_FILE))) {
-			oos.writeObject(inventory);
-			System.out.println("Inventory saved successfully to binary file: " + INVENTORY_FILE);
-		} catch (IOException e) {
-			System.err.println("Error saving inventory to binary file: " + e.getMessage());
-		}
-	}
 
+	
+
+>>>>>>> 939ed7eaa6c7cbbae782ec86d5b40c1d07302353
 	// Save a bill to a text file
 	public void saveBill(String billNumber, ArrayList<Item> items, double total, String cashierName, String sector) {
 		String date = dateFormat.format(new Date());
@@ -379,7 +525,7 @@ public class FileHandler {
 			for (Item item : items) {
 				writer.write(String.format("%-20s %-10s %-10d %-10.2f\n", item.getItemName(),
 						item.getCategory() != null ? item.getCategory() : "Uncategorized", // Check for null category
-						item.getItemQuantity(), item.getSellingPrice()));
+						item.getStockQuantity(), item.getSellingPrice()));
 			}
 
 			writer.write("-----------------------------------------\n");
@@ -389,6 +535,7 @@ public class FileHandler {
 			writer.write("=========================================\n");
 
 			System.out.println("Bill saved successfully to " + fileName);
+			appendSalesSummary(billNumber, total, date, cashierName);
 		} catch (IOException e) {
 			System.err.println("Error saving bill to file: " + fileName + ". Cause: " + e.getMessage());
 		}

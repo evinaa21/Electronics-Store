@@ -2,9 +2,7 @@
 package view;
 
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -19,7 +17,6 @@ import java.util.ArrayList;
 
 public class ViewSectorsView {
     private Manager manager;
-    private FileHandlerMANAGER fileHandler;
     private ViewSectorsController controller;
 
     public ViewSectorsView(Manager manager) {
@@ -42,16 +39,10 @@ public class ViewSectorsView {
             sectorsLayout.getChildren().add(sectorBox);
         }
 
-        Button addSectorButton = new Button("+ Add Sector");
-        addSectorButton.setOnAction(e -> showAddSectorDialog(sectorsLayout));
 
-        HBox buttonsLayout = new HBox(10, addSectorButton);
-        buttonsLayout.setAlignment(Pos.TOP_LEFT);
-
-        layout.getChildren().addAll(buttonsLayout, scrollPane);
+        layout.getChildren().addAll( scrollPane);
         return layout;
     }
-
 
     private VBox createSectorBox(Sector sector) {
         VBox sectorBox = new VBox(5);
@@ -82,19 +73,6 @@ public class ViewSectorsView {
         return sectorBox;
     }
 
-    private void showAddSectorDialog(VBox sectorsLayout) {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Add Sector");
-        dialog.setHeaderText("Enter the name of the new sector:");
-        dialog.setContentText("Sector name:");
-
-        dialog.showAndWait().ifPresent(sectorName -> {
-            controller.addSector(sectorName);
-            VBox newSectorBox = createSectorBox(new Sector(sectorName));
-            sectorsLayout.getChildren().add(newSectorBox);
-        });
-    }
-
     private void showAddCategoryDialog(String sectorName) {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Add Category");
@@ -110,7 +88,6 @@ public class ViewSectorsView {
     }
 
     public void setFileHandler(FileHandlerMANAGER fileHandler) {
-        this.fileHandler = fileHandler;
     }
 
     public void setController(ViewSectorsController controller) {

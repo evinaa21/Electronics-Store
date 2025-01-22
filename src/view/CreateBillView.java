@@ -1,7 +1,5 @@
 package view;
 
-import java.util.ArrayList;
-
 import controller.CreateBillController;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,69 +11,61 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import model.Cashier;
-import model.Item;
 import model.Sector;
-import util.FileHandler;
 
 public class CreateBillView {
-	private BorderPane mainLayout; // Main layout container
-	private VBox itemsContainer; // Container for displaying added items
-	private ComboBox<String> categoryDropdown; // Dropdown to select category
-	private ComboBox<String> itemDropdown; // Dropdown to select item
-	private TextField quantityField; // Input field for the quantity
-	private TextField totalField; // Field to display the current total
-	private Button addItemButton; // Button to add items to the bill
-	private Button finalizeBillButton; // Button to finalize and save the bill
+	private BorderPane mainLayout; 
+	private VBox itemsContainer; 
+	private ComboBox<String> categoryDropdown; 
+	private ComboBox<String> itemDropdown; 
+	private TextField quantityField; 
+	private TextField totalField; 
+	private Button addItemButton;
+	private Button finalizeBillButton; 
 
 	private Sector sector;
 	private Cashier cashier;
-	private ArrayList<Item> items;
 	private CreateBillController createBillController;
 
 	public CreateBillView(Sector sector) {
 		this.sector = sector;
 
-		mainLayout = new BorderPane(); // Initialize main layout
-		mainLayout.setPadding(new Insets(10)); // Add padding to the layout
+		mainLayout = new BorderPane(); 
+		mainLayout.setPadding(new Insets(10)); 
 
-		// Input section at the top
-		HBox inputBox = new HBox(10); // Horizontal layout for input fields
-		inputBox.setAlignment(Pos.CENTER_LEFT); // Align elements to the left
+		// Input section 
+		HBox inputBox = new HBox(10); 
+		inputBox.setAlignment(Pos.CENTER_LEFT); 
 
-		// Label and dropdown for category
 		Label categoryLabel = new Label("Category:");
 		categoryDropdown = new ComboBox<>();
 		categoryDropdown.setPromptText("Select Category");
 
 
-		// Label and dropdown for item
 		Label itemLabel = new Label("Item:");
 		itemDropdown = new ComboBox<>();
 		itemDropdown.setPromptText("Select Item");
 
-		// Label and text field for the quantity
 		Label quantityLabel = new Label("Quantity:");
 		quantityField = new TextField();
 		quantityField.setPromptText("Enter quantity");
 
-		// Button to add items to the bill
 		addItemButton = new Button("Add Item");
 		addItemButton.setStyle("-fx-background-color: #007BFF; -fx-text-fill: white; -fx-font-weight: bold;");
 
-		// Add all input elements to the input box
 		inputBox.getChildren().addAll(categoryLabel, categoryDropdown, itemLabel, itemDropdown, quantityLabel,
 				quantityField, addItemButton);
 
-		// Container for displaying the list of items added to the bill
-		itemsContainer = new VBox(10); // Vertical layout for items
-		itemsContainer.setPadding(new Insets(10)); // Padding inside the container
+		
+		itemsContainer = new VBox(10);
+		itemsContainer.setPadding(new Insets(10)); 
 		itemsContainer.setStyle("-fx-background-color: #f4f4f4;"); // Background color for visibility
 
-		// Total and finalize section at the bottom
+		
 		HBox totalBox = new HBox(10); // Horizontal layout for total and button
 		totalBox.setAlignment(Pos.CENTER_RIGHT); // Align elements to the right
 
-		// Label and text field for the total amount
+		
 		Label totalLabel = new Label("Total:");
 		totalField = new TextField("0.00"); // Default value for total
 		totalField.setEditable(false); // Prevent user from editing the total
@@ -84,13 +74,12 @@ public class CreateBillView {
 		finalizeBillButton = new Button("Finalize Bill");
 		finalizeBillButton.setStyle("-fx-background-color: #28A745; -fx-text-fill: white; -fx-font-weight: bold;");
 
-		// Add total elements to the total box
+		
 		totalBox.getChildren().addAll(totalLabel, totalField, finalizeBillButton);
 
-		// Assemble main layout
-		mainLayout.setTop(inputBox); // Input section at the top
-		mainLayout.setCenter(itemsContainer); // Items list in the center
-		mainLayout.setBottom(totalBox); // Total and finalize section at the bottom
+		mainLayout.setTop(inputBox); 
+		mainLayout.setCenter(itemsContainer); 
+		mainLayout.setBottom(totalBox); 
 
 		this.createBillController = new CreateBillController(itemsContainer, totalField, categoryDropdown, itemDropdown,
 				sector);
@@ -108,7 +97,7 @@ public class CreateBillView {
 		
 	}
 
-	// Getters for the main layout
+	// Getters
 	public BorderPane getViewContent() {
 		return mainLayout;
 	}

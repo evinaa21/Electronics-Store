@@ -1,10 +1,8 @@
 package view;
 
 import controller.SupplierController;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
 import javafx.geometry.*;
 import model.Manager;
 import model.Supplier;
@@ -18,59 +16,42 @@ public class SupplierView {
     private SupplierController supplierController;
     private Manager manager;
 
-    private FileHandlerMANAGER fileHandler;
-
-
     public SupplierView(Manager manager, FileHandlerMANAGER fileHandler) {
         this.manager = manager;
-        this.fileHandler = fileHandler;
-
-        // Initialize the SupplierController
         this.supplierController = new SupplierController(manager, this, fileHandler);
 
         // Load suppliers and items from file with null checks
         this.manager.setSuppliers(getNonNullList(fileHandler.loadSuppliers()));
         this.manager.setItems(getNonNullList(fileHandler.loadInventory()));
-
-        // Initialize suppliedItems for each supplier if not already initialized
         for (Supplier supplier : manager.getSuppliers()) {
             if (supplier.getSuppliedItems() == null) {
-                supplier.setSuppliedItems(new ArrayList<>()); // Initialize with an empty list if null
+                supplier.setSuppliedItems(new ArrayList<>()); 
             }
         }
-
-        // Debugging logs
-        System.out.println("Suppliers loaded from file: " + manager.getSuppliers());
-        System.out.println("Items loaded from file: " + manager.getItems());
     }
 
 
     public VBox getViewContent() {
         VBox supplierLayout = new VBox(30);
         ListView<HBox> supplierListView = new ListView<>();
-        
-        // Set VBox to fill the available space
+     
         supplierLayout.setPrefWidth(Double.MAX_VALUE);
         supplierLayout.setPrefHeight(Double.MAX_VALUE);
 
-        // Add each supplier to the ListView
         for (Supplier supplier : manager.getSuppliers()) {
             HBox supplierItem = createSupplierItem(supplier, supplierListView);
             supplierListView.getItems().add(supplierItem);
         }
 
-        // Add button to add a new supplier
         Button addSupplierButton = new Button("Add Supplier");
         addSupplierButton.setOnAction(e -> showAddSupplierDialog(supplierListView));
 
-        // Set the button to expand to fill the available width
         addSupplierButton.setMaxWidth(100);
 
         supplierLayout.getChildren().addAll(supplierListView, addSupplierButton);
         supplierLayout.setPadding(new Insets(20));
 
-        // Allow the VBox to expand
-        VBox.setVgrow(supplierListView, Priority.ALWAYS); // Let the ListView take all the available vertical space
+        VBox.setVgrow(supplierListView, Priority.ALWAYS); 
 
         return supplierLayout;
     }
@@ -118,9 +99,8 @@ public class SupplierView {
 
         dialog.showAndWait().ifPresent(supplierName -> {
             if (!supplierName.trim().isEmpty()) {
-                // Add the supplier with only the name and default contact info
                 supplierController.addSupplier(supplierName, supplierListView);
-                refreshSupplierList(supplierListView);  // Refresh the list to show the new supplier
+                refreshSupplierList(supplierListView); 
             } else {
                 showErrorDialog("Supplier name cannot be empty.");
             }
@@ -128,10 +108,10 @@ public class SupplierView {
     }
 
     public void refreshSupplierList(ListView<HBox> supplierListView) {
-        supplierListView.getItems().clear(); // Clear the existing items first
+        supplierListView.getItems().clear(); 
         for (Supplier supplier : manager.getSuppliers()) {
             HBox supplierItem = createSupplierItem(supplier, supplierListView);
-            supplierListView.getItems().add(supplierItem); // Add the new items
+            supplierListView.getItems().add(supplierItem); 
         }
     }
 
@@ -153,7 +133,6 @@ public class SupplierView {
 
 
     public void setFileHandler(FileHandlerMANAGER fileHandler) {
-        this.fileHandler = fileHandler;
     }
 
     // Utility method to handle null lists
