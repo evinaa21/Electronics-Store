@@ -50,7 +50,6 @@ public class Cashier extends User implements Serializable {
 		this.totalSales = totalSales;
 	}
 	
-	
 
 	public void setItems(ArrayList<Item> items) {
 		this.items = items;
@@ -59,6 +58,7 @@ public class Cashier extends User implements Serializable {
 	public ArrayList<Item> getItems() {
 		return this.items;
 	}
+	
 		
 	
 }
