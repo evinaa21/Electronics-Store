@@ -19,6 +19,7 @@ public class FileHandler {
 	private static final String INVENTORY_FILE = "src/BinaryFiles/items.dat"; // Binary files for inventory
 	private static final String BILL_DIRECTORY = "src/BinaryFiles/Bills/"; // Text files for bills
 	private static final String SECTOR_FILE = "src/BinaryFiles/sectors.dat"; // Path to sector file
+	private final EmployeeFileHandler EmployeeFile = new EmployeeFileHandler();
 
 	// Date format for parsing and saving dates
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyy");
@@ -347,81 +348,10 @@ public class FileHandler {
 			System.err.println("Error saving inventory to binary file: " + e.getMessage());
 		}
 	}
-	// Save employee data to the employees.dat file
-	public void saveEmployeeData(ArrayList<User> employees) {
-
-		// Validation ???
-		if (employees.isEmpty()) {
-			System.err.println("No employee data to save.");
-			return;
-		}
-
-		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(EMPLOYEE_FILE))) {
-			oos.writeObject(employees);
-			System.out.println("Employee data saved successfully to binary file: " + EMPLOYEE_FILE);
-		} catch (IOException e) {
-			System.out.println("Error saving employee data to binary file: " + e.getMessage());
-		}
-	}
-
-	public void saveEmployee(User employee) {
-
-		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(EMPLOYEE_FILE))) {
-			oos.writeObject(employee);
-			System.out.println("Employee data saved successfully to binary file: " + EMPLOYEE_FILE);
-		} catch (IOException e) {
-			System.out.println("Error saving employee data to binary file: " + e.getMessage());
-		}
-	}
-
-	// Load employee data from a binary file
-	@SuppressWarnings("unchecked")
-	public ArrayList<User> loadEmployeeData() {
-		ArrayList<User> employees = new ArrayList<>();
-		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(EMPLOYEE_FILE))) {
-			while (true) {
-				try {
-					employees = (ArrayList<User>) ois.readObject();
-				} catch (EOFException e) {
-					break;
-				}
-			}
-			System.out.println("Employee data loaded successfully from binary file: " + EMPLOYEE_FILE);
-		} catch (FileNotFoundException e) {
-			System.err.println("Employee binary file not found: " + EMPLOYEE_FILE);
-		} catch (IOException | ClassNotFoundException e) {
-			System.err.println("Error loading employee data from binary file: " + e.getMessage());
-		}
-		return employees;
-	}
-
-	public User loadEmployee(String Name) {
-		ArrayList<User> user = new ArrayList<>();
-		user = loadEmployeeData();
-		for (User employee : user) {
-			if (employee.getName().equals(Name)) {
-				return employee;
-			}
-		}
-		System.out.println("No user with the name of " + Name + " was found!");
-		return null;
-	}
-
-	public void updateEmployeeData(User updatedUser) {
-		ArrayList<User> employees = loadEmployeeData();
-
-		employees.removeIf(user -> user.getUsername().equals(updatedUser.getUsername()));
-
-		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(EMPLOYEE_FILE))) {
-			oos.writeObject(updatedUser);
-		} catch (IOException e) {
-			System.err.println("Error updating employee data: " + e.getMessage());
-		}
-	}
 
 	// Add employee salary or update if employee exists
 	public void addEmployeeSalary(String employeeName, double salary) {
-		ArrayList<User> employees = loadEmployeeData(); // Load current employees
+		ArrayList<User> employees = EmployeeFile.loadEmployeeData(); // Load current employees
 		boolean found = false;
 
 		for (int i = 0; i < employees.size(); i++) {
@@ -436,7 +366,7 @@ public class FileHandler {
 		if (!found) {
 			System.err.println("Employee not found: " + employeeName);
 		} else {
-			saveEmployeeData(employees); // Save updated employees back to the file
+			EmployeeFile.saveEmployeeData(employees); // Save updated employees back to the file
 			System.out.println("Salary updated for employee: " + employeeName);
 		}
 	}
