@@ -88,12 +88,7 @@ Generate bills for sales.
 # CAPTURES
 
 
-<style>
-  img {
-    width: 300px;
-    height: 200px;
-  }
-</style>
+
 
 <img src="Images of app/image.png" alt="Image 1" />
 <img src="Images of app/image-1.png" alt="Image 2" />
