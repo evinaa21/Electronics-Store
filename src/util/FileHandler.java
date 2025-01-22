@@ -11,10 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-<<<<<<< HEAD
-=======
 
->>>>>>> 939ed7eaa6c7cbbae782ec86d5b40c1d07302353
 
 public class FileHandler {
 	// Constants for file paths CHANGE IF THESE DONT WORK FOR YOU
@@ -350,9 +347,6 @@ public class FileHandler {
 			System.err.println("Error saving inventory to binary file: " + e.getMessage());
 		}
 	}
-
-<<<<<<< HEAD
-=======
 	// Save employee data to the employees.dat file
 	public void saveEmployeeData(ArrayList<User> employees) {
 
@@ -502,7 +496,6 @@ public class FileHandler {
 
 	
 
->>>>>>> 939ed7eaa6c7cbbae782ec86d5b40c1d07302353
 	// Save a bill to a text file
 	public void saveBill(String billNumber, ArrayList<Item> items, double total, String cashierName, String sector) {
 		String date = dateFormat.format(new Date());

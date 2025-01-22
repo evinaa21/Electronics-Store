@@ -8,11 +8,7 @@ import model.Admin;
 import model.Cashier;
 import model.Manager;
 import model.User;
-<<<<<<< HEAD
 import util.EmployeeFileHandler;
-=======
-import util.FileHandler;
->>>>>>> 939ed7eaa6c7cbbae782ec86d5b40c1d07302353
 import util.FileHandlerMANAGER;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -70,11 +66,7 @@ public class LoginController {
 			        ManagerController managerController = new ManagerController(stage, (Manager) user);
 			        
 			        // Create the ManagerView, passing the ManagerController, primaryStage, Manager, and FileHandler
-<<<<<<< HEAD
 			       new ManagerView(managerController, stage, (Manager) user, new FileHandlerMANAGER());
-=======
-			        ManagerView managerView = new ManagerView(managerController, stage, (Manager) user, new FileHandlerMANAGER());
->>>>>>> 939ed7eaa6c7cbbae782ec86d5b40c1d07302353
 
 			        // Set up the UI or additional logic if needed
 			    }
