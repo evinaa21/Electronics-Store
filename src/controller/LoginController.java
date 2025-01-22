@@ -9,6 +9,7 @@ import model.Cashier;
 import model.Manager;
 import model.User;
 import util.FileHandler;
+import util.FileHandlerMANAGER;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
@@ -55,7 +56,7 @@ public class LoginController {
 			if (user instanceof Admin) {
 				if (username.equals(usernameInFile) && password.equals(passwordInFile)) {
 					AdminView adminView = new AdminView();
-					AdminController adminController = new AdminController(stage, adminView);
+					new AdminController(stage, adminView);
 					break;
 				} else {
 					errorLabel();
@@ -66,10 +67,9 @@ public class LoginController {
 			        ManagerController managerController = new ManagerController(stage, (Manager) user);
 			        
 			        // Create the ManagerView, passing the ManagerController, primaryStage, Manager, and FileHandler
-			        ManagerView managerView = new ManagerView(managerController, stage, (Manager) user, new FileHandler());
+			        ManagerView managerView = new ManagerView(managerController, stage, (Manager) user, new FileHandlerMANAGER());
 
 			        // Set up the UI or additional logic if needed
-			        break;
 			    }
 			} else if (user instanceof Cashier) {
 				if (username.equals(usernameInFile) && password.equals(passwordInFile)) {

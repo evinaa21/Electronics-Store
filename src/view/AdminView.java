@@ -75,6 +75,7 @@ public class AdminView {
 	    adminLayout.setFitToHeight(true);
 	}
 
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	private TableView<User> createEmployeeTable() {
 		TableView<User> table = new TableView<>();
 		
@@ -174,7 +175,4 @@ public class AdminView {
 	public NavBar getNavBar() {
 		return navBar;
 	}
-	
-	
-
 }
