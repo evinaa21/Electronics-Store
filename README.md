@@ -27,7 +27,7 @@ User Role Management: Three types of users—Cashier, Manager, and Administrator
 Stock and Sales Management: Includes functionalities for restocking, tracking sales, and generating performance reports.
 # User Roles and Responsibilities
 
-Cashier
+** Cashier **
 The Cashier is responsible for:
 
 Checking out electronics items.
@@ -37,8 +37,9 @@ Generating and printing bills, saved as [BillNrDate].txt.
 Tracking and viewing all bills generated on a given day, along with their totals.
 Updating relevant data files after each transaction.
 Cashiers are assigned to a single sector.
-Manager
-The Manager is responsible for:
+
+ ** Manager **
+ The Manager is responsible for:
 
 Overseeing one or more sectors of the store.
 Managing inventory, including adding new items or categories to the stock.
@@ -46,7 +47,8 @@ Restocking items when their stock falls below a set threshold (e.g., 5 items).
 Monitoring cashier performance, including sales metrics and total revenue.
 Generating statistics for daily, monthly, or overall summaries.
 Maintaining a list of suppliers and their offered products.
-Administrator
+
+** Administrator **
 The Administrator is responsible for:
 
 Managing all aspects of the software, including roles of Cashier and Manager.
