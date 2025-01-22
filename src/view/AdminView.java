@@ -17,23 +17,23 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import model.SalesMetrics;
 import model.User;
-
-import util.FileHandler;
-import util.NavBar;
+import util.EmployeeFileHandler;
+import util.AdminNavBar;
 import util.Role;
 
 import java.util.Date;
 
 public class AdminView {
+	private final EmployeeFileHandler file = new EmployeeFileHandler();
 	private ScrollPane adminLayout;
 	private Button deleteEmployee, MEmployeeB;
 	private TextField deleteEmployeeTF, MEmployeeTF;
-	public NavBar navBar;
+	public AdminNavBar navBar;
 	private TableView<User> table;
 	private ObservableList<User> observableList;
 	
 	public AdminView() {
-		navBar = new NavBar();
+		navBar = new AdminNavBar();
 		HBox nav = navBar.getNavBar();
 		
 		Text EmpTableText = new Text("Data about employees:");
@@ -71,7 +71,7 @@ public class AdminView {
 		vbox.getChildren().addAll(nav, EmpTableText, table, MEmployeeHBox, deleteEmployeeHBox, incomeOutcomeHBox);
 		vbox.setPadding(new Insets(10,10,10,10));
 		adminLayout = new ScrollPane(vbox);
-	    adminLayout.setFitToWidth(false);
+	    adminLayout.setFitToWidth(true);
 	    adminLayout.setFitToHeight(true);
 	}
 
@@ -144,7 +144,6 @@ public class AdminView {
 	}
 	
 	public ObservableList<User> userList(){
-		FileHandler file = new FileHandler();
 		return FXCollections.observableArrayList(file.loadEmployeeData());
 	}
 
@@ -167,12 +166,8 @@ public class AdminView {
 	public ObservableList<User> getUserList(){
 		return observableList;
 	}
-	
-	public TableView<User> getTable(){
-		return table;
-	}
 
-	public NavBar getNavBar() {
+	public AdminNavBar getNavBar() {
 		return navBar;
 	}
 }

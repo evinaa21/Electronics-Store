@@ -12,23 +12,18 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.Cashier;
-import model.Item;
 import model.Sector;
-import util.FileHandler;
 
 public class CashierView {
 
 	private CashierController cashierController;
-	private Stage primaryStage;
 	private Cashier cashier;
-	private Label outOfStockLabel;
 	private Sector assignedSector; // Assigned sector for the cashier
 
 	public CashierView(CashierController cashierController, Stage primaryStage, Cashier cashier) {
 		this.cashierController = cashierController;
-		this.primaryStage = primaryStage;
 		this.cashier = cashier;
-		this.outOfStockLabel = new Label();
+		new Label();
 		this.assignedSector = cashier.getSector(); // Initialize the assigned sector
 	}
 
@@ -84,7 +79,7 @@ public class CashierView {
 		Button homeButton = createNavButton("Home");
 		Button createBillButton = createNavButton("Create Bill");
 		Button dailyBillsButton = createNavButton("Daily Bills");
-		Button notifyLowStockButton = createNavButton("Low Stock Items");
+		
 
 		// Set action for the Home button
 		homeButton.setOnAction(e -> {
@@ -101,13 +96,9 @@ public class CashierView {
 			cashierController.openDailyBillsView(); // Calls the openDailyBillsView method
 		});
 
-		// Set action for Notify Low Stock button
-		notifyLowStockButton.setOnAction(e -> {
-			showLowStockItems(); // You may need to implement this method to show low stock items
-		});
 
 		// Add navigation buttons to the bar
-		navigationBar.getChildren().addAll(homeButton, createBillButton, dailyBillsButton, notifyLowStockButton);
+		navigationBar.getChildren().addAll(homeButton, createBillButton, dailyBillsButton);
 
 		return navigationBar;
 	}
@@ -143,23 +134,6 @@ public class CashierView {
 		alert.setTitle("Out of Stock Alert");
 		alert.setHeaderText("Item Out of Stock");
 		alert.setContentText("The item '" + selectedItemName + "' is out of stock. Please choose another item.");
-		alert.showAndWait();
-	}
-
-	private void showLowStockItems() {
-		int threshold = 5; // You can set this threshold as needed
-		var lowStockItems = cashierController.notifyLowStock(threshold);
-
-		StringBuilder lowStockMessage = new StringBuilder("Low Stock Items:\n");
-		for (Item item : lowStockItems) {
-			lowStockMessage.append("Item: ").append(item.getItemName()).append(", Quantity: ")
-					.append(item.getStockQuantity()).append("\n");
-		}
-
-		Alert alert = new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle("Low Stock Items");
-		alert.setHeaderText("Items with Low Stock");
-		alert.setContentText(lowStockMessage.toString());
 		alert.showAndWait();
 	}
 }

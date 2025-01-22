@@ -8,7 +8,7 @@ import model.Admin;
 import model.Cashier;
 import model.Manager;
 import model.User;
-import util.FileHandler;
+import util.EmployeeFileHandler;
 import util.FileHandlerMANAGER;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -17,12 +17,12 @@ import javafx.stage.Stage;
 import view.LoginView;
 import view.ManagerView;
 import view.AdminView;
-import view.CashierView;
 
 public class LoginController {
 	private final Stage stage;
 	private final LoginView loginView;
 	private Scene loginScene;
+	private final EmployeeFileHandler file = new EmployeeFileHandler();
 
 	public LoginController(Stage stage, LoginView loginView) {
 		this.stage = stage;
@@ -46,7 +46,6 @@ public class LoginController {
 
 	private void authenticate(String username, String password) {
 		ArrayList<User> employees = new ArrayList<>();
-		FileHandler file = new FileHandler();
 		employees = file.loadEmployeeData();
 
 		for (User user : employees) {
@@ -67,7 +66,7 @@ public class LoginController {
 			        ManagerController managerController = new ManagerController(stage, (Manager) user);
 			        
 			        // Create the ManagerView, passing the ManagerController, primaryStage, Manager, and FileHandler
-			        ManagerView managerView = new ManagerView(managerController, stage, (Manager) user, new FileHandlerMANAGER());
+			       new ManagerView(managerController, stage, (Manager) user, new FileHandlerMANAGER());
 
 			        // Set up the UI or additional logic if needed
 			    }

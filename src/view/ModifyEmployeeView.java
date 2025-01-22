@@ -17,20 +17,20 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 import model.Sector;
 import util.FileHandler;
-import util.NavBar;
+import util.AdminNavBar;
 import util.Role;
 
 public class ModifyEmployeeView {
 	private GridPane layout;
 	private FlowPane sectorPane;
 	private TextField username, password, salary, email;
-	public NavBar navBar;
+	public AdminNavBar navBar;
 	private ComboBox<Role> role;
 	private ArrayList<CheckBox> sectorCheckBoxes =  new ArrayList<>();
 	private Button Modify;
 	
 	public ModifyEmployeeView() {
-		navBar = new NavBar();
+		navBar = new AdminNavBar();
 		HBox nav = navBar.getNavBar();
 		
 		layout = new GridPane();
@@ -179,7 +179,7 @@ public class ModifyEmployeeView {
 		return sectorCheckBoxes;
 	}
 	
-	public NavBar getNavBar() {
+	public AdminNavBar getNavBar() {
 		return navBar;
 	}
 }

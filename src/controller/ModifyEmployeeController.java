@@ -12,14 +12,14 @@ import model.Manager;
 import model.Sector;
 import model.User;
 import util.CredentialsException;
-import util.FileHandler;
-import util.NavBar;
+import util.EmployeeFileHandler;
+import util.AdminNavBar;
 import util.Role;
 import view.AdminView;
 import view.ModifyEmployeeView;
 
 public class ModifyEmployeeController {
-	private final FileHandler file = new FileHandler();
+	private final EmployeeFileHandler file = new EmployeeFileHandler();
 	private final Stage stage;
 	private final ModifyEmployeeView MEV;
 	private final String name;
@@ -34,7 +34,7 @@ public class ModifyEmployeeController {
 	}
 
 	private void loadNavBar() {
-		NavBar nav = MEV.getNavBar();
+		AdminNavBar nav = MEV.getNavBar();
 		NavBarController navBarController = new NavBarController(stage);
 		navBarController.configureNavBar(nav);
 		
@@ -71,7 +71,7 @@ public class ModifyEmployeeController {
 				showAlert("Please enter a valid email!");
 			}
 			
-			Enum role = MEV.getRole();
+			Role role = MEV.getRole();
 			if(role == null) {
 				role = user.getRole();
 						
@@ -100,7 +100,7 @@ public class ModifyEmployeeController {
 					updateEmployeeFile(newUser);
 					showSuccessMessage();
 					AdminView adminView = new AdminView();
-					AdminController adminController = new AdminController(stage, adminView);
+					new AdminController(stage, adminView);
 			}catch(CredentialsException e) {
 				System.err.println("Invalid credential input" + e.getMessage());
 			}

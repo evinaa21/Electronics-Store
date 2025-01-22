@@ -1,4 +1,4 @@
 package util;
 public enum Role {
-    Admin, Manager, Cashier, Guest
+    Admin, Manager, Cashier
 }

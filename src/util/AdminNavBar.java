@@ -4,11 +4,11 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 
-public class NavBar {
+public class AdminNavBar {
 	private HBox navigationBar;
 	private Button homeButton, register;
 	
-	public NavBar() {
+	public AdminNavBar() {
 		navigationBar = new HBox(20);
         navigationBar.setAlignment(Pos.CENTER);
         

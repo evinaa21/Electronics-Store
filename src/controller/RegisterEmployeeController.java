@@ -16,8 +16,8 @@ import model.Manager;
 import model.Sector;
 import model.User;
 import util.CredentialsException;
-import util.FileHandler;
-import util.NavBar;
+import util.EmployeeFileHandler;
+import util.AdminNavBar;
 import util.Role;
 import view.AdminView;
 import view.RegisterEmployeeView;
@@ -25,6 +25,7 @@ import view.RegisterEmployeeView;
 public class RegisterEmployeeController {
 	private final Stage stage;
 	private final RegisterEmployeeView regEmpView;
+	private final EmployeeFileHandler file = new EmployeeFileHandler();
 	
 	public RegisterEmployeeController(Stage stage, RegisterEmployeeView regEmpView) {
 		this.stage = stage;
@@ -35,7 +36,7 @@ public class RegisterEmployeeController {
 	}
 	
 	private void loadNavBar() {
-		NavBar navBar = regEmpView.getNavBar();
+		AdminNavBar navBar = regEmpView.getNavBar();
 		NavBarController navBarController = new NavBarController(stage);
 		navBarController.configureNavBar(navBar);
 	}
@@ -60,7 +61,6 @@ public class RegisterEmployeeController {
 				ArrayList<Sector> sectors = getSelectedSectors();
 				
 				if(validateCredentials(name, s, username, password, date, phone, role, email, sectors)) {
-					long phonenum = parsePhone(phone);
 					double salary = parseSalary(s);
 					User user = null;
 					if(role == Role.Admin) {
@@ -76,19 +76,16 @@ public class RegisterEmployeeController {
 					}
 					
 					if (user != null) {
-					    FileHandler file = new FileHandler();
 					    ArrayList<User> data = file.loadEmployeeData(); // Load existing data
 					    data.add(user); // Add the new user
 					    file.saveEmployeeData(data); // Save the updated data
 					    showRegistrationSuccess(); // Show success message
-					    AdminView adminView = new AdminView();
-					    AdminController adminController = new AdminController(stage, adminView);
-					} else {
+					    new AdminController(stage, new AdminView());
+					}else{
 					    System.out.println("Error: User could not be created.");
 					}
-					
-					
-					}
+						
+				}
 			}catch(Exception e1) {
 				System.out.println("Error during registration: " + e1.getMessage());
 				showAlert("Error during registration!");
@@ -109,7 +106,6 @@ public class RegisterEmployeeController {
 			throw new CredentialsException("Email input is wrong!");
 		}
 		
-		FileHandler file = new FileHandler();
 		ArrayList<User> data = file.loadEmployeeData();
 		for(User user : data) {
 			if(user.getName().equals(name)) {
@@ -128,7 +124,6 @@ public class RegisterEmployeeController {
 			}
 			
 		}
-		
 		
 		return true;
 	}
@@ -149,14 +144,6 @@ public class RegisterEmployeeController {
 		try {
 			return Double.parseDouble(salaryString);
 		} catch (NumberFormatException e) {
-			throw new IllegalArgumentException("Invalid salary formal.");
-		}
-	}
-	
-	private long parsePhone(String phone) {
-		try {
-			return Long.parseLong(phone);
-		}catch(NumberFormatException e) {
 			throw new IllegalArgumentException("Invalid salary formal.");
 		}
 	}

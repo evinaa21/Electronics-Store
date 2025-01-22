@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 import model.Admin;
 import model.User;
 import util.DeleteException;
-import util.FileHandler;
-import util.NavBar;
+import util.EmployeeFileHandler;
+import util.AdminNavBar;
 import view.AdminView;
 import view.ModifyEmployeeView;
 
 public class AdminController {
 	private final AdminView adminView;
 	private final Stage stage;
+	private final EmployeeFileHandler file = new EmployeeFileHandler();
 	
 	public AdminController(Stage stage, AdminView adminView) {
 		this.stage = stage;
@@ -27,7 +27,7 @@ public class AdminController {
 	}
 	
 	private void loadNavBar() {
-		NavBar navBar = adminView.getNavBar();
+		AdminNavBar navBar = adminView.getNavBar();
 		NavBarController navBarController = new NavBarController(stage);
 		navBarController.configureNavBar(navBar);
 	}
@@ -39,16 +39,14 @@ public class AdminController {
 
 	private void setButtonActions() {
 		adminView.getDeleteButton().setOnAction(event -> {
-			FileHandler file = new FileHandler();
 			if(adminView.getDeleteEmployeeName().getText().equals("") || file.loadEmployee(adminView.getDeleteEmployeeName().getText()) == null) {
 				alertMessage("Warning!", "You should put a valid employee name!");
 			}else {
-				deleteEmployee(adminView.getDeleteEmployeeName().getText(), adminView.getTable());
+				deleteEmployee(adminView.getDeleteEmployeeName().getText());
 			}
 		});
 		
 		adminView.getEditButton().setOnAction(event -> {
-			FileHandler file = new FileHandler();
 			if(adminView.getEditEmployeeName().getText().equals("") || file.loadEmployee(adminView.getEditEmployeeName().getText()) == null) {
 				alertMessage("Warning!", "You should put a valid employee name!");
 			}else {
@@ -56,16 +54,14 @@ public class AdminController {
 				if(user instanceof Admin) {
 					alertMessage("Information!", "Admins cannot be modified!");
 				}else {
-					ModifyEmployeeView MEmpV = new ModifyEmployeeView();
-					ModifyEmployeeController MEmpC = new ModifyEmployeeController(stage, MEmpV, user.getName());
+					new ModifyEmployeeController(stage, new ModifyEmployeeView(), user.getName());
 				}
 			}
 		});
 	}
 
-	private void deleteEmployee(String name, TableView<User> table) {
+	private void deleteEmployee(String name) {
 		try {
-			FileHandler file = new FileHandler();
 			ArrayList<User> empData = file.loadEmployeeData();
 			User admin = file.loadEmployee(name);
 			if(admin instanceof Admin) {
@@ -87,16 +83,11 @@ public class AdminController {
 				}
 			}
 			file.saveEmployeeData(empData);
-			table.refresh();
 			alertMessage("Success!", "User deleted succesfully!");
-			AdminView adminView = new AdminView();
-			AdminController adminController = new AdminController(stage, adminView);
+			new AdminController(stage, new AdminView());
 		}catch(DeleteException e) {
 			System.out.println("Error during deletion: " + e.getMessage());
 			alertMessage("Error", "There should be at least one Admin");
-		}catch(Exception e) {
-			System.out.println("Error during registration: " + e.getMessage());
-			alertMessage("Warning", "Error during registration!");
 		}
 	}
 

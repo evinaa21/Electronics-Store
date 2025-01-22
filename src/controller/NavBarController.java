@@ -1,6 +1,6 @@
 package controller;
 import javafx.stage.Stage;
-import util.NavBar;
+import util.AdminNavBar;
 import view.AdminView;
 import view.RegisterEmployeeView;
 
@@ -12,15 +12,15 @@ public class NavBarController {
 		this.stage = stage;
 	}
 	
-	public void configureNavBar(NavBar navBar) {
+	public void configureNavBar(AdminNavBar navBar) {
 		navBar.getHomeButton().setOnAction(event -> {
 			AdminView admin = new AdminView();
-			AdminController adminC = new AdminController(stage, admin);
+			new AdminController(stage, admin);
 		});
 		
 		navBar.getRegister().setOnAction(event -> {
 			RegisterEmployeeView registerEmployeeView = new RegisterEmployeeView();
-			RegisterEmployeeController registerEmployeeController = new RegisterEmployeeController(stage, registerEmployeeView);
+			new RegisterEmployeeController(stage, registerEmployeeView);
 		});
 	}
 }

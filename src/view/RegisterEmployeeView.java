@@ -17,7 +17,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import model.Sector;
 import util.FileHandler;
-import util.NavBar;
+import util.AdminNavBar;
 import util.Role;
 
 public class RegisterEmployeeView {
@@ -26,7 +26,7 @@ public class RegisterEmployeeView {
 	private TextField name, salary, username, password, phone, email;
 	private DatePicker dob;
 	private ComboBox<Role> role;
-	private NavBar navBar;
+	private AdminNavBar navBar;
 	private ArrayList<CheckBox> sectorCheckBoxes =  new ArrayList<>();
 	private Button register;
 	
@@ -37,7 +37,7 @@ public class RegisterEmployeeView {
 		layout.setHgap(10);
 		layout.setAlignment(Pos.CENTER);
 		
-		navBar = new NavBar();
+		navBar = new AdminNavBar();
 		navBar.getNavBar();
 		
 		Text registerText = new Text("Register new employee");
@@ -209,7 +209,7 @@ public class RegisterEmployeeView {
 		return sectorCheckBoxes;
 	}
 	
-	public NavBar getNavBar() {
+	public AdminNavBar getNavBar() {
 		return navBar;
 	}
 }
