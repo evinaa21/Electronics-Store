@@ -57,30 +57,30 @@ Monitoring the store's financial data, including income from sales and costs (pu
 Ensuring the system functions smoothly by managing overall operations.
 # Features
 
-# Inventory Management:
+ Inventory Management:
 ->Add, update, and delete items.
 ->Organize items by categories.
 ->Restock items based on stock thresholds.
 
-# Sales Tracking:
+ Sales Tracking:
 Generate bills for sales.
 ->Track sold items by bill number, date, and quantity.
 ->Generate reports based on sales performance.
 
-# User Role Management:
+ User Role Management:
 ->Separate views and access levels for Cashiers, Managers, and Administrators.
 ->Admin users can manage employee access and permissions.
 
-# File Handling:
+ File Handling:
 ->Store item and transaction data in both binary and text file formats.
 
-# Financial Management:
+ Financial Management:
 ->Track income from sales and costs for purchases and employee salaries.
 
-# Performance Reports:
+ Performance Reports:
 ->Generate daily, monthly, and total reports for sales and inventory metrics.
 
-# User Authentication:
+ User Authentication:
 ->Secure login for all users with role-based access.
 
 # CAPTURES
