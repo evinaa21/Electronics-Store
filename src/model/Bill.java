@@ -55,7 +55,7 @@ public class Bill implements Serializable{
 	public double calculateTotal() {
 		double total = 0.0;
 		for(int i = 0; i <items.size(); i++) {
-			total += items.get(i).getSellingPrice() * items.get(i).getItemQuantity();
+			total += items.get(i).getSellingPrice() * items.get(i).getStockQuantity();
 		}
 		
 		this.totalAmount = total; //Update totalAmount
@@ -84,7 +84,7 @@ public class Bill implements Serializable{
 	            "%-20s %-15s %-10d %-10.2f\n",
 	            item.getItemName(),
 	            item.getCategory() != null ? item.getCategory() : "Uncategorized", // Handle null category
-	            item.getItemQuantity(),
+	            item.getStockQuantity(),
 	            item.getSellingPrice()
 	        ));
 	    }

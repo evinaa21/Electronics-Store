@@ -8,12 +8,9 @@ public class Supplier implements Serializable {
     private static final long serialVersionUID = -4499787452810759813L;
 
     private String supplierName;
-    private String contactInfo;
     private ArrayList<Item> suppliedItems;
-    private List<String> itemIds; // Store IDs of items supplied by this supplier
-
-	private String supplierId;
-
+    private ArrayList<String> itemIds; 
+    
     public Supplier( String supplierName) {
         this.supplierName = supplierName;
         this.itemIds = new ArrayList<>();
@@ -22,19 +19,15 @@ public class Supplier implements Serializable {
 
     public void addItem(Item item) {
         if (suppliedItems == null) {
-            suppliedItems = new ArrayList<>();  // Initialize if not already initialized
+            suppliedItems = new ArrayList<>(); 
         }
-        suppliedItems.add(item);  // Add the item
+        suppliedItems.add(item);
     }
 
-
-    // Remove an item from the supplier's list of supplied items
     public void removeItem(Item item) {
         suppliedItems.remove(item);
     }
 
-
-    // Getter and Setter for supplier name
     public String getSupplierName() {
         return supplierName;
     }
@@ -50,14 +43,7 @@ public class Supplier implements Serializable {
         this.supplierName = supplierName;
     }
 
-    // Getter and Setter for contact information
-    public String getContactInfo() {
-        return contactInfo;
-    }
-
-    public void setContactInfo(String contactInfo) {
-        this.contactInfo = contactInfo;
-    }
+    
     public void setSuppliedItems(ArrayList<Item> suppliedItems) {
         this.suppliedItems = suppliedItems;
     }
@@ -71,7 +57,7 @@ public class Supplier implements Serializable {
 
     @Override
     public String toString() {
-        return "Supplier: " + supplierName + ", Contact Info: " + contactInfo;
+        return "Supplier: " + supplierName;
     }
 
 

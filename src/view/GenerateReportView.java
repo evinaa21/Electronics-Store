@@ -7,22 +7,19 @@ import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import model.Manager;
-import util.FileHandlerMANAGER;
+import util.FileHandler;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class GenerateReportView {
 
-    private Manager manager;
-	private FileHandlerMANAGER fileHandler;
-	
-
-
-    public GenerateReportView(Manager manager, FileHandlerMANAGER fileHandler) {
-
-        this.manager = manager;
-        this.fileHandler=fileHandler;
+    public GenerateReportView(Manager manager, FileHandler fileHandler) {
     }
 
     public VBox getViewContent() {
@@ -39,22 +36,8 @@ public class GenerateReportView {
         timePeriodLabel.setTextFill(Color.WHITE);
 
         ComboBox<String> timePeriodCombo = new ComboBox<>();
-        timePeriodCombo.getItems().addAll("Last 7 Days", "Last Month", "Custom");
+        timePeriodCombo.getItems().addAll("Last 7 Days", "Last Month");
         timePeriodCombo.setValue("Last 7 Days");
-
-        Label startDateLabel = new Label("Start Date:");
-        startDateLabel.setTextFill(Color.WHITE);
-        DatePicker startDatePicker = new DatePicker();
-        startDatePicker.setVisible(false);
-
-        Label endDateLabel = new Label("End Date:");
-        endDateLabel.setTextFill(Color.WHITE);
-        DatePicker endDatePicker = new DatePicker();
-        endDatePicker.setVisible(false);
-
-        HBox dateBox = new HBox(10, startDateLabel, startDatePicker, endDateLabel, endDatePicker);
-        dateBox.setAlignment(Pos.CENTER);
-        dateBox.setVisible(false);
 
         TextArea reportArea = new TextArea();
         reportArea.setEditable(false);
@@ -69,91 +52,119 @@ public class GenerateReportView {
             if (timePeriod == null || timePeriod.isEmpty()) {
                 reportArea.setText("Please select a valid time period.");
             } else {
-                if (timePeriod.equals("Custom")) {
-                    if (startDatePicker.getValue() == null || endDatePicker.getValue() == null) {
-                        reportArea.setText("Please select both start and end dates.");
-                    } else {
-                        LocalDate startDate = startDatePicker.getValue();
-                        LocalDate endDate = endDatePicker.getValue();
-                        reportArea.setText(generateSalesReport(timePeriod, startDate, endDate));
-                    }
-                } else {
-                    reportArea.setText(generateSalesReport(timePeriod, null, null));
-                }
-            }
-        });
-
-        timePeriodCombo.setOnAction(event -> {
-            if (timePeriodCombo.getValue().equals("Custom")) {
-                startDatePicker.setVisible(true);
-                endDatePicker.setVisible(true);
-                dateBox.setVisible(true);
-            } else {
-                startDatePicker.setVisible(false);
-                endDatePicker.setVisible(false);
-                dateBox.setVisible(false);
+                reportArea.setText(generateSalesReport(timePeriod, null, null));
             }
         });
 
         parentLayout.setEffect(createDropShadowEffect());
-        parentLayout.getChildren().addAll(titleLabel, timePeriodLabel, timePeriodCombo, dateBox, generateButton, reportArea);
+        parentLayout.getChildren().addAll(titleLabel, timePeriodLabel, timePeriodCombo, generateButton, reportArea);
 
         return parentLayout;
     }
 
-
-
-
-    // Method to create a DropShadow effect
-
     public String generateSalesReport(String timePeriod, LocalDate startDate, LocalDate endDate) {
-        // Use the fileHandler to read bills from the file
-        ArrayList<String> billsData = fileHandler.readBills();
+        // Calculate the total sales from the filtered bills (using data from SalesSummary.txt)
+        double totalSales = calculateTotalSalesFromSummary();
 
-        // Filter the bills data based on the time period or custom date range
-        ArrayList<String> filteredBills = filterBills(billsData, timePeriod, startDate, endDate);
-
-        // Calculate the total sales from the filtered bills
-        double totalSales = calculateTotalSales(filteredBills);
-
-        return "Total Sales: $" + totalSales;
+        return String.format("Total Sales: $%.2f", totalSales);
     }
 
-    private ArrayList<String> filterBills(ArrayList<String> billsData, String timePeriod, LocalDate startDate, LocalDate endDate) {
-        ArrayList<String> filteredBills = new ArrayList<>();
-        LocalDate now = LocalDate.now();
-
-        for (String bill : billsData) {
-            // Parse each bill date and amount
-            String[] billData = bill.split(",");
-            LocalDate billDate = LocalDate.parse(billData[0]);
-            double billAmount = Double.parseDouble(billData[1]);
-
-            // Filter based on time period or custom date range
-            if (timePeriod.equals("Last 7 Days") && billDate.isAfter(now.minusDays(7))) {
-                filteredBills.add(bill);
-            } else if (timePeriod.equals("Last Month") && billDate.isAfter(now.minusMonths(1))) {
-                filteredBills.add(bill);
-            } else if (timePeriod.equals("Custom") && billDate.isAfter(startDate.minusDays(1)) && billDate.isBefore(endDate.plusDays(1))) {
-                filteredBills.add(bill);
-            }
-        }
-        return filteredBills;
-    }
-
-    private double calculateTotalSales(ArrayList<String> billsData) {
+    public double calculateTotalSalesFromSummary() {
+        String summaryFilePath = "C:\\Users\\Evina\\git\\Electronics-Store\\src\\BinaryFiles\\sales_summary.txt";
+        File summaryFile = new File(summaryFilePath);
         double totalSales = 0.0;
 
-        for (String bill : billsData) {
-            // Parse the bill data (assuming the format is "date,amount")
-            String[] billData = bill.split(",");
-            double amount = Double.parseDouble(billData[1]);
-            totalSales += amount;
+        if (!summaryFile.exists()) {
+            System.out.println("Sales summary file does not exist.");
+            return totalSales;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(summaryFile))) {
+            String line;
+            // Read each line
+            while ((line = reader.readLine()) != null) {
+              
+                if (line.contains("Sales Report")) {
+                    continue; 
+                }
+                
+                if (line.contains("Total Amount:") && line.contains("Cashier:")) {
+                    // Split the line into parts by the "Total Amount:" label
+                    String[] parts = line.split("Total Amount:");
+                    if (parts.length > 1) {
+                        // extract the total amount
+                        String totalAmountStr = parts[1].split(",")[0].trim();  // Get the total amount part before the comma
+                        try {
+                            double totalAmount = Double.parseDouble(totalAmountStr);//skips 0 amounts
+                            if (totalAmount > 0.0) {
+                                totalSales += totalAmount; 
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Error parsing total amount: " + parts[1]);
+                        }
+
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading sales summary: " + e.getMessage());
         }
 
         return totalSales;
     }
 
+    public ArrayList<String> filterBills(ArrayList<String> billsData, String timePeriod, LocalDate startDate, LocalDate endDate) {
+        ArrayList<String> filteredBills = new ArrayList<>();
+        LocalDate now = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        for (String bill : billsData) {
+            // this ignores dividers and non-relevant lines
+            if (bill.contains("=========================================") || bill.contains("THANK YOU FOR SHOPPING")) {
+                continue;
+            }
+
+            // it initialize date, total amount, and cashier name variables
+            String billDateStr = null;
+            String cashierName = null;  
+
+            String[] lines = bill.split("\n");
+            for (String line : lines) {
+                if (line.startsWith("Date:")) {
+                    billDateStr = line.split(":")[1].trim();
+                } else if (line.startsWith("Total Amount:")) {
+                    // Extract total amount
+                    String amountStr = line.split(":")[1].trim();
+                    try {
+                    } catch (NumberFormatException e) {
+                        System.out.println("Skipping invalid total amount: " + amountStr);
+                    }
+                } else if (line.startsWith("Cashier:")) {
+                    // Extract cashier name 
+                    cashierName = line.split(":")[1].trim();
+                }
+            }
+
+            if (billDateStr != null) {
+                try {
+                    LocalDate billDate = LocalDate.parse(billDateStr, formatter); // Parse the date
+                    // Filter based on time period
+                    if (timePeriod.equals("Last 7 Days") && billDate.isAfter(now.minusDays(7))) {
+                        filteredBills.add(bill);
+                    } else if (timePeriod.equals("Last Month") && billDate.isAfter(now.minusMonths(1))) {
+                        filteredBills.add(bill);
+                    }
+                } catch (Exception e) {
+                    System.out.println("Skipping invalid date in bill: " + billDateStr);
+                }
+            }
+
+            if (cashierName != null) {
+            }
+        }
+
+        return filteredBills;
+    }
 
     private DropShadow createDropShadowEffect() {
         DropShadow dropShadow = new DropShadow();
@@ -164,12 +175,6 @@ public class GenerateReportView {
         return dropShadow;
     }
 
-
-
-    public void setFileHandler(FileHandlerMANAGER fileHandler) {
-        this.fileHandler = fileHandler;
+    public void setFileHandler(FileHandler fileHandler) {
     }
-
 }
-
-

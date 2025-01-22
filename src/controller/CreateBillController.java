@@ -30,7 +30,6 @@ public class CreateBillController {
 		this.categoryDropdown = categoryDropdown;
 		this.itemDropdown = itemDropdown;
 		this.assignedSector = assignedSector;
-
 		this.inventory = new ArrayList<>();
 		this.billItems = new ArrayList<>();
 
@@ -108,7 +107,7 @@ public class CreateBillController {
 
 		// Add the item to the current bill
 		Item billItem = new Item(selectedItem.getItemName(), selectedItem.getCategory(), selectedItem.getSellingPrice(),
-				quantity, 0, quantity);
+				quantity, 0);
 
 		this.billItems.add(billItem); // Maintain a reference to the added item
 
@@ -140,6 +139,7 @@ public class CreateBillController {
 
 			// Save the bill
 			fileHandler.saveBill(billNumber, this.billItems, totalAmount, cashierName, sector);
+			fileHandler.updateInventoryForSale(billItems);
 
 			// Reset UI and bill items
 			resetFields();
@@ -165,7 +165,7 @@ public class CreateBillController {
 		return "BILL-" + System.currentTimeMillis();
 	}
 
-	// Helper method to show alerts
+	// Alerts
 	private void showAlert(String title, String message, Alert.AlertType type) {
 		Alert alert = new Alert(Alert.AlertType.INFORMATION);
 		alert.setTitle(title);

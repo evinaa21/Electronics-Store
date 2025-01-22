@@ -1,9 +1,7 @@
 package view;
 
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -20,17 +18,14 @@ import java.util.ArrayList;
 public class ManagerView {
 
     private ManagerController managerController;
-    private Stage primaryStage;
+
     private Manager manager;
     private FileHandlerMANAGER fileHandler;
-    private Label lowStockLabel;
 
     public ManagerView(ManagerController managerController, Stage primaryStage, Manager manager, FileHandlerMANAGER fileHandler) {
         this.managerController = managerController;
-        this.primaryStage = primaryStage;
         this.manager = manager;
         this.fileHandler = fileHandler;
-        this.lowStockLabel = new Label();
     }
 
     public void setupUI(BorderPane mainLayout, StackPane centerContent) {
@@ -142,22 +137,15 @@ public class ManagerView {
         centerContent.getChildren().add(homeContent);
     }
     private String getLowStockInfo() {
-        ArrayList<Sector> managerSectors = manager.getSectors();  // Get manager's assigned sectors
-        // Get all low stock items based on the threshold and sectors assigned to the manager
+        ArrayList<Sector> managerSectors = manager.getSectors();  // gets manager's assigned sectors
         ArrayList<Item> lowStockItems = fileHandler.notifyLowStockforManager(5, managerSectors);  
-
-        // If there are no low stock items, return a message
         if (lowStockItems.isEmpty()) {
             return "No low stock items.";
         }
-
-        // Prepare the string to display low stock items
         StringBuilder lowStockInfo = new StringBuilder("Low Stock Items:\n");
 
         for (Item item : lowStockItems) {
             boolean isCategoryInSector = false;
-            
-            // Iterate through the manager's sectors and check if the category is in the sector's categories
             for (Sector sector : managerSectors) {
                 // Check if the item’s category is in the sector's categories
                 if (sector.getCategories().contains(item.getCategory())) {
@@ -175,7 +163,7 @@ public class ManagerView {
             }
         }
 
-        return lowStockInfo.toString();  // Return the formatted low stock information
+        return lowStockInfo.toString();
     }
 
     }

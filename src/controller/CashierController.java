@@ -18,53 +18,57 @@ import view.DailyBillsView;
 
 public class CashierController {
 
-	private final Stage primaryStage; // Primary application stage
-	private final Cashier cashier; // The currently logged-in cashier
-	private final Sector assignedSector; // Sector assigned to the cashier
-	private final FileHandler fileHandler; // Handles file operations
-	private final BorderPane mainLayout; // Main layout for the dashboard
-	private final StackPane centerContent; // Area for dynamic content
-	private Scene cashierScene; // Cashier scene
+	private final Stage primaryStage; 
+	private final Cashier cashier; 
+	private final Sector assignedSector; 
+	private final FileHandler fileHandler; 
+	private final BorderPane mainLayout; 
+	private final StackPane centerContent; 
+	private Scene cashierScene;
 
 	public CashierController(Stage primaryStage, Cashier cashier) {
-		this.primaryStage = primaryStage; // Assign the stage
-		this.cashier = cashier; // Assign the logged-in cashier
-		this.assignedSector = cashier.getSector(); // Get the cashier's assigned sector
-		this.fileHandler = new FileHandler(); // Initialize FileHandler
-		this.mainLayout = new BorderPane(); // Main layout for the dashboard
-		this.centerContent = new StackPane(); // Area for dynamic content
-		System.out.println("Cashier view needs to load now...");
+		this.primaryStage = primaryStage; 
+		this.cashier = cashier; 
+		this.assignedSector = cashier.getSector(); 
+		this.fileHandler = new FileHandler(); 
+		this.mainLayout = new BorderPane(); 
+		this.centerContent = new StackPane(); 
 		loadDataFromFiles();
-		setupUI(); // Set up the UI components
+		setupUI(); 
 	}
 
-	// Load data from binary and other files
+	// Load data from binary 
 	private void loadDataFromFiles() {
-		ArrayList<Sector> sectors = fileHandler.loadSectors();
-		if (sectors.isEmpty()) {
-			throw new RuntimeException("Failed to load sectors.");
-		}
+	    ArrayList<Sector> sectors = fileHandler.loadSectors();
+	    if (sectors.isEmpty()) {
+	        throw new RuntimeException("Failed to load sectors.");
+	    }
 
-		Sector sector = sectors.stream().filter(s -> s.getName().equalsIgnoreCase(cashier.getSector().getName()))
-				.findFirst().orElse(null);
+	    Sector sector = null;
+	    for (Sector s : sectors) {
+	        if (s.getName().equalsIgnoreCase(cashier.getSector().getName())) {
+	            sector = s;
+	            break;
+	        }
+	    }
 
-		if (sector != null) {
-			System.out.println("Sector found: " + sector.getName());
-			cashier.setSector(sector);
-		} else {
-			throw new RuntimeException("Failed to find the sector: " + cashier.getSector().getName());
-		}
+	    if (sector != null) {
+	        System.out.println("Sector found: " + sector.getName());
+	        cashier.setSector(sector);
+	    } else {
+	        throw new RuntimeException("Failed to find the sector: " + cashier.getSector().getName());
+	    }
 
-		ArrayList<Item> items = fileHandler.loadInventoryBySector(cashier.getSector().getName());
-		cashier.setItems(items);
+	    ArrayList<Item> items = fileHandler.loadInventoryBySector(cashier.getSector().getName());
+	    cashier.setItems(items);
 
-		// Load bills
-		try {
-			ArrayList<Bill> bills = fileHandler.loadBills();
-			cashier.setBills(bills);
-		} catch (Exception e) {
-			System.out.println("Error loading bills: " + e.getMessage());
-		}
+	    // Load bills
+	    try {
+	        ArrayList<Bill> bills = fileHandler.loadBills();
+	        cashier.setBills(bills);
+	    } catch (Exception e) {
+	        System.out.println("Error loading bills: " + e.getMessage());
+	    }
 	}
 
 	private void setupUI() {
@@ -72,8 +76,7 @@ public class CashierController {
 		CashierView cashierView = new CashierView(this, primaryStage, cashier);
 		cashierView.setupUI(mainLayout, centerContent);
 
-		// Set up the scene
-		cashierScene = new Scene(mainLayout, 800, 600);
+		cashierScene = new Scene(mainLayout, 1200, 600);
 		primaryStage.setTitle("Cashier Dashboard");
 		primaryStage.setScene(cashierScene);
 		primaryStage.centerOnScreen();
@@ -102,19 +105,17 @@ public class CashierController {
 		centerContent.getChildren().add(content);
 	}
 
-	// Check if the selected item is out of stock
+	// Is it ou of stock
 	public void handleItemSelection(String selectedItemName) {
 		boolean isOutOfStock = fileHandler.isItemOutOfStock(selectedItemName, cashier.getSector().getName());
 
 		if (isOutOfStock) {
-			// Notify the cashier that the selected item is out of stock
+			// Notify the cashier 
 			CashierView.showOutOfStockAlert(selectedItemName);
 		}
 	}
 
-	public ArrayList<Item> notifyLowStock(int threshold) {
-		return fileHandler.notifyLowStock(threshold);
-	}
+
 
 	public Scene getCashierScene() {
 		return cashierScene;

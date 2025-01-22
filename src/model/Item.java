@@ -16,7 +16,6 @@ public class Item implements Serializable {
     private double price;
     private int stockQuantity;
     private int itemsSold;
-    private int itemQuantity;
     private String imagePath;
     private String category;
     private String description;
@@ -29,7 +28,6 @@ public class Item implements Serializable {
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.itemsSold = 0;
-        this.itemQuantity = stockQuantity;
         this.category = category;
         this.description = description;
         this.supplierName = supplierName;
@@ -37,7 +35,7 @@ public class Item implements Serializable {
     }
 
     // Constructor for Cashier
-    public Item(String itemName, String itemCategory, double price, int stockQuantity, int itemsSold, int itemQuantity) {
+    public Item(String itemName, String itemCategory, double price, int stockQuantity, int itemsSold) {
         this.itemName = itemName;
         //TODO: itemSector should not be itemCategory
         this.itemSector = itemCategory;
@@ -45,34 +43,24 @@ public class Item implements Serializable {
         this.price = price;
         this.stockQuantity = stockQuantity;
         this.itemsSold = itemsSold;
-        this.itemQuantity = itemQuantity;
+
     }
 
-    // Getters and Setters
-    public void setItemQuantity(int itemQuantity) {
-        this.itemQuantity = itemQuantity;
-    }
-
-    public int getItemQuantity() {
-        return itemQuantity;
-    }
+  
 
     public void sellItem(int quantity) {
         if (quantity > stockQuantity) {
             System.out.println("Not enough stock available for: " + itemName);
             return;
         }
-        stockQuantity -= quantity;  // Decrease the stock by the sold quantity
-        itemsSold += quantity;      // Increase the sold count
+        stockQuantity -= quantity;  
+        itemsSold += quantity;      
     }
 
 
     public void restockItem(int quantity) {
 
-this.itemQuantity += quantity;
-
-        this.stockQuantity += quantity;  // Update the stock quantity
-        this.itemQuantity += quantity;  // Update the total item quantity
+     this.stockQuantity += quantity;  // Update the stock quantity
 
     }
   
@@ -138,12 +126,12 @@ this.itemQuantity += quantity;
 
     @Override
     public String toString() {
-        return "Item->" +
-                "Name:'" + itemName + '\'' +
-                ", Category:'" + itemSector + '\'' +
-                ", Price:" + price +
-                ", Stock:" + stockQuantity +
-                ", Items Sold:" + itemsSold;
+        return "Item-> " +
+                "Name: " + itemName + '\'' +
+                ", Category: '" + itemSector + '\'' +
+                ", Price: " + price +
+                ", Stock: " + stockQuantity +
+                ", Items Sold: " + itemsSold;
     }
 
     @Override
@@ -152,9 +140,8 @@ this.itemQuantity += quantity;
         if (o == null || getClass() != o.getClass()) return false;
         Item item = (Item) o;
         return Double.compare(item.price, price) == 0 &&
-                stockQuantity == item.stockQuantity &&
                 itemsSold == item.itemsSold &&
-                itemQuantity == item.itemQuantity &&
+                stockQuantity == item.stockQuantity &&
                 Objects.equals(itemName, item.itemName) &&
                 Objects.equals(itemSector, item.itemSector) &&
                 Objects.equals(category, item.category) &&
@@ -165,6 +152,6 @@ this.itemQuantity += quantity;
 
     @Override
     public int hashCode() {
-        return Objects.hash(itemName, itemSector, price, stockQuantity, itemsSold, itemQuantity, imagePath, category, description, supplierName);
+        return Objects.hash(itemName, itemSector, price, itemsSold, stockQuantity, imagePath, category, description, supplierName);
     }
 }

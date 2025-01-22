@@ -1,7 +1,5 @@
 package util;
 
-import model.Admin;
-import model.Bill;
 import model.Cashier;
 import model.Item;
 import model.Manager;
@@ -10,32 +8,23 @@ import model.Supplier;
 import model.User;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class FileHandlerMANAGER{
-	private ArrayList<Item> items = new ArrayList<>();
-
 	// Constants for file paths CHANGE IF THESE DONT WORK FOR YOU
 	private static final String EMPLOYEE_FILE = "src/BinaryFiles/employees.dat"; // Binary files for employees
-	private static final String INVENTORY_FILE = "src/BinaryFiles/items.dat"; // Binary files for inventory
+	private static final String INVENTORY_FILE = "C:\\Users\\Evina\\git\\Electronics-Store\\src\\BinaryFiles\\items .dat"; // Binary files for inventory
 	private static final String BILL_DIRECTORY = "src/BinaryFiles/Bills/"; // Text files for bills
 	private static final String SECTOR_FILE = "src/BinaryFiles/sectors.dat"; // Path to sector file
 	private static final String SUPPLIER_FILE = "src/BinaryFiles/suppliers.dat"; // Binary files for suppliers
 
-	// Date format for parsing and saving dates
-	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyy");
-
 	public FileHandlerMANAGER() {
 
 	}
-
+	
 	public boolean deleteItemAndUpdateSuppliers(Item item, ArrayList<Item> inventory, ArrayList<Supplier> suppliers) {
 		boolean itemRemoved = inventory.remove(item);
 
@@ -52,8 +41,6 @@ public class FileHandlerMANAGER{
 		}
 		return false;
 	}
-
-	
 
 	// Add a new item to the inventory and save it to the file
 	public void addNewItem(Item newItem) {
@@ -100,6 +87,7 @@ public class FileHandlerMANAGER{
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public ArrayList<Supplier> loadSuppliers() {
 		ArrayList<Supplier> suppliers = new ArrayList<>();
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(SUPPLIER_FILE))) {
@@ -140,6 +128,7 @@ public class FileHandlerMANAGER{
 
 	// Load inventory data from the item.dat file
 	// This method does not modify or update the inventory file
+	@SuppressWarnings("unchecked")
 	public ArrayList<Item> loadInventory() {
 		ArrayList<Item> inventory = new ArrayList<>();
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(INVENTORY_FILE))) {
@@ -157,7 +146,8 @@ public class FileHandlerMANAGER{
 	public static ArrayList<Item> readLowStockItemsFromBinaryFileMANAGER(String fileName, int threshold, ArrayList<Sector> managerSectors) {
 	    ArrayList<Item> lowStockItems = new ArrayList<>();
 	    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))) {
-	        ArrayList<Item> inventory = (ArrayList<Item>) ois.readObject();
+	        @SuppressWarnings("unchecked")
+			ArrayList<Item> inventory = (ArrayList<Item>) ois.readObject();
 	        
 	        // Iterate through the inventory and check stock levels and sector-category match
 	        for (Item item : inventory) {
@@ -197,81 +187,6 @@ public class FileHandlerMANAGER{
 		    return lowStockItems;
 		}
 
-	// Filter items by category
-	public ArrayList<Item> filterItemsByCategory(String category) {
-		ArrayList<Item> filteredItems = new ArrayList<>();
-		ArrayList<Item> inventory = loadInventory(); // Load all items from inventory
-
-		for (Item item : inventory) {
-			if (item.getCategory().equalsIgnoreCase(category)) {
-				filteredItems.add(item); // Add item to list if it matches the category
-			}
-		}
-
-		return filteredItems;
-	}
-
-	// Sort items by price (low to high)
-	public ArrayList<Item> sortItemsByPriceLowToHigh(ArrayList<Item> items) {
-		items.sort(Comparator.comparingDouble(Item::getSellingPrice)); // Sort by selling price (low to high)
-		return items;
-	}
-
-	// Sort items by price (high to low)
-	public ArrayList<Item> sortItemsByPriceHighToLow(ArrayList<Item> items) {
-		items.sort((item1, item2) -> Double.compare(item2.getSellingPrice(), item1.getSellingPrice())); // Sort by
-																										// selling price
-																										// (high to low)
-		return items;
-	}
-
-	// Combine filter and sort (first by category, then by price)
-	public ArrayList<Item> filterAndSortItems(String category, String sortOrder) {
-		ArrayList<Item> inventory = loadInventory(); // Load all items from inventory
-
-		// Step 1: Filter items by category
-		List<Item> filteredItems = inventory.stream()
-				.filter(item -> category == null || category.isEmpty() || item.getCategory().equalsIgnoreCase(category))
-				.collect(Collectors.toList());
-
-		// Step 2: Sort items by category (grouped by category)
-		filteredItems.sort(Comparator.comparing(Item::getCategory)); // Sort by category
-
-		// Step 3: Sort each category by price
-		ArrayList<Item> sortedItems = new ArrayList<>();
-		String currentCategory = "";
-		ArrayList<Item> categoryItems = new ArrayList<>();
-
-		for (Item item : filteredItems) {
-			// If a new category starts, sort the previous category's items and add them to
-			// the sorted list
-			if (!item.getCategory().equalsIgnoreCase(currentCategory)) {
-				if (!categoryItems.isEmpty()) {
-					if ("lowToHigh".equalsIgnoreCase(sortOrder)) {
-						sortItemsByPriceLowToHigh(categoryItems);
-					} else if ("highToLow".equalsIgnoreCase(sortOrder)) {
-						sortItemsByPriceHighToLow(categoryItems);
-					}
-					sortedItems.addAll(categoryItems);
-				}
-				categoryItems.clear(); // Clear previous category items
-				currentCategory = item.getCategory(); // Update to new category
-			}
-			categoryItems.add(item); // Add item to current category's list
-		}
-
-		// Sort and add the last category
-		if (!categoryItems.isEmpty()) {
-			if ("lowToHigh".equalsIgnoreCase(sortOrder)) {
-				sortItemsByPriceLowToHigh(categoryItems);
-			} else if ("highToLow".equalsIgnoreCase(sortOrder)) {
-				sortItemsByPriceHighToLow(categoryItems);
-			}
-			sortedItems.addAll(categoryItems);
-		}
-
-		return sortedItems;
-	}
 
 	public ArrayList<String> loadCategoriesBySectors() {
 		ArrayList<String> categories = new ArrayList<>();
@@ -322,7 +237,8 @@ public class FileHandlerMANAGER{
         ArrayList<Cashier> cashiers = new ArrayList<>();
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(EMPLOYEE_FILE))) {
             // First, read the entire ArrayList of Users
-            ArrayList<User> users = (ArrayList<User>) ois.readObject(); // Read the whole list
+            @SuppressWarnings("unchecked")
+			ArrayList<User> users = (ArrayList<User>) ois.readObject(); // Read the whole list
 
             // Debug: Print Manager Sectors
             System.out.println("Manager Sectors: " + managerSectors);
@@ -395,6 +311,7 @@ public class FileHandlerMANAGER{
 	
 
 	// Load employee data from a binary file
+	@SuppressWarnings("unchecked")
 	public ArrayList<User> loadEmployeeData() {
 		ArrayList<User> employees = new ArrayList<>();
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(EMPLOYEE_FILE))) {

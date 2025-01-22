@@ -1,6 +1,4 @@
 package controller;
-
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
@@ -11,6 +9,7 @@ import model.Manager;
 import model.Sector;
 import model.Supplier;
 import model.Item;
+import util.FileHandler;
 import util.FileHandlerMANAGER;
 import view.*;
 
@@ -23,34 +22,32 @@ public class ManagerController {
     private BorderPane mainLayout;
     private StackPane centerContent;
     private Scene managerScene;
+    private FileHandler fileHandler1;
 
     public ManagerController(Stage primaryStage, Manager manager) {
         this.primaryStage = primaryStage;
         this.manager = manager;
         this.fileHandler = new FileHandlerMANAGER();
+        this.fileHandler1 = new FileHandler();
         this.mainLayout = new BorderPane();
         this.centerContent = new StackPane();
         loadDataFromFiles();
         setupUI();
     }
 
-    private void loadDataFromFiles() {
+    private void loadDataFromFiles() { //Loads data the moment the stage is opened
         ArrayList<Item> items = fileHandler.loadInventory();
         manager.setItems(items);
-
         ArrayList<Supplier> suppliers = fileHandler.loadSuppliers();
         manager.setSuppliers(suppliers);
-
         ArrayList<Sector> loadedSectors = fileHandler.loadManagerSectors();
-        
-        // Assuming 'manager' is a reference to the Manager object and has a setSectors() method
         manager.setSectors(loadedSectors);
     }
 
     private void setupUI() {
         ManagerView managerView = new ManagerView(this, primaryStage, manager, fileHandler);
         managerView.setupUI(mainLayout, centerContent);
-        managerScene = new Scene(mainLayout, 800, 600);
+        managerScene = new Scene(mainLayout, 1200, 600);
         primaryStage.setTitle("Manager Dashboard");
         primaryStage.setScene(managerScene);
         primaryStage.centerOnScreen();
@@ -74,7 +71,7 @@ public class ManagerController {
     }
 
     public void openGenerateReportView() {
-        GenerateReportView generateReportView = new GenerateReportView(manager, fileHandler);
+        GenerateReportView generateReportView = new GenerateReportView(manager, fileHandler1);
         updateCenterContent(generateReportView.getViewContent());
     }
 
@@ -106,12 +103,11 @@ public class ManagerController {
     }
 
     public int getLowStockItemsCount() {
-        // Get the list of sectors the manager is responsible for
+        // gets sectors of manager
         ArrayList<Sector> managerSectors = manager.getSectors();
 
-        // Use fileHandler to get low stock items filtered by manager's sectors
-        ArrayList<Item> lowStockItems = fileHandler.notifyLowStockforManager(5, managerSectors);
-        
+        // low stock items
+        ArrayList<Item> lowStockItems = fileHandler.notifyLowStockforManager(5, managerSectors);     
         return lowStockItems.size();
     }
 

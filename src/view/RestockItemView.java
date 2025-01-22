@@ -11,8 +11,8 @@ import model.Item;
 import model.Manager;
 import util.FileHandlerMANAGER;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class RestockItemView {
 
@@ -28,42 +28,45 @@ public class RestockItemView {
         this.manager = manager;
         this.fileHandler = fileHandler;
     }
-
+    
     public VBox getViewContent() {
-        VBox layout = new VBox(20);
-        layout.setAlignment(Pos.CENTER);
-        layout.setStyle("-fx-background-color: #2C3E50; -fx-padding: 30px; -fx-border-radius: 15px;");
+    VBox layout = new VBox(20);
+    layout.setAlignment(Pos.CENTER);
+    layout.setStyle("-fx-background-color: #2C3E50; -fx-padding: 30px; -fx-border-radius: 15px;");
 
-        // Label and ComboBox for selecting an item to restock
-        Label itemLabel = new Label("Select Item to Restock:");
-        itemLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
+    Label itemLabel = new Label("Select Item to Restock:");
+    itemLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
 
-        ComboBox<String> itemComboBox = new ComboBox<>();
-        styleComboBox(itemComboBox);
+    ComboBox<String> itemComboBox = new ComboBox<>();
+    styleComboBox(itemComboBox);
 
-        // Filter items that need restocking (stock < 5)
-        List<Item> itemsToRestock = manager.getItems().stream()
-                .filter(item -> item.getItemQuantity() < 5)
-                .collect(Collectors.toList());
-
-        if (itemsToRestock.isEmpty()) {
-            VBox errorLayout = new VBox(20);
-            errorLayout.setAlignment(Pos.CENTER);
-            errorLayout.setStyle("-fx-background-color: #2C3E50; -fx-padding: 30px; -fx-border-radius: 15px;");
-            Label errorLabel = new Label("No items need restocking.");
-            errorLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #FF6F61;");
-            errorLayout.getChildren().add(errorLabel);
-            return errorLayout;
+    ArrayList<Item> itemsToRestock = new ArrayList<>();
+    for (Item item : manager.getItems()) {
+        if (item.getStockQuantity() < 5) {
+            itemsToRestock.add(item);
         }
+    }
 
-        itemsToRestock.forEach(item -> itemComboBox.getItems().add(item.getItemName()));
+    if (itemsToRestock.isEmpty()) {
+        VBox errorLayout = new VBox(20);
+        errorLayout.setAlignment(Pos.CENTER);
+        errorLayout.setStyle("-fx-background-color: #2C3E50; -fx-padding: 30px; -fx-border-radius: 15px;");
+        Label errorLabel = new Label("No items need restocking.");
+        errorLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #FF6F61;");
+        errorLayout.getChildren().add(errorLabel);
+        return errorLayout;
+    }
 
-        // Quantity input field and restock button
-        Label quantityLabel = new Label("Restock Quantity:");
-        quantityLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
+    for (Item item : itemsToRestock) {
+        itemComboBox.getItems().add(item.getItemName());
+    }
 
-        TextField quantityField = new TextField();
-        styleTextField(quantityField);
+    Label quantityLabel = new Label("Restock Quantity:");
+    quantityLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
+
+    TextField quantityField = new TextField();
+    styleTextField(quantityField);
+
 
         Button restockButton = new Button("Restock Item");
         styleButton(restockButton);
@@ -90,7 +93,7 @@ public class RestockItemView {
                     return;
                 }
 
-                // Find the selected item in the list of items to restock
+               
                 Item item = findItemByName(selectedItem, itemsToRestock);
                 if (item != null) {
                     // Restock the item
@@ -103,7 +106,7 @@ public class RestockItemView {
 
                     // Refresh the ComboBox after restocking
                     itemComboBox.getItems().clear();
-                    itemsToRestock.forEach(i -> itemComboBox.getItems().add(i.getItemName()));
+                    itemsToRestock.forEach(i -> itemComboBox.getItems().add(i.getItemName()));//lambda expression
 
                 } else {
                     showError("Item not found: " + selectedItem);
@@ -154,10 +157,6 @@ public class RestockItemView {
         alert.setContentText(message);
         alert.showAndWait();
     }
-
-
-
-
 
     public void setFileHandler(FileHandlerMANAGER fileHandler) {
         this.fileHandler = fileHandler;
