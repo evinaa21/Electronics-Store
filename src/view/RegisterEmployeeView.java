@@ -75,7 +75,6 @@ public class RegisterEmployeeView {
 		email = new TextField();
 		Label roleL = new Label("Role");
 		role = new ComboBox<>();
-		role.setValue(Role.Cashier);
 		role.setItems(FXCollections.observableArrayList(Role.values()));
 		
 		Label sectorL = new Label("Sector");
@@ -90,7 +89,13 @@ public class RegisterEmployeeView {
 			sectorPane.getChildren().add(sectorCheckBox);
 		}
 		
-		role.valueProperty().addListener((observable, oldValue, newValue) -> handleRoleChange((Role) newValue));
+        for (CheckBox checkBox : sectorCheckBoxes) {
+            checkBox.setSelected(false);
+            checkBox.setDisable(true);
+            checkBox.setOnAction(null);
+        }
+		
+		role.valueProperty().addListener((observable, oldValue, newValue) -> handleRoleChange(role.getValue()));
 		
 		register = new Button("Register");
 		
@@ -123,8 +128,8 @@ public class RegisterEmployeeView {
 	        checkBox.setDisable(true);
 	        checkBox.setOnAction(null);
 	    }
-
-	    if (role == Role.Manager) {
+		
+		if (role == Role.Manager) {
 	        for (CheckBox checkBox : sectorCheckBoxes) {
 	            checkBox.setDisable(false);
 	        }

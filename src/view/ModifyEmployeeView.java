@@ -59,7 +59,6 @@ public class ModifyEmployeeView {
         }));
 		Label roleL = new Label("Role");
 		role = new ComboBox<>();
-		role.setValue(Role.Cashier);
 		role.setPrefWidth(300);
 		role.setItems(FXCollections.observableArrayList(Role.values()));
 		
@@ -75,7 +74,13 @@ public class ModifyEmployeeView {
 			sectorPane.getChildren().add(sectorCheckBox);
 		}
 		
-		role.valueProperty().addListener((observable, oldValue, newValue) -> handleRoleChange((Role) newValue));
+		for (CheckBox checkBox : sectorCheckBoxes) {
+            checkBox.setSelected(false);
+            checkBox.setDisable(true);
+            checkBox.setOnAction(null);
+        }
+		
+		role.valueProperty().addListener((observable, oldValue, newValue) -> handleRoleChange(role.getValue()));
 		
 		Modify = new Button("Modify");
 		HBox modifyB = new HBox();

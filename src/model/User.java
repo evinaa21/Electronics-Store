@@ -9,7 +9,7 @@ import java.util.Date;
 public abstract class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	public static int idCounter = 1;
+	public static int idCounter = 0;
 	private int id;
     private String name;
     private double salary;
@@ -106,6 +106,10 @@ public abstract class User implements Serializable {
 
     public String getEmail() {
         return email;
+    }
+    
+    public static void resetIdCounter() {
+        idCounter = 0;
     }
     
     @Override
